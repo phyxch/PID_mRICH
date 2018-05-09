@@ -7,3 +7,4 @@ src/*.swp
 obj/*.o
 bin/analysis
 bin/genMassHypo
+bin/calLikelihood

@@ -20,11 +20,12 @@ using namespace std;
 using namespace TMath;
 
 
-genMassHypo::genMassHypo(char *fout): outf(fout)
+genMassHypo::genMassHypo(string outputfile)
 {
  cout<<endl;
  cout<<"genMassHypo::genMassHypo() ----- Constructor ! ------"<<endl;
  cout<<endl;
+ mOutPutFile = outputfile;
  init();
 }
 
@@ -32,8 +33,7 @@ genMassHypo::~genMassHypo()
 {
  cout<<"genMassHypo::~genMassHypo() ----- Release memory ! ------"<<endl;
  delete mat;
- delete outf;
- delete outputfile;
+ delete File_OutPut;
  delete hNEvtvsP;
  delete h_photonDist_piplus;
  delete h_photonDist_piminus;
@@ -49,8 +49,8 @@ int genMassHypo::init()
 
  mat = new material(); //// initialize the material
 
- cout<<"genMassHypo::init(), create output file: "<< outf <<endl;
- outputfile = new TFile(outf,"RECREATE");
+ cout<<"genMassHypo::init(), create output file: "<< mOutPutFile.c_str() <<endl;
+ File_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
 
  cout<<"genMassHypo::init(), initialize database histograms ;"<<endl;
  hNEvtvsP = new TH2D("hNEvtvsP","hNEvtvsP",6,-3.0,3.0,65,2.5,15.5);
@@ -124,8 +124,8 @@ int genMassHypo::end()
   cout<<endl;
   cout<<"genMassHypo::end() ----- Write out tree and histogram to files !------"<<endl;
   cout<<"This is the end of this program !"<<endl;
-  if(outputfile != NULL){
-    outputfile->cd();
+  if(File_OutPut != NULL){
+    File_OutPut->cd();
     hNEvtvsP->Write();
     h_photonDist_piplus->Write();
     h_photonDist_piminus->Write();
@@ -133,7 +133,7 @@ int genMassHypo::end()
     h_photonDist_Kminus->Write();
     h_photonDist_proton->Write();
     h_photonDist_antiproton->Write();
-    outputfile->Close();
+    File_OutPut->Close();
   }
   return 0;
 }
@@ -169,10 +169,9 @@ int main(int argc, char **argv)
 {
   TString inputdir = "/work/eic/xusun/output/modular_rich/May02_2018/";
 
-  TString InPutList = "/work/eic/xusun/list/modular_rich/mRICH_test.list";
+  TString InPutList = "/work/eic/xusun/list/modular_rich/mRICH_PDF_test.list";
 
-  char outputf[256];
-  strcpy(outputf,"/work/eic/xusun/output/modular_rich/test/test.root");
+  string outputfile = "/work/eic/xusun/output/modular_rich/test/PDF_database_test.root";
   
   TChain *fevt  = new TChain("generated");
   TChain *fhit  = new TChain("eic_rich");
@@ -213,7 +212,7 @@ int main(int argc, char **argv)
   event *aevt = new event(fevt);  /// declear and save info to branchs for event
   hit *ahit = new hit(fhit);	/// declear and save info to branchs for track
   
-  genMassHypo *genMassHypotheses = new genMassHypo(outputf);
+  genMassHypo *genMassHypotheses = new genMassHypo(outputfile);
   
   int nevent = (int)fevt->GetEntries();
   cout << "total number of events:  " << nevent << endl;

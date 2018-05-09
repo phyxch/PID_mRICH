@@ -1,5 +1,5 @@
-#ifndef genMassHypo_h
-#define genMassHypo_h
+#ifndef calLikelihood_h
+#define calLikelihood_h
 
 #include <iostream> 
 #include <fstream>
@@ -13,9 +13,9 @@
 #include <TChain.h>
 #include "LLTreeDst.h"
 
+//#define doLikelihoodDB
+
 const double DEG=180./3.1415926;
-//const unsigned int nPads=88;   ///// number of photonsenor segmentation pads
-//const double halfWidth=44; // (mm) half width (x) and height (y) of the photon sensor
 const unsigned int nPads=105;   ///// number of photonsenor segmentation pads
 const double halfWidth=52.5; // (mm) half width (x) and height (y) of the photon sensor
 
@@ -25,11 +25,11 @@ class event;
 class hit;
 class material;
 
-class genMassHypo
+class calLikelihood
 {
  public:
-  genMassHypo(string outputfile);
-  ~genMassHypo();
+  calLikelihood(string inputdatebase, string outputfile);
+  ~calLikelihood();
   
   int init();
   int process_event(event *aevt, hit *ahit);
@@ -39,12 +39,13 @@ class genMassHypo
   bool isReflection(hit *ahit, int i);
   bool isOnAerogel(hit *ahit, int i);
   bool isOnPhotonSensor(hit *ahit, int i);
-  void Smearing2D(double inx, double iny, double& outx, double& outy);
-  double probability(TH2D* db, TH2D *hXY);
+  double probability(TH2D* h_database, TH2D *h_photonDist_PID);
   
  private:
   material *mat;
+  string mInPutDataBase;
   string mOutPutFile;
+  TFile *File_InPutDataBase;
   TFile *File_OutPut;
   
   TH2D *hNEvtvsP;
@@ -54,5 +55,8 @@ class genMassHypo
   TH3D *h_photonDist_Kminus;
   TH3D *h_photonDist_proton;
   TH3D *h_photonDist_antiproton;
+  
+  TTree *mTree;
+  LLTreeDst mDst;
 };
 #endif
