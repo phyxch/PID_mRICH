@@ -6,3 +6,4 @@ include/*.swp
 src/*.swp
 obj/*.o
 bin/analysis
+bin/genMassHypo

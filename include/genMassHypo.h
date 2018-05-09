@@ -1,5 +1,5 @@
-#ifndef LIKELIHOOD_H
-#define LIKELIHOOD_H
+#ifndef genMassHypo_h
+#define genMassHypo_h
 
 #include <iostream> 
 #include <fstream>
@@ -15,21 +15,20 @@
 const double DEG=180./3.1415926;
 //const unsigned int nPads=88;   ///// number of photonsenor segmentation pads
 //const double halfWidth=44; // (mm) half width (x) and height (y) of the photon sensor
-const unsigned int nPads=8;   ///// number of photonsenor segmentation pads
-const double halfWidth=24.25; // (mm) half width (x) and height (y) of the photon sensor
+const unsigned int nPads=105;   ///// number of photonsenor segmentation pads
+const double halfWidth=52.5; // (mm) half width (x) and height (y) of the photon sensor
 
 using namespace std;
 
 class event;
 class hit;
 class material;
-class ring;
 
-class likelihood
+class genMassHypo
 {
  public:
-  likelihood(char *fout);
-  ~likelihood();
+  genMassHypo(char *fout);
+  ~genMassHypo();
   
   int init();
   int process_event(event *aevt, hit *ahit);
@@ -43,14 +42,16 @@ class likelihood
   double probability(TH2D* db, TH2D *hXY);
   
  private:
-  TRandom *rd;
   material *mat;
   char *outf;
   TFile *outputfile;
   
   TH2D *hNEvtvsP;
-  TH3D *hPiXYvsP;
-  TH3D *hKaonXYvsP;
-  TH3D *hProtonXYvsP;
+  TH3D *h_photonDist_piplus; // x: photon out_x | y: photon out_y | z: total momentum of generated particle
+  TH3D *h_photonDist_piminus;
+  TH3D *h_photonDist_Kplus;
+  TH3D *h_photonDist_Kminus;
+  TH3D *h_photonDist_proton;
+  TH3D *h_photonDist_antiproton;
 };
 #endif

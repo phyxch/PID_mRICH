@@ -94,11 +94,11 @@ NOOPTOBJS :=  $(BIN)Raw.o $(BIN)TrkSort.o
 SOFLAGS = -G
 
 ############## Make Executables ####################################
-all: analysis 
+all: genMassHypo
 #all: ds kaka pika pipi lambdac charged d0rho thetapp l1520 thetapp2 d0
 
 
-analysis : $(OBJ)likelihood.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o
+genMassHypo : $(OBJ)genMassHypo.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o
 	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
 	@echo
 
