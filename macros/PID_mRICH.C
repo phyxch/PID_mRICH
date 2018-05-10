@@ -3,7 +3,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TChain.h"
-#include "TH1D.h"
+#include "TGraph.h"
 #include "TH2D.h"
 #include "string.h"
 
@@ -52,59 +52,59 @@ void PID_mRICH(const string inputfile = "/work/eic/xusun/output/modular_rich/tes
   fchain->SetBranchAddress("LKaon", &LKaon);
   fchain->SetBranchAddress("Lproton", &Lproton);
 
-  TH2D *h_likelihood_piKplus = new TH2D("h_likelihood_piKplus","h_likelihood_piKplus",65,2.5,15.5,450,-20.0,430.0); // pi to K
-  TH2D *h_likelihood_pipplus = new TH2D("h_likelihood_pipplus","h_likelihood_pipplus",65,2.5,15.5,450,-20.0,430.0); // pi to p
-  double counter_pipiplus = 0.0;
-  double counter_piKplus = 0.0;
-  double counter_pipplus = 0.0;
-  TH1D *h_prob_pipiplus = new TH1D("h_prob_pipiplus","h_prob_pipiplus",65,2.5,15.5); 
-  TH1D *h_prob_piKplus  = new TH1D("h_prob_piKplus","h_prob_piKplus",65,2.5,15.5); 
-  TH1D *h_prob_pipplus  = new TH1D("h_prob_pipplus","h_prob_pipplus",65,2.5,15.5);
+  TH2D *h_likelihood_piplusKplus = new TH2D("h_likelihood_piplusKplus","h_likelihood_piplusKplus",65,2.5,15.5,450,-20.0,430.0); // pi to K
+  TH2D *h_likelihood_piplusproton = new TH2D("h_likelihood_piplusproton","h_likelihood_piplusproton",65,2.5,15.5,450,-20.0,430.0); // pi to p
+  double counter_pipluspiplus = 0.0;
+  double counter_piplusKplus = 0.0;
+  double counter_piplusproton = 0.0;
+  TGraph *g_prob_pipluspiplus = new TGraph();
+  TGraph *g_prob_piplusKplus  = new TGraph();
+  TGraph *g_prob_piplusproton  = new TGraph();
 
-  TH2D *h_likelihood_piKminus = new TH2D("h_likelihood_piKminus","h_likelihood_piKminus",65,2.5,15.5,450,-20.0,430.0);
-  TH2D *h_likelihood_pipminus = new TH2D("h_likelihood_pipminus","h_likelihood_pipminus",65,2.5,15.5,450,-20.0,430.0);
-  double counter_pipiminus = 0.0;
-  double counter_piKminus = 0.0;
-  double counter_pipminus = 0.0;
-  TH1D *h_prob_pipiminus = new TH1D("h_prob_pipiminus","h_prob_pipiminus",65,2.5,15.5);
-  TH1D *h_prob_piKminus  = new TH1D("h_prob_piKminus","h_prob_piKminus",65,2.5,15.5);
-  TH1D *h_prob_pipminus  = new TH1D("h_prob_pipminus","h_prob_pipminus",65,2.5,15.5);
+  TH2D *h_likelihood_piminusKminus = new TH2D("h_likelihood_piminusKminus","h_likelihood_piminusKminus",65,2.5,15.5,450,-20.0,430.0);
+  TH2D *h_likelihood_piminusantiproton = new TH2D("h_likelihood_piminusantiproton","h_likelihood_piminusantiproton",65,2.5,15.5,450,-20.0,430.0);
+  double counter_piminuspiminus = 0.0;
+  double counter_piminusKminus = 0.0;
+  double counter_piminusantiproton = 0.0;
+  TGraph *g_prob_piminuspiminus = new TGraph();
+  TGraph *g_prob_piminusKminus  = new TGraph();
+  TGraph *g_prob_piminusantiproton  = new TGraph();
 
-  TH2D *h_likelihood_Kpiplus = new TH2D("h_likelihood_Kpiplus","h_likelihood_Kpiplus",65,2.5,15.5,450,-20.0,430.0); // K to pi
-  TH2D *h_likelihood_Kpplus = new TH2D("h_likelihood_Kpplus","h_likelihood_Kpplus",65,2.5,15.5,450,-20.0,430.0); // K to p
-  double counter_Kpiplus = 0.0;
-  double counter_KKplus = 0.0;
-  double counter_Kpplus = 0.0;
-  TH1D *h_prob_Kpiplus = new TH1D("h_prob_Kpiplus","h_prob_Kpiplus",65,2.5,15.5);
-  TH1D *h_prob_KKplus  = new TH1D("h_prob_KKplus","h_prob_KKplus",65,2.5,15.5);
-  TH1D *h_prob_Kpplus  = new TH1D("h_prob_Kpplus","h_prob_Kpplus",65,2.5,15.5);
+  TH2D *h_likelihood_Kpluspiplus = new TH2D("h_likelihood_Kpluspiplus","h_likelihood_Kpluspiplus",65,2.5,15.5,450,-20.0,430.0); // K to pi
+  TH2D *h_likelihood_Kplusproton = new TH2D("h_likelihood_Kplusproton","h_likelihood_Kplusproton",65,2.5,15.5,450,-20.0,430.0); // K to p
+  double counter_Kpluspiplus = 0.0;
+  double counter_KplusKplus = 0.0;
+  double counter_Kplusproton = 0.0;
+  TGraph *g_prob_Kpluspiplus = new TGraph();
+  TGraph *g_prob_KplusKplus  = new TGraph();
+  TGraph *g_prob_Kplusproton  = new TGraph();
 
-  TH2D *h_likelihood_Kpiminus = new TH2D("h_likelihood_Kpiminus","h_likelihood_Kpiminus",65,2.5,15.5,450,-20.0,430.0);
-  TH2D *h_likelihood_Kpminus = new TH2D("h_likelihood_Kpminus","h_likelihood_Kpminus",65,2.5,15.5,450,-20.0,430.0);
-  double counter_Kpiminus = 0.0;
-  double counter_KKminus = 0.0;
-  double counter_Kpminus = 0.0;
-  TH1D *h_prob_Kpiminus = new TH1D("h_prob_Kpiminus","h_prob_Kpiminus",65,2.5,15.5);
-  TH1D *h_prob_KKminus  = new TH1D("h_prob_KKminus","h_prob_KKminus",65,2.5,15.5);
-  TH1D *h_prob_Kpminus  = new TH1D("h_prob_Kpminus","h_prob_Kpminus",65,2.5,15.5);
+  TH2D *h_likelihood_Kminuspiminus = new TH2D("h_likelihood_Kminuspiminus","h_likelihood_Kminuspiminus",65,2.5,15.5,450,-20.0,430.0);
+  TH2D *h_likelihood_Kminusantiproton = new TH2D("h_likelihood_Kminusantiproton","h_likelihood_Kminusantiproton",65,2.5,15.5,450,-20.0,430.0);
+  double counter_Kminuspiminus = 0.0;
+  double counter_KminusKminus = 0.0;
+  double counter_Kminusantiproton = 0.0;
+  TGraph *g_prob_Kminuspiminus = new TGraph();
+  TGraph *g_prob_KminusKminus  = new TGraph();
+  TGraph *g_prob_Kminusantiproton  = new TGraph();
   
-  TH2D *h_likelihood_ppiplus = new TH2D("h_likelihood_ppiplus","h_likelihood_ppiplus",65,2.5,15.5,450,-20.0,430.0); // p to pi
-  TH2D *h_likelihood_pKplus = new TH2D("h_likelihood_pKplus","h_likelihood_pKplus",65,2.5,15.5,450,-20.0,430.0); // p to K
-  double counter_ppplus = 0.0;
-  double counter_ppiplus = 0.0;
-  double counter_pKplus = 0.0;
-  TH1D *h_prob_ppiplus = new TH1D("h_prob_ppiplus","h_prob_ppiplus",65,2.5,15.5);
-  TH1D *h_prob_pKplus  = new TH1D("h_prob_pKplus","h_prob_pKplus",65,2.5,15.5);
-  TH1D *h_prob_ppplus  = new TH1D("h_prob_ppplus","h_prob_ppplus",65,2.5,15.5);
+  TH2D *h_likelihood_protonpiplus = new TH2D("h_likelihood_protonpiplus","h_likelihood_protonpiplus",65,2.5,15.5,450,-20.0,430.0); // p to pi
+  TH2D *h_likelihood_protonKplus = new TH2D("h_likelihood_protonKplus","h_likelihood_protonKplus",65,2.5,15.5,450,-20.0,430.0); // p to K
+  double counter_protonpiplus = 0.0;
+  double counter_protonKplus = 0.0;
+  double counter_protonproton = 0.0;
+  TGraph *g_prob_protonpiplus = new TGraph();
+  TGraph *g_prob_protonKplus  = new TGraph();
+  TGraph *g_prob_protonproton  = new TGraph();
 
-  TH2D *h_likelihood_ppiminus = new TH2D("h_likelihood_ppiminus","h_likelihood_ppiminus",65,2.5,15.5,450,-20.0,430.0);
-  TH2D *h_likelihood_pKminus = new TH2D("h_likelihood_pKminus","h_likelihood_pKminus",65,2.5,15.5,450,-20.0,430.0);
-  double counter_ppminus = 0.0;
-  double counter_ppiminus = 0.0;
-  double counter_pKminus = 0.0;
-  TH1D *h_prob_ppiminus = new TH1D("h_prob_ppiminus","h_prob_ppiminus",65,2.5,15.5);
-  TH1D *h_prob_pKminus  = new TH1D("h_prob_pKminus","h_prob_pKminus",65,2.5,15.5);
-  TH1D *h_prob_ppminus  = new TH1D("h_prob_ppminus","h_prob_ppminus",65,2.5,15.5);
+  TH2D *h_likelihood_antiprotonpiminus = new TH2D("h_likelihood_antiprotonpiminus","h_likelihood_antiprotonpiminus",65,2.5,15.5,450,-20.0,430.0);
+  TH2D *h_likelihood_antiprotonKminus = new TH2D("h_likelihood_antiprotonKminus","h_likelihood_antiprotonKminus",65,2.5,15.5,450,-20.0,430.0);
+  double counter_antiprotonpiminus = 0.0;
+  double counter_antiprotonKminus = 0.0;
+  double counter_antiprotonantiproton = 0.0;
+  TGraph *g_prob_antiprotonpiminus = new TGraph();
+  TGraph *g_prob_antiprotonKminus  = new TGraph();
+  TGraph *g_prob_antiprotonantiproton  = new TGraph();
 
   Int_t nEvents = fchain->GetEntries();
   for(int i_event = 0; i_event < nEvents; i_event++)
@@ -116,124 +116,142 @@ void PID_mRICH(const string inputfile = "/work/eic/xusun/output/modular_rich/tes
 
     if(pid == 211) 
     {
-      h_likelihood_piKplus->Fill(mom,Lpion-LKaon);
-      h_likelihood_pipplus->Fill(mom,Lpion-Lproton);
-      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_pipiplus++;
-      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_piKplus++;
-      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_pipplus++;
+      h_likelihood_piplusKplus->Fill(mom,Lpion-LKaon);
+      h_likelihood_piplusproton->Fill(mom,Lpion-Lproton);
+      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_pipluspiplus++;
+      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_piplusKplus++;
+      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_piplusproton++;
     }
     else if(pid == -211)
     {
-      h_likelihood_piKminus->Fill(mom,Lpion-LKaon);
-      h_likelihood_pipminus->Fill(mom,Lpion-Lproton);
-      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_pipiminus++;
-      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_piKminus++;
-      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_pipminus++;
+      h_likelihood_piminusKminus->Fill(mom,Lpion-LKaon);
+      h_likelihood_piminusantiproton->Fill(mom,Lpion-Lproton);
+      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_piminuspiminus++;
+      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_piminusKminus++;
+      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_piminusantiproton++;
     }
     else if(pid == 321) 
     {
-      h_likelihood_Kpiplus->Fill(mom,LKaon-Lpion);
-      h_likelihood_Kpplus->Fill(mom,LKaon-Lproton);
-      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_Kpiplus++;
-      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_KKplus++;
-      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_Kpplus++;
+      h_likelihood_Kpluspiplus->Fill(mom,LKaon-Lpion);
+      h_likelihood_Kplusproton->Fill(mom,LKaon-Lproton);
+      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_Kpluspiplus++;
+      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_KplusKplus++;
+      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_Kplusproton++;
     }
     else if(pid == -321)
     {
-      h_likelihood_Kpiminus->Fill(mom,LKaon-Lpion);
-      h_likelihood_Kpminus->Fill(mom,LKaon-Lproton);
-      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_Kpiminus++;
-      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_KKminus++;
-      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_Kpminus++;
+      h_likelihood_Kminuspiminus->Fill(mom,LKaon-Lpion);
+      h_likelihood_Kminusantiproton->Fill(mom,LKaon-Lproton);
+      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_Kminuspiminus++;
+      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_KminusKminus++;
+      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_Kminusantiproton++;
     }
     else if(pid == 2212) 
     {
-      h_likelihood_ppiplus->Fill(mom,Lproton-Lpion);
-      h_likelihood_pKplus->Fill(mom,Lproton-LKaon);
-      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_ppiplus++;
-      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_pKplus++;
-      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_ppplus++;
+      h_likelihood_protonpiplus->Fill(mom,Lproton-Lpion);
+      h_likelihood_protonKplus->Fill(mom,Lproton-LKaon);
+      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_protonpiplus++;
+      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_protonKplus++;
+      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_protonproton++;
     }
-    else if(pid == -321)
+    else if(pid == -2212)
     {
-      h_likelihood_ppiminus->Fill(mom,Lproton-Lpion);
-      h_likelihood_pKminus->Fill(mom,Lproton-LKaon);
-      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_ppiminus++;
-      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_pKminus++;
-      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_ppminus++;
+      h_likelihood_antiprotonpiminus->Fill(mom,Lproton-Lpion);
+      h_likelihood_antiprotonKminus->Fill(mom,Lproton-LKaon);
+      if( (Lpion-LKaon) > 0.0 && (Lpion-Lproton) > 0.0) counter_antiprotonpiminus++;
+      if( (LKaon-Lpion) > 0.0 && (LKaon-Lproton) > 0.0) counter_antiprotonKminus++;
+      if( (Lproton-Lpion) > 0.0 && (Lproton-LKaon) > 0.0) counter_antiprotonantiproton++;
     }
   }
 
-  double sum_piplus = counter_pipiplus + counter_piKplus + counter_pipplus;
-  h_prob_pipiplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_pipiplus/sum_piplus);
-  h_prob_piKplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_piKplus/sum_piplus);
-  h_prob_pipplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_pipplus/sum_piplus);
+  double sum_piplus = counter_pipluspiplus + counter_piplusKplus + counter_piplusproton;
+  g_prob_pipluspiplus->SetPoint(0,5.0,counter_pipluspiplus/sum_piplus);
+  g_prob_pipluspiplus->SetName("g_prob_pipluspiplus");
+  g_prob_piplusKplus->SetPoint(0,5.0,counter_piplusKplus/sum_piplus);
+  g_prob_piplusKplus->SetName("g_prob_piplusKplus");
+  g_prob_piplusproton->SetPoint(0,5.0,counter_piplusproton/sum_piplus);
+  g_prob_piplusproton->SetName("g_prob_piplusproton");
 
-  double sum_piminus = counter_pipiminus + counter_piKminus + counter_pipiminus;
-  h_prob_pipiminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_pipiminus/sum_piminus);
-  h_prob_piKminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_piKminus/sum_piminus);
-  h_prob_pipminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_pipminus/sum_piminus);
+  double sum_piminus = counter_piminuspiminus + counter_piminusKminus + counter_piminusantiproton;
+  g_prob_piminuspiminus->SetPoint(0,5.0,counter_piminuspiminus/sum_piminus);
+  g_prob_piminuspiminus->SetName("g_prob_piminuspiminus");
+  g_prob_piminusKminus->SetPoint(0,5.0,counter_piminusKminus/sum_piminus);
+  g_prob_piminusKminus->SetName("g_prob_piminusKminus");
+  g_prob_piminusantiproton->SetPoint(0,5.0,counter_piminusantiproton/sum_piminus);
+  g_prob_piminusantiproton->SetName("g_prob_piminusantiproton");
 
-  double sum_Kplus = counter_Kpiplus + counter_KKplus + counter_Kpplus;
-  h_prob_Kpiplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_Kpiplus/sum_Kplus);
-  h_prob_KKplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_KKplus/sum_Kplus);
-  h_prob_Kpplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_Kpplus/sum_Kplus);
+  double sum_Kplus = counter_Kpluspiplus + counter_KplusKplus + counter_Kplusproton;
+  g_prob_Kpluspiplus->SetPoint(0,5.0,counter_Kpluspiplus/sum_Kplus);
+  g_prob_Kpluspiplus->SetName("g_prob_Kpluspiplus");
+  g_prob_KplusKplus->SetPoint(0,5.0,counter_KplusKplus/sum_Kplus);
+  g_prob_KplusKplus->SetName("g_prob_KplusKplus");
+  g_prob_Kplusproton->SetPoint(0,5.0,counter_Kplusproton/sum_Kplus);
+  g_prob_Kplusproton->SetName("g_prob_Kplusproton");
 
-  double sum_Kminus = counter_Kpiminus + counter_KKminus + counter_Kpiminus;
-  h_prob_Kpiminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_Kpiminus/sum_Kminus);
-  h_prob_KKminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_KKminus/sum_Kminus);
-  h_prob_Kpminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_Kpminus/sum_Kminus);
+  double sum_Kminus = counter_Kminuspiminus + counter_KminusKminus + counter_Kminuspiminus;
+  g_prob_Kminuspiminus->SetPoint(0,5.0,counter_Kminuspiminus/sum_Kminus);
+  g_prob_Kminuspiminus->SetName("g_prob_Kminuspiminus");
+  g_prob_KminusKminus->SetPoint(0,5.0,counter_KminusKminus/sum_Kminus);
+  g_prob_KminusKminus->SetName("g_prob_KminusKminus");
+  g_prob_Kminusantiproton->SetPoint(0,5.0,counter_Kminusantiproton/sum_Kminus);
+  g_prob_Kminusantiproton->SetName("g_prob_Kminusantiproton");
 
-  double sum_pplus = counter_ppiplus + counter_pKplus + counter_ppplus;
-  h_prob_ppiplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_ppiplus/sum_pplus);
-  h_prob_pKplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_pKplus/sum_pplus);
-  h_prob_ppplus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_ppplus/sum_pplus);
+  double sum_pplus = counter_protonpiplus + counter_protonKplus + counter_protonproton;
+  g_prob_protonpiplus->SetPoint(0,5.0,counter_protonpiplus/sum_pplus);
+  g_prob_protonpiplus->SetName("g_prob_protonpiplus");
+  g_prob_protonKplus->SetPoint(0,5.0,counter_protonKplus/sum_pplus);
+  g_prob_protonKplus->SetName("g_prob_protonKplus");
+  g_prob_protonproton->SetPoint(0,5.0,counter_protonproton/sum_pplus);
+  g_prob_protonproton->SetName("g_prob_protonproton");
 
-  double sum_pminus = counter_ppiminus + counter_pKminus + counter_ppiminus;
-  h_prob_ppiminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_ppiminus/sum_pminus);
-  h_prob_pKminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_pKminus/sum_pminus);
-  h_prob_ppminus->SetBinContent(h_prob_pipiplus->FindBin(5.0),counter_ppminus/sum_pminus);
+  double sum_pminus = counter_antiprotonpiminus + counter_antiprotonKminus + counter_antiprotonantiproton;
+  g_prob_antiprotonpiminus->SetPoint(0,5.0,counter_antiprotonpiminus/sum_pminus);
+  g_prob_antiprotonpiminus->SetName("g_prob_antiprotonpiminus");
+  g_prob_antiprotonKminus->SetPoint(0,5.0,counter_antiprotonKminus/sum_pminus);
+  g_prob_antiprotonKminus->SetName("g_prob_antiprotonKminus");
+  g_prob_antiprotonantiproton->SetPoint(0,5.0,counter_antiprotonantiproton/sum_pminus);
+  g_prob_antiprotonantiproton->SetName("g_prob_antiprotonantiproton");
   
   TFile *Fill_OutPut = new TFile("/work/eic/xusun/output/modular_rich/test/LogLikelihood.root","RECREATE");
 
-  h_likelihood_piKplus->Write();
-  h_likelihood_piKminus->Write();
-  h_likelihood_pipplus->Write();
-  h_likelihood_pipminus->Write();
+  h_likelihood_piplusKplus->Write();
+  h_likelihood_piminusKminus->Write();
+  h_likelihood_piplusproton->Write();
+  h_likelihood_piminusantiproton->Write();
 
-  h_likelihood_Kpiplus->Write();
-  h_likelihood_Kpiminus->Write();
-  h_likelihood_Kpplus->Write();
-  h_likelihood_Kpminus->Write();
+  h_likelihood_Kpluspiplus->Write();
+  h_likelihood_Kminuspiminus->Write();
+  h_likelihood_Kplusproton->Write();
+  h_likelihood_Kminusantiproton->Write();
   
-  h_likelihood_ppiplus->Write();
-  h_likelihood_ppiminus->Write();
-  h_likelihood_pKplus->Write();
-  h_likelihood_pKminus->Write();
+  h_likelihood_protonpiplus->Write();
+  h_likelihood_antiprotonpiminus->Write();
+  h_likelihood_protonKplus->Write();
+  h_likelihood_antiprotonKminus->Write();
 
-  h_prob_pipiplus->Write();
-  h_prob_piKplus->Write();
-  h_prob_pipplus->Write();
+  g_prob_pipluspiplus->Write();
+  g_prob_piplusKplus->Write();
+  g_prob_piplusproton->Write();
 
-  h_prob_pipiminus->Write();
-  h_prob_piKminus->Write();
-  h_prob_pipminus->Write();
+  g_prob_piminuspiminus->Write();
+  g_prob_piminusKminus->Write();
+  g_prob_piminusantiproton->Write();
 
-  h_prob_Kpiplus->Write();
-  h_prob_KKplus->Write();
-  h_prob_Kpplus->Write();
+  g_prob_Kpluspiplus->Write();
+  g_prob_KplusKplus->Write();
+  g_prob_Kplusproton->Write();
 
-  h_prob_Kpiminus->Write();
-  h_prob_KKminus->Write();
-  h_prob_Kpminus->Write();
+  g_prob_Kminuspiminus->Write();
+  g_prob_KminusKminus->Write();
+  g_prob_Kminusantiproton->Write();
 
-  h_prob_ppiplus->Write();
-  h_prob_pKplus->Write();
-  h_prob_ppplus->Write();
+  g_prob_protonpiplus->Write();
+  g_prob_protonKplus->Write();
+  g_prob_protonproton->Write();
 
-  h_prob_ppiminus->Write();
-  h_prob_pKminus->Write();
-  h_prob_ppminus->Write();
+  g_prob_antiprotonpiminus->Write();
+  g_prob_antiprotonKminus->Write();
+  g_prob_antiprotonantiproton->Write();
   
   Fill_OutPut->Close();
 }
