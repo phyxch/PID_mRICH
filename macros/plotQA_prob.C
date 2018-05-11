@@ -46,9 +46,8 @@ void plotQA_prob(int pid = 211)
 
   if(particle.first == -1) return;
 
-  string date = "test/";
-  string input_dir = Form("/work/eic/xusun/output/modular_rich/%s",date.c_str());
-  string inputfile = Form("%sLogLikelihood.root",input_dir.c_str());
+  string date = "May10_2018";
+  string inputfile = Form("/work/eic/xusun/output/likelihood/LogLikelihood_%s.root",date.c_str());
   cout << "read in file: " << inputfile.c_str() << endl;
   TFile *File_InPut = TFile::Open(inputfile.c_str());
   assert(File_InPut);

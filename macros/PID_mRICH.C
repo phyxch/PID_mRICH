@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void PID_mRICH(const string inputfile = "/work/eic/xusun/output/modular_rich/test/PID_Likelihood_test.root") 
+void PID_mRICH(const string inputfile = "/work/eic/xusun/output/likelihood/PID_Likelihood_May10_2018.root") 
 {
   Int_t           pid;
   Float_t         px;
@@ -212,7 +212,7 @@ void PID_mRICH(const string inputfile = "/work/eic/xusun/output/modular_rich/tes
   g_prob_antiprotonantiproton->SetPoint(0,5.0,counter_antiprotonantiproton/sum_pminus);
   g_prob_antiprotonantiproton->SetName("g_prob_antiprotonantiproton");
   
-  TFile *Fill_OutPut = new TFile("/work/eic/xusun/output/modular_rich/test/LogLikelihood.root","RECREATE");
+  TFile *Fill_OutPut = new TFile("/work/eic/xusun/output/likelihood/LogLikelihood_May10_2018.root","RECREATE");
 
   h_likelihood_piplusKplus->Write();
   h_likelihood_piminusKminus->Write();

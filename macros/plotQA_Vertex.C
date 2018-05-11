@@ -14,14 +14,12 @@ using namespace std;
 
 std::pair<int,std::string> get_particle(int pid)
 {
-  if(pid ==  14)    return std::pair<int,std::string>(pid,"pikpplus");
   if(pid ==  211)   return std::pair<int,std::string>(pid,"piplus");
-  if(pid ==  321)   return std::pair<int,std::string>(pid,"kplus");
-  if(pid ==  2212)  return std::pair<int,std::string>(pid,"pplus");
-  if(pid == -14)    return std::pair<int,std::string>(pid,"pikpminus");
+  if(pid ==  321)   return std::pair<int,std::string>(pid,"Kplus");
+  if(pid ==  2212)  return std::pair<int,std::string>(pid,"proton");
   if(pid == -211)   return std::pair<int,std::string>(pid,"piminus");
-  if(pid == -321)   return std::pair<int,std::string>(pid,"kminus");
-  if(pid == -2212)  return std::pair<int,std::string>(pid,"pminus");
+  if(pid == -321)   return std::pair<int,std::string>(pid,"Kminus");
+  if(pid == -2212)  return std::pair<int,std::string>(pid,"antiproton");
   else return std::pair<int,std::string>(-1,"undefined");
 }
 
@@ -32,9 +30,9 @@ void plotQA_Vertex(int pid = 211)
 
   if(particle.first == -1) return;
 
-  int runid = 14;
+  int runid = 4;
 
-  string date = "May02_2018/";
+  string date = "May10_2018/";
   string input_dir = Form("/work/eic/xusun/output/modular_rich/%s",date.c_str());
   string inputfile = Form("%sout.%s.%d.root",input_dir.c_str(),particle.second.c_str(),runid);
   cout << "read in file: " << inputfile.c_str() << endl;
@@ -53,9 +51,7 @@ void plotQA_Vertex(int pid = 211)
   c_rich->cd()->SetTicks(1,1);
 
   TH2F *h_vertex_rich = new TH2F("h_vertex_rich","h_vertex_rich",151,-75.5,75.5,151,-75.5,75.5);
-  if(abs(pid) > 100) eic_rich->Draw("mvy:mvx>>h_vertex_rich","mpid==PID","colz");
-  else eic_rich->Draw("mvy:mvx>>h_vertex_rich","abs(mpid)==211 || abs(mpid)==321 || abs(mpid)==2212","colz");
-  // else eic_rich->Draw("mvy:mvx>>h_vertex_rich","abs(mpid)==2212","colz");
+  eic_rich->Draw("mvy:mvx>>h_vertex_rich","mpid==PID","colz");
 
   h_vertex_rich->SetTitle(particle.second.c_str());
   // h_vertex_rich->SetStats(0);
@@ -82,9 +78,7 @@ void plotQA_Vertex(int pid = 211)
   c_generated->cd()->SetTicks(1,1);
 
   TH2F *h_vertex_generated = new TH2F("h_vertex_generated","h_vertex_generated",151,-75.5,75.5,151,-75.5,75.5);
-  if(abs(pid) > 100) generated->Draw("vy:vx>>h_vertex_generated","pid==PID","colz");
-  else generated->Draw("vy:vx>>h_vertex_generated","abs(pid)==211 || abs(pid)==321 || abs(pid)==2212","colz");
-  // else generated->Draw("vy:vx>>h_vertex_generated","abs(pid)==2212","colz");
+  generated->Draw("vy:vx>>h_vertex_generated","pid==PID","colz");
 
   h_vertex_generated->SetTitle(particle.second.c_str());
   // h_vertex_generated->SetStats(0);

@@ -44,9 +44,8 @@ void plotQA_likelihood(int pid = 211)
 
   if(particle.first == -1) return;
 
-  string date = "test/";
-  string input_dir = Form("/work/eic/xusun/output/modular_rich/%s",date.c_str());
-  string inputfile = Form("%sLogLikelihood.root",input_dir.c_str());
+  string date = "May10_2018";
+  string inputfile = Form("/work/eic/xusun/output/likelihood/LogLikelihood_%s.root",date.c_str());
   cout << "read in file: " << inputfile.c_str() << endl;
   TFile *File_InPut = TFile::Open(inputfile.c_str());
   assert(File_InPut);
@@ -72,8 +71,9 @@ void plotQA_likelihood(int pid = 211)
   }
 
   c_likelihood->cd(1);
+  string title_1st = Form("%s vs. %s",particle.second.c_str(),misIdentified.first.c_str());
   string label_1st = Form("Log(%s) - Log(%s)",particle.second.c_str(),misIdentified.first.c_str());
-  h_misIdentified_1st->SetTitle(particle.second.c_str());
+  h_misIdentified_1st->SetTitle(title_1st.c_str());
   h_misIdentified_1st->SetStats(0);
 
   h_misIdentified_1st->GetXaxis()->SetTitle("generated momentum (GeV/c)");
@@ -88,8 +88,9 @@ void plotQA_likelihood(int pid = 211)
   h_misIdentified_1st->Draw("colz");
 
   c_likelihood->cd(2);
+  string title_2nd = Form("%s vs. %s",particle.second.c_str(),misIdentified.second.c_str());
   string label_2nd = Form("Log(%s) - Log(%s)",particle.second.c_str(),misIdentified.second.c_str());
-  h_misIdentified_2nd->SetTitle(particle.second.c_str());
+  h_misIdentified_2nd->SetTitle(title_2nd.c_str());
   h_misIdentified_2nd->SetStats(0);
 
   h_misIdentified_2nd->GetXaxis()->SetTitle("generated momentum (GeV/c)");

@@ -167,20 +167,21 @@ bool genMassHypo::isOnPhotonSensor(hit *ahit, int i)
 ////// This is the main function 
 int main(int argc, char **argv)
 {
-  TString inputdir = "/work/eic/xusun/output/modular_rich/May02_2018/";
+  string date = "May10_2018";
 
-  TString InPutList = "/work/eic/xusun/list/modular_rich/mRICH_PDF_test.list";
+  string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",date.c_str());
+  string InPutList = Form("/work/eic/xusun/list/modular_rich/mRICH_PDF_%s.list",date.c_str());
 
-  string outputfile = "/work/eic/xusun/output/modular_rich/test/PDF_database_test.root";
+  string outputfile = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
   
   TChain *fevt  = new TChain("generated");
   TChain *fhit  = new TChain("eic_rich");
 
-  if (!InPutList.IsNull())   // if input file is ok
+  if (!InPutList.empty())   // if input file is ok
   {
     TString InFo_List ="Open test file list ";
     cout << InFo_List.Data() << endl;
-    ifstream in(InPutList);  // input stream
+    ifstream in(InPutList.c_str());  // input stream
     if(in)
     {
       cout << "input file list is ok" << endl;

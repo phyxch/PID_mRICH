@@ -15,14 +15,12 @@ using namespace std;
 
 std::pair<int,std::string> get_particle(int pid)
 {
-  if(pid ==  14)    return std::pair<int,std::string>(pid,"pikpplus");
   if(pid ==  211)   return std::pair<int,std::string>(pid,"piplus");
-  if(pid ==  321)   return std::pair<int,std::string>(pid,"kplus");
-  if(pid ==  2212)  return std::pair<int,std::string>(pid,"pplus");
-  if(pid == -14)    return std::pair<int,std::string>(pid,"pikpminus");
+  if(pid ==  321)   return std::pair<int,std::string>(pid,"Kplus");
+  if(pid ==  2212)  return std::pair<int,std::string>(pid,"proton");
   if(pid == -211)   return std::pair<int,std::string>(pid,"piminus");
-  if(pid == -321)   return std::pair<int,std::string>(pid,"kminus");
-  if(pid == -2212)  return std::pair<int,std::string>(pid,"pminus");
+  if(pid == -321)   return std::pair<int,std::string>(pid,"Kminus");
+  if(pid == -2212)  return std::pair<int,std::string>(pid,"antiproton");
   else return std::pair<int,std::string>(-1,"undefined");
 }
 
@@ -33,9 +31,9 @@ void plotQA_photon(int pid = 211)
 
   if(particle.first == -1) return;
 
-  int runid = 14;
+  int runid = 4;
 
-  string date = "May02_2018/";
+  string date = "May10_2018/";
   string input_dir = Form("/work/eic/xusun/output/modular_rich/%s",date.c_str());
   string inputfile = Form("%sout.%s.%d.root",input_dir.c_str(),particle.second.c_str(),runid);
   cout << "read in file: " << inputfile.c_str() << endl;
@@ -54,8 +52,7 @@ void plotQA_photon(int pid = 211)
   c_mRICH->cd()->SetTicks(1,1);
 
   TH3F *h_photon_mRICH = new TH3F("h_photon_mRICH","h_photon_mRICH",230,60.5,299.5,151,-75.5,75.5,151,-75.5,75.5); // 1mm*1mm pixel
-  if(abs(pid) > 100) eic_rich->Draw("out_x:out_y:out_z>>h_photon_mRICH","mpid==PID && pid==0");
-  else eic_rich->Draw("out_x:out_y:out_z>>h_photon_mRICH","(abs(mpid)==211 || abs(mpid)==321 || abs(mpid)==2212) && pid==0");
+  eic_rich->Draw("out_x:out_y:out_z>>h_photon_mRICH","mpid==PID && pid==0");
 
   h_photon_mRICH->SetTitle(particle.second.c_str());
   h_photon_mRICH->SetStats(0);
@@ -80,8 +77,7 @@ void plotQA_photon(int pid = 211)
   c_sensor->cd()->SetTicks(1,1);
 
   TH2F *h_photon_sensor = new TH2F("h_photon_sensor","h_photon_sensor",151,-75.5,75.5,151,-75.5,75.5); // 1mm*1mm pixel
-  if(abs(pid) > 100) eic_rich->Draw("out_y:out_x>>h_photon_sensor","mpid==PID && pid==0 && out_z>200.0","colz");
-  else eic_rich->Draw("out_y:out_x>>h_photon_sensor","(abs(mpid)==211 || abs(mpid)==321 || abs(mpid)==2212) && pid==0 && out_z>200.0");
+  eic_rich->Draw("out_y:out_x>>h_photon_sensor","mpid==PID && pid==0 && out_z>200.0","colz");
 
   h_photon_sensor->SetTitle(particle.second.c_str());
   h_photon_sensor->SetStats(0);
