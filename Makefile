@@ -98,7 +98,7 @@ all: genMassHypo
 #all: ds kaka pika pipi lambdac charged d0rho thetapp l1520 thetapp2 d0
 
 
-genMassHypo : $(OBJ)genMassHypo.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o
+genMassHypo : $(OBJ)genMassHypo.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o $(OBJ)Utility.o
 	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
 	@echo
 

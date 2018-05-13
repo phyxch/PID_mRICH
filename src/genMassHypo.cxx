@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <cmath> 
 #include <math.h> 
+#include <utility>
 #include "string.h"
 #include <TFile.h>
 #include <TF1.h>
@@ -15,6 +16,7 @@
 #include "../include/hit.h"
 #include "../include/material.h"
 #include "../include/genMassHypo.h"
+#include "../include/Utility.h"
 
 using namespace std;
 using namespace TMath;
@@ -33,14 +35,8 @@ genMassHypo::~genMassHypo()
 {
  cout<<"genMassHypo::~genMassHypo() ----- Release memory ! ------"<<endl;
  delete mat;
+ delete utility;
  delete File_OutPut;
- delete hNEvtvsP;
- delete h_photonDist_piplus;
- delete h_photonDist_piminus;
- delete h_photonDist_Kplus;
- delete h_photonDist_Kminus;
- delete h_photonDist_proton;
- delete h_photonDist_antiproton;
 }
 
 int genMassHypo::init()
@@ -48,21 +44,33 @@ int genMassHypo::init()
  cout<<"genMassHypo::init() ----- Initialization ! ------"<<endl;
 
  mat = new material(); //// initialize the material
+ utility = new Utility(); // initialize utility class
 
  cout<<"genMassHypo::init(), create output file: "<< mOutPutFile.c_str() <<endl;
  File_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
 
  cout<<"genMassHypo::init(), initialize database histograms ;"<<endl;
- hNEvtvsP = new TH2D("hNEvtvsP","hNEvtvsP",6,-3.0,3.0,65,2.5,15.5);
 
- h_photonDist_piplus = new TH3D("h_photonDist_piplus","h_photonDist_piplus",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth,65,2.5,15.5);
- h_photonDist_piminus = new TH3D("h_photonDist_piminus","h_photonDist_piminus",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth,65,2.5,15.5);
+std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
+ for(int i_pid = 0; i_pid < 6; ++i_pid)
+ {
+   for(int i_vx = 0; i_vx < 5; ++i_vx)
+   {
+     for(int i_vy = 0; i_vy < 5; ++i_vy)
+     {
+       for(int i_mom = 0; i_mom < 10; ++i_mom)
+       {
+	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
+	 hNEvtvsP[key_events] = new TH1D(key_events.c_str(),key_events.c_str(),1,-0.5,0.5);
 
- h_photonDist_Kplus = new TH3D("h_photonDist_Kplus","h_photonDist_Kplus",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth,65,2.5,15.5);
- h_photonDist_Kminus = new TH3D("h_photonDist_Kminus","h_photonDist_Kminus",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth,65,2.5,15.5);
- 
- h_photonDist_proton = new TH3D("h_photonDist_proton","h_photonDist_proton",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth,65,2.5,15.5);
- h_photonDist_antiproton = new TH3D("h_photonDist_antiproton","h_photonDist_antiproton",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth,65,2.5,15.5);
+	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
+	 h_photonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth);
+       }
+     }
+   }
+ }
 
  return 0;
 }
@@ -85,21 +93,25 @@ int genMassHypo::process_event(event *aevt, hit *ahit)
     px_gen=aevt->get_px()->at(i)/1e3;    //in MeV, convert to GeV
     py_gen=aevt->get_py()->at(i)/1e3;    //in MeV, convert to GeV
     pz_gen=aevt->get_pz()->at(i)/1e3;    //in MeV, convert to GeV
-    vx_gen=aevt->get_vx()->at(i)/1e1;    //in mm, convert to cm
-    vy_gen=aevt->get_vy()->at(i)/1e1;    //in mm, convert to cm
-    vz_gen=aevt->get_vz()->at(i)/1e1;    //in mm, convert to cm
+    vx_gen=aevt->get_vx()->at(i);        //in mm
+    vy_gen=aevt->get_vy()->at(i);        //in mm
+    vz_gen=aevt->get_vz()->at(i);        //in mm
     p_gen=sqrt(px_gen*px_gen+py_gen*py_gen+pz_gen*pz_gen);
     theta_gen=acos(pz_gen/p_gen)*DEG;    //in deg
     phi_gen=atan2(py_gen,px_gen)*DEG;    //in deg            
   }  
   
-  if(pid_gen==-211) hNEvtvsP->Fill(-2.5,p_gen);
-  else if(pid_gen==-321) hNEvtvsP->Fill(-1.5,p_gen);
-  else if(pid_gen==-2212) hNEvtvsP->Fill(-0.5,p_gen);
-  if(pid_gen==211) hNEvtvsP->Fill(2.5,p_gen);
-  else if(pid_gen==321) hNEvtvsP->Fill(1.5,p_gen);
-  else if(pid_gen==2212) hNEvtvsP->Fill(0.5,p_gen);
-  
+  string identifiedParticle = utility->get_IdentifiedParticle(pid_gen);
+  int indexSpaceX = utility->get_indexSpaceX(vx_gen);
+  int indexSpaceY = utility->get_indexSpaceX(vy_gen);
+  int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
+
+  string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",identifiedParticle.c_str(),indexSpaceX,indexSpaceY,indexMomentumP);
+  // cout << "fill histogram: " << key_events.c_str() << endl;
+  hNEvtvsP[key_events]->Fill(0);
+
+  string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",identifiedParticle.c_str(),indexSpaceX,indexSpaceY,indexMomentumP);
+  // cout << "fill histogram: " << key_photon.c_str() << endl;
   int nhits = ahit->get_hitn()->size();
   for (int i=0;i<nhits;i++) 
   {
@@ -107,15 +119,10 @@ int genMassHypo::process_event(event *aevt, hit *ahit)
     {
       double out_x = ahit->get_out_x()->at(i);
       double out_y = ahit->get_out_y()->at(i);
-      if(pid_gen==211)        h_photonDist_piplus->Fill(out_x,out_y,p_gen);
-      else if(pid_gen==-211)  h_photonDist_piminus->Fill(out_x,out_y,p_gen);
-      else if(pid_gen==321)   h_photonDist_Kplus->Fill(out_x,out_y,p_gen);
-      else if(pid_gen==-321)  h_photonDist_Kminus->Fill(out_x,out_y,p_gen);
-      else if(pid_gen==2212)  h_photonDist_proton->Fill(out_x,out_y,p_gen);
-      else if(pid_gen==-2212) h_photonDist_antiproton->Fill(out_x,out_y,p_gen);
+      h_photonDist[key_photon]->Fill(out_x,out_y);
     }
   }
-  
+
   return 0;
 }
 
@@ -126,13 +133,26 @@ int genMassHypo::end()
   cout<<"This is the end of this program !"<<endl;
   if(File_OutPut != NULL){
     File_OutPut->cd();
-    hNEvtvsP->Write();
-    h_photonDist_piplus->Write();
-    h_photonDist_piminus->Write();
-    h_photonDist_Kplus->Write();
-    h_photonDist_Kminus->Write();
-    h_photonDist_proton->Write();
-    h_photonDist_antiproton->Write();
+    std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
+    for(int i_pid = 0; i_pid < 6; ++i_pid)
+    {
+      for(int i_vx = 0; i_vx < 5; ++i_vx)
+      {
+	for(int i_vy = 0; i_vy < 5; ++i_vy)
+	{
+	  for(int i_mom = 0; i_mom < 10; ++i_mom)
+	  {
+	    string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	    // cout << "genMassHypo::end(), write histogram: " << key_events.c_str() << endl;
+	    hNEvtvsP[key_events]->Write();
+
+	    string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	    // cout << "genMassHypo::end(), write histogram: " << key_photon.c_str() << endl;
+	    h_photonDist[key_photon]->Write();
+	  }
+	}
+      }
+    }
     File_OutPut->Close();
   }
   return 0;

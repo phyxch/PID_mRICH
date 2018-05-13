@@ -106,9 +106,9 @@ int calLikelihood::process_event(event *aevt, hit *ahit)
     px_gen=aevt->get_px()->at(i)/1e3;    //in MeV, convert to GeV
     py_gen=aevt->get_py()->at(i)/1e3;    //in MeV, convert to GeV
     pz_gen=aevt->get_pz()->at(i)/1e3;    //in MeV, convert to GeV
-    vx_gen=aevt->get_vx()->at(i)/1e1;    //in mm, convert to cm
-    vy_gen=aevt->get_vy()->at(i)/1e1;    //in mm, convert to cm
-    vz_gen=aevt->get_vz()->at(i)/1e1;    //in mm, convert to cm
+    vx_gen=aevt->get_vx()->at(i);        //in mm
+    vy_gen=aevt->get_vy()->at(i);        //in mm
+    vz_gen=aevt->get_vz()->at(i);        //in mm
     p_gen=sqrt(px_gen*px_gen+py_gen*py_gen+pz_gen*pz_gen);
     theta_gen=acos(pz_gen/p_gen)*DEG;    //in deg
     phi_gen=atan2(py_gen,px_gen)*DEG;    //in deg            

@@ -12,6 +12,7 @@
 #include <TTree.h>
 #include <TChain.h>
 #include "LLTreeDst.h"
+#include "type.h"
 
 const double DEG=180./3.1415926;
 //const unsigned int nPads=88;   ///// number of photonsenor segmentation pads
@@ -24,6 +25,7 @@ using namespace std;
 class event;
 class hit;
 class material;
+class Utility;
 
 class genMassHypo
 {
@@ -44,15 +46,12 @@ class genMassHypo
   
  private:
   material *mat;
+  Utility *utility;
   string mOutPutFile;
   TFile *File_OutPut;
-  
-  TH2D *hNEvtvsP;
-  TH3D *h_photonDist_piplus; // x: photon out_x | y: photon out_y | z: total momentum of generated particle
-  TH3D *h_photonDist_piminus;
-  TH3D *h_photonDist_Kplus;
-  TH3D *h_photonDist_Kminus;
-  TH3D *h_photonDist_proton;
-  TH3D *h_photonDist_antiproton;
+
+  // key: pid | indexSpaceX | indexSpaceY | indexMomentumP | indexMomentumTheta | indexMomentumPhi
+  TH1DMap hNEvtvsP; // number of total events
+  TH2DMap h_photonDist; // x: photon out_x | y: photon out_y 
 };
 #endif
