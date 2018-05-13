@@ -51,7 +51,7 @@ int genMassHypo::init()
 
  cout<<"genMassHypo::init(), initialize database histograms ;"<<endl;
 
-std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
+ std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
  for(int i_pid = 0; i_pid < 6; ++i_pid)
  {
    for(int i_vx = 0; i_vx < 5; ++i_vx)
@@ -61,11 +61,11 @@ std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"}
        for(int i_mom = 0; i_mom < 10; ++i_mom)
        {
 	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	 cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
+	 // cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
 	 hNEvtvsP[key_events] = new TH1D(key_events.c_str(),key_events.c_str(),1,-0.5,0.5);
 
 	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	 cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
+	 // cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
 	 h_photonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth);
        }
      }

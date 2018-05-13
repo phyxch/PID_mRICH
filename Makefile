@@ -102,7 +102,7 @@ genMassHypo : $(OBJ)genMassHypo.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o $(O
 	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
 	@echo
 
-calLikelihood : $(OBJ)calLikelihood.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o
+calLikelihood : $(OBJ)calLikelihood.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o $(OBJ)Utility.o
 	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
 	@echo
 

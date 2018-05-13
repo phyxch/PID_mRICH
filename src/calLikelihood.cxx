@@ -13,9 +13,9 @@
 #include "../include/hit.h"
 #include "../include/material.h"
 #include "../include/calLikelihood.h"
+#include "../include/Utility.h"
 
 using namespace std;
-// using namespace TMath;
 
 calLikelihood::calLikelihood(string inputdatebase, string outputfile)
 {
@@ -31,17 +31,10 @@ calLikelihood::~calLikelihood()
 {
  cout<<"calLikelihood::~calLikelihood() ----- Release memory ! ------"<<endl;
  delete mat;
+ delete utility;
  delete File_InPutDataBase;
  delete File_OutPut;
  delete mTree;
-
- delete hNEvtvsP;
- delete h_photonDist_piplus;
- delete h_photonDist_piminus;
- delete h_photonDist_Kplus;
- delete h_photonDist_Kminus;
- delete h_photonDist_proton;
- delete h_photonDist_antiproton;
 }
 
 int calLikelihood::init()
@@ -55,13 +48,26 @@ int calLikelihood::init()
 
  cout<<"calLikelihood::init(), read database file: "<< mInPutDataBase.c_str() <<endl;
  File_InPutDataBase = TFile::Open(mInPutDataBase.c_str());
- hNEvtvsP = (TH2D*) File_InPutDataBase->Get("hNEvtvsP");
- h_photonDist_piplus = (TH3D*)File_InPutDataBase->Get("h_photonDist_piplus");
- h_photonDist_piminus = (TH3D*)File_InPutDataBase->Get("h_photonDist_piminus");
- h_photonDist_Kplus = (TH3D*)File_InPutDataBase->Get("h_photonDist_Kplus");
- h_photonDist_Kminus = (TH3D*)File_InPutDataBase->Get("h_photonDist_Kminus");
- h_photonDist_proton = (TH3D*)File_InPutDataBase->Get("h_photonDist_proton");
- h_photonDist_antiproton = (TH3D*)File_InPutDataBase->Get("h_photonDist_antiproton");
+ std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
+ for(int i_pid = 0; i_pid < 6; ++i_pid)
+ {
+   for(int i_vx = 0; i_vx < 5; ++i_vx)
+   {
+     for(int i_vy = 0; i_vy < 5; ++i_vy)
+     {
+       for(int i_mom = 0; i_mom < 10; ++i_mom)
+       {
+	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 cout << "calLikelihood::init(), read database histogram: " << key_events.c_str() << endl;
+	 hNEvtvsP[key_events] = (TH1D*)File_InPutDataBase->Get(key_events.c_str())->Clone();
+
+	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 cout << "calLikelihood::init(), read database histogram: " << key_photon.c_str() << endl;
+	 h_photonDist[key_photon] = (TH2D*)File_InPutDataBase->Get(key_photon.c_str())->Clone();
+       }
+     }
+   }
+ }
 
  cout<<"calLikelihood::init(), initialize tree  ; "<<endl;
  mTree = new TTree("LLTreeDst","Tree for Likelihood Analysis");
@@ -114,51 +120,63 @@ int calLikelihood::process_event(event *aevt, hit *ahit)
     phi_gen=atan2(py_gen,px_gen)*DEG;    //in deg            
   }  
   
+  int indexSpaceX = utility->get_indexSpaceX(vx_gen);
+  int indexSpaceY = utility->get_indexSpaceX(vy_gen);
+  int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
+
+  TH1D *h_NumofEvents_pion;
   TH2D *h_database_pion;
+  TH1D *h_NumofEvents_kaon;
   TH2D *h_database_kaon;
   TH2D *h_database_proton;
+  TH1D *h_NumofEvents_proton;
   
   if(pid_gen > 0)
   {
-    int ibin = h_photonDist_piplus->GetZaxis()->FindBin(p_gen);
+    string key_events_pion = Form("h_NumofEvents_piplus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_NumofEvents_pion = (TH1D*)hNEvtvsP[key_events_pion]->Clone();
+    string key_photon_pion = Form("h_photonDist_piplus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_database_pion = (TH2D*)h_photonDist[key_photon_pion]->Clone();
 
-    h_photonDist_piplus->GetZaxis()->SetRange(ibin,ibin);
-    h_database_pion = (TH2D *)h_photonDist_piplus->Project3D("xy");
+    string key_events_kaon = Form("h_NumofEvents_Kplus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_NumofEvents_kaon = (TH1D*)hNEvtvsP[key_events_kaon]->Clone();
+    string key_photon_kaon = Form("h_photonDist_Kplus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_database_kaon = (TH2D*)h_photonDist[key_photon_kaon]->Clone();
 
-    h_photonDist_Kplus->GetZaxis()->SetRange(ibin,ibin);
-    h_database_kaon = (TH2D *)h_photonDist_Kplus->Project3D("xy");
-
-    h_photonDist_proton->GetZaxis()->SetRange(ibin,ibin);
-    h_database_proton = (TH2D *)h_photonDist_proton->Project3D("xy");
+    string key_events_proton = Form("h_NumofEvents_proton_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_NumofEvents_proton = (TH1D*)hNEvtvsP[key_events_proton]->Clone();
+    string key_photon_proton = Form("h_photonDist_proton_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_database_proton = (TH2D*)h_photonDist[key_photon_proton]->Clone();
   }
-  else if(pid_gen < 0)
+  if(pid_gen < 0)
   {
-    int ibin = h_photonDist_piminus->GetZaxis()->FindBin(p_gen);
+    string key_events_pion = Form("h_NumofEvents_piminus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_NumofEvents_pion = (TH1D*)hNEvtvsP[key_events_pion]->Clone();
+    string key_photon_pion = Form("h_photonDist_piminus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_database_pion = (TH2D*)h_photonDist[key_photon_pion]->Clone();
 
-    h_photonDist_piminus->GetZaxis()->SetRange(ibin,ibin);
-    h_database_pion = (TH2D *)h_photonDist_piplus->Project3D("xy");
+    string key_events_kaon = Form("h_NumofEvents_Kminus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_NumofEvents_kaon = (TH1D*)hNEvtvsP[key_events_kaon]->Clone();
+    string key_photon_kaon = Form("h_photonDist_Kminus_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_database_kaon = (TH2D*)h_photonDist[key_photon_kaon]->Clone();
 
-    h_photonDist_Kminus->GetZaxis()->SetRange(ibin,ibin);
-    h_database_kaon = (TH2D *)h_photonDist_Kplus->Project3D("xy");
-
-    h_photonDist_antiproton->GetZaxis()->SetRange(ibin,ibin);
-    h_database_proton = (TH2D *)h_photonDist_proton->Project3D("xy");
+    string key_events_proton = Form("h_NumofEvents_antiproton_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_NumofEvents_proton = (TH1D*)hNEvtvsP[key_events_proton]->Clone();
+    string key_photon_proton = Form("h_photonDist_antiproton_vx_%d_vy_%d_mom_%d",indexSpaceX,indexSpaceY,indexMomentumP);
+    h_database_proton = (TH2D*)h_photonDist[key_photon_proton]->Clone();
   }
 
-  int NEvtPiBin = hNEvtvsP->FindBin(2.5,p_gen);
-  int NEvtPi = hNEvtvsP->GetBinContent(NEvtPiBin);
+  int NumofEvents_pion = h_NumofEvents_pion->GetBinContent(1);
   h_database_pion->Sumw2();
-  h_database_pion->Scale(1./NEvtPi);
+  h_database_pion->Scale(1./NumofEvents_pion);
 
-  int NEvtKaonBin = hNEvtvsP->FindBin(1.5,p_gen);
-  int NEvtKaon = hNEvtvsP->GetBinContent(NEvtKaonBin);
+  int NumofEvents_kaon = h_NumofEvents_kaon->GetBinContent(1);
   h_database_kaon->Sumw2();
-  h_database_kaon->Scale(1./NEvtKaon);
+  h_database_kaon->Scale(1./NumofEvents_kaon);
 
-  int NEvtProtonBin = hNEvtvsP->FindBin(0.5,p_gen);
-  int NEvtProton = hNEvtvsP->GetBinContent(NEvtProtonBin);
+  int NumofEvents_proton = h_NumofEvents_proton->GetBinContent(1);
   h_database_proton->Sumw2();
-  h_database_proton->Scale(1./NEvtProton);
+  h_database_proton->Scale(1./NumofEvents_proton);
   
   TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth);
   int nhits = ahit->get_hitn()->size();
@@ -251,7 +269,8 @@ double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
       double k = h_photonDist_PID->GetBinContent(i_x+1,i_y+1); // detected photon number
       double lambda = h_database->GetBinContent(i_x+1,i_y+1); // averaged photon number
       double err_lambda = h_database->GetBinError(i_x+1,i_y+1); // error for specific bin
-      if(err_lambda > 0.0) prob *= TMath::PoissonI(k,lambda);
+      // if(err_lambda > 0.0) prob *= TMath::PoissonI(k,lambda);
+      if(lambda > 0.0) prob *= TMath::PoissonI(k,lambda);
     }
   }
   return log(prob);
