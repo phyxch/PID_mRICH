@@ -14,6 +14,7 @@
 #include "../include/material.h"
 #include "../include/calLikelihood.h"
 #include "../include/Utility.h"
+#include "../include/mRICH.h"
 
 using namespace std;
 
@@ -48,20 +49,19 @@ int calLikelihood::init()
 
  cout<<"calLikelihood::init(), read database file: "<< mInPutDataBase.c_str() <<endl;
  File_InPutDataBase = TFile::Open(mInPutDataBase.c_str());
- std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
  for(int i_pid = 0; i_pid < 6; ++i_pid)
  {
-   for(int i_vx = 0; i_vx < 2; ++i_vx)
+   for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
    {
-     for(int i_vy = 0; i_vy < 2; ++i_vy)
+     for(int i_vy = 0; i_vy < mRICH::mNumOfIndexSpaceY; ++i_vy)
      {
-       for(int i_mom = 0; i_mom < 10; ++i_mom)
+       for(int i_mom = 0; i_mom < mRICH::mNumOfIndexMomentumP; ++i_mom)
        {
-	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	 // cout << "calLikelihood::init(), read database histogram: " << key_events.c_str() << endl;
 	 hNEvtvsP[key_events] = (TH1D*)File_InPutDataBase->Get(key_events.c_str())->Clone();
 
-	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	 // cout << "calLikelihood::init(), read database histogram: " << key_photon.c_str() << endl;
 	 h_photonDist[key_photon] = (TH2D*)File_InPutDataBase->Get(key_photon.c_str())->Clone();
        }
@@ -116,8 +116,8 @@ int calLikelihood::process_event(event *aevt, hit *ahit)
     vy_gen=aevt->get_vy()->at(i);        //in mm
     vz_gen=aevt->get_vz()->at(i);        //in mm
     p_gen=sqrt(px_gen*px_gen+py_gen*py_gen+pz_gen*pz_gen);
-    theta_gen=acos(pz_gen/p_gen)*DEG;    //in deg
-    phi_gen=atan2(py_gen,px_gen)*DEG;    //in deg            
+    theta_gen=acos(pz_gen/p_gen)*mRICH::DEG;    //in deg
+    phi_gen=atan2(py_gen,px_gen)*mRICH::DEG;    //in deg            
   }  
   
   int indexSpaceX = utility->get_indexSpaceX(vx_gen);
@@ -178,7 +178,7 @@ int calLikelihood::process_event(event *aevt, hit *ahit)
   h_database_proton->Sumw2();
   h_database_proton->Scale(1./NumofEvents_proton);
   
-  TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth);
+  TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
   int nhits = ahit->get_hitn()->size();
   for (int i=0;i<nhits;i++) 
   {
@@ -214,6 +214,7 @@ int calLikelihood::process_event(event *aevt, hit *ahit)
   // cout << "probability pion = " << probability(h_database_pion, h_photonDist_PID) << endl;
   // cout << "probability kaon = " << probability(h_database_kaon, h_photonDist_PID) << endl;
   // cout << "probability proton = " << probability(h_database_proton, h_photonDist_PID) << endl;
+  // cout << endl;
 
   if(mTree) mTree->Fill();
   
@@ -267,16 +268,19 @@ bool calLikelihood::isOnPhotonSensor(hit *ahit, int i)
 double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
 {
   double prob=1.0;
+  const double noise = 2./mRICH::mNPads/mRICH::mNPads; // force every photon from inject particles used in likelihood calculation
 
-  for(unsigned int i_x = 0; i_x < nPads; i_x++)
+  for(unsigned int i_x = 0; i_x < mRICH::mNPads; i_x++)
   {
-    for(unsigned int i_y = 0; i_y < nPads; i_y++)
+    for(unsigned int i_y = 0; i_y < mRICH::mNPads; i_y++)
     {
       double k = h_photonDist_PID->GetBinContent(i_x+1,i_y+1); // detected photon number
       double lambda = h_database->GetBinContent(i_x+1,i_y+1); // averaged photon number
       double err_lambda = h_database->GetBinError(i_x+1,i_y+1); // error for specific bin
       // if(err_lambda > 0.0) prob *= TMath::PoissonI(k,lambda);
+      if(lambda == 0.0) prob *= TMath::PoissonI(k,noise);
       if(lambda > 0.0) prob *= TMath::PoissonI(k,lambda);
+      // if(k > 0.0) prob *= TMath::PoissonI(k,lambda);
     }
   }
   return log(prob);

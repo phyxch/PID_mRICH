@@ -1,4 +1,5 @@
 #include "../include/Utility.h"
+#include "../include/mRICH.h"
 #include "TMath.h"
 
 Utility::Utility()
@@ -44,21 +45,16 @@ std::pair<std::string,std::string> Utility::get_misIdentifiedParticle(int pid)
   return mParticleMisIdMap[pid];
 }
 
-int Utility::get_indexSpaceX(float vx)
+int Utility::get_indexSpaceX(double vx)
 {
-  // const float vx_start = -57.0; // aerogel halfx is 55.25
-  // const float vx_stop = 57.0; // this is to make sure 0 is in cente of [-1,1] and minimize edge effect
-  const float delta_vx = 5.0; // in mm
-  const float vx_start = -5.0;
-  const float vx_stop = 5.0;
-  const int NumOfIndex = (int)(vx_stop - vx_start)/delta_vx;
+  const double delta_vx = (mRICH::mVx_stop-mRICH::mVx_start)/mRICH::mNumOfIndexSpaceX; 
 
   int index = -1;
-  if(vx > vx_start && vx < vx_stop)
+  if(vx > mRICH::mVx_start && vx < mRICH::mVx_stop)
   {
-    for(int i_index = 0; i_index < NumOfIndex; ++i_index)
+    for(int i_index = 0; i_index < mRICH::mNumOfIndexSpaceX; ++i_index)
     {
-      if(vx > vx_start+i_index*delta_vx && vx <= vx_start+(i_index+1)*delta_vx)
+      if(vx > mRICH::mVx_start+i_index*delta_vx && vx <= mRICH::mVx_start+(i_index+1)*delta_vx)
       {
 	index = i_index;
       }
@@ -68,21 +64,16 @@ int Utility::get_indexSpaceX(float vx)
   return index;
 }
 
-int Utility::get_indexSpaceY(float vy)
+int Utility::get_indexSpaceY(double vy)
 {
-  // const float vy_start = -57.0; // aerogel halfy is 55.25
-  // const float vy_stop = 57.0;
-  const float delta_vy = 5.0;
-  const float vy_start = -5.0; // aerogel halfy is 55.25
-  const float vy_stop = 5.0;
-  const int NumOfIndex = (int)(vy_stop - vy_start)/delta_vy;
+  const double delta_vy = (mRICH::mVy_stop-mRICH::mVy_start)/mRICH::mNumOfIndexSpaceY; 
 
   int index = -1;
-  if(vy > vy_start && vy < vy_stop)
+  if(vy > mRICH::mVy_start && vy < mRICH::mVy_stop)
   {
-    for(int i_index = 0; i_index < NumOfIndex; ++i_index)
+    for(int i_index = 0; i_index < mRICH::mNumOfIndexSpaceY; ++i_index)
     {
-      if(vy > vy_start+i_index*delta_vy && vy <= vy_start+(i_index+1)*delta_vy)
+      if(vy > mRICH::mVy_start+i_index*delta_vy && vy <= mRICH::mVy_start+(i_index+1)*delta_vy)
       {
 	index = i_index;
       }
@@ -92,22 +83,18 @@ int Utility::get_indexSpaceY(float vy)
   return index;
 }
 
-int Utility::get_indexMomentumP(float px, float py, float pz)
+int Utility::get_indexMomentumP(double px, double py, double pz)
 {
-  const float momentum = TMath::Sqrt(px*px+py*py+pz*pz); // in GeV
-  // const float p_start = 2.5;
-  // const float p_stop  = 15.5;
-  const float p_start = 4.0;
-  const float p_stop  = 6.0;
-  const float delta_p = 0.2;
-  const int NumOfIndex = (int)(p_stop - p_start)/delta_p;
+  const double momentum = TMath::Sqrt(px*px+py*py+pz*pz); // in GeV
+
+  const double delta_p = (mRICH::mMomP_stop-mRICH::mMomP_start)/mRICH::mNumOfIndexMomentumP; 
 
   int index = -1;
-  if(momentum > p_start && momentum < p_stop)
+  if(momentum > mRICH::mMomP_start && momentum < mRICH::mMomP_stop)
   {
-    for(int i_index = 0; i_index < NumOfIndex; ++i_index)
+    for(int i_index = 0; i_index < mRICH::mNumOfIndexMomentumP; ++i_index)
     {
-      if(momentum > p_start+i_index*delta_p && momentum <= p_start+(i_index+1)*delta_p)
+      if(momentum > mRICH::mMomP_start+i_index*delta_p && momentum <= mRICH::mMomP_start+(i_index+1)*delta_p)
       {
 	index = i_index;
       }

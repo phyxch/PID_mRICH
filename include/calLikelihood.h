@@ -14,10 +14,6 @@
 #include "LLTreeDst.h"
 #include "type.h"
 
-const double DEG=180./3.1415926;
-const unsigned int nPads=105;   ///// number of photonsenor segmentation pads
-const double halfWidth=52.5; // (mm) half width (x) and height (y) of the photon sensor
-
 using namespace std;
 
 class event;

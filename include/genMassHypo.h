@@ -14,12 +14,6 @@
 #include "LLTreeDst.h"
 #include "type.h"
 
-const double DEG=180./3.1415926;
-//const unsigned int nPads=88;   ///// number of photonsenor segmentation pads
-//const double halfWidth=44; // (mm) half width (x) and height (y) of the photon sensor
-const unsigned int nPads=105;   ///// number of photonsenor segmentation pads
-const double halfWidth=52.5; // (mm) half width (x) and height (y) of the photon sensor
-
 using namespace std;
 
 class event;
@@ -41,7 +35,6 @@ class genMassHypo
   bool isReflection(hit *ahit, int i);
   bool isOnAerogel(hit *ahit, int i);
   bool isOnPhotonSensor(hit *ahit, int i);
-  void Smearing2D(double inx, double iny, double& outx, double& outy);
   double probability(TH2D* db, TH2D *hXY);
   
  private:

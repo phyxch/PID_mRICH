@@ -17,6 +17,7 @@
 #include "../include/material.h"
 #include "../include/genMassHypo.h"
 #include "../include/Utility.h"
+#include "../include/mRICH.h"
 
 using namespace std;
 using namespace TMath;
@@ -51,22 +52,21 @@ int genMassHypo::init()
 
  cout<<"genMassHypo::init(), initialize database histograms ;"<<endl;
 
- std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
  for(int i_pid = 0; i_pid < 6; ++i_pid)
  {
-   for(int i_vx = 0; i_vx < 2; ++i_vx)
+   for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
    {
-     for(int i_vy = 0; i_vy < 2; ++i_vy)
+     for(int i_vy = 0; i_vy < mRICH::mNumOfIndexSpaceY; ++i_vy)
      {
-       for(int i_mom = 0; i_mom < 10; ++i_mom)
+       for(int i_mom = 0; i_mom < mRICH::mNumOfIndexMomentumP; ++i_mom)
        {
-	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	 // cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
 	 hNEvtvsP[key_events] = new TH1D(key_events.c_str(),key_events.c_str(),1,-0.5,0.5);
 
-	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	 // cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
-	 h_photonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),nPads,-halfWidth,halfWidth,nPads,-halfWidth,halfWidth);
+	 h_photonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
        }
      }
    }
@@ -97,8 +97,8 @@ int genMassHypo::process_event(event *aevt, hit *ahit)
     vy_gen=aevt->get_vy()->at(i);        //in mm
     vz_gen=aevt->get_vz()->at(i);        //in mm
     p_gen=sqrt(px_gen*px_gen+py_gen*py_gen+pz_gen*pz_gen);
-    theta_gen=acos(pz_gen/p_gen)*DEG;    //in deg
-    phi_gen=atan2(py_gen,px_gen)*DEG;    //in deg            
+    theta_gen=acos(pz_gen/p_gen)*mRICH::DEG;    //in deg
+    phi_gen=atan2(py_gen,px_gen)*mRICH::DEG;    //in deg            
   }  
   
   string identifiedParticle = utility->get_IdentifiedParticle(pid_gen);
@@ -133,20 +133,19 @@ int genMassHypo::end()
   cout<<"This is the end of this program !"<<endl;
   if(File_OutPut != NULL){
     File_OutPut->cd();
-    std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
     for(int i_pid = 0; i_pid < 6; ++i_pid)
     {
-      for(int i_vx = 0; i_vx < 2; ++i_vx)
+      for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
       {
-	for(int i_vy = 0; i_vy < 2; ++i_vy)
+	for(int i_vy = 0; i_vy < mRICH::mNumOfIndexSpaceY; ++i_vy)
 	{
-	  for(int i_mom = 0; i_mom < 10; ++i_mom)
+	  for(int i_mom = 0; i_mom < mRICH::mNumOfIndexMomentumP; ++i_mom)
 	  {
-	    string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	    string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	    // cout << "genMassHypo::end(), write histogram: " << key_events.c_str() << endl;
 	    hNEvtvsP[key_events]->Write();
 
-	    string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
+	    string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	    // cout << "genMassHypo::end(), write histogram: " << key_photon.c_str() << endl;
 	    h_photonDist[key_photon]->Write();
 	  }
