@@ -54,11 +54,11 @@ int genMassHypo::init()
  std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
  for(int i_pid = 0; i_pid < 6; ++i_pid)
  {
-   for(int i_vx = 0; i_vx < 5; ++i_vx)
+   for(int i_vx = 0; i_vx < 2; ++i_vx)
    {
-     for(int i_vy = 0; i_vy < 5; ++i_vy)
+     for(int i_vy = 0; i_vy < 2; ++i_vy)
      {
-       for(int i_mom = 0; i_mom < 10; ++i_mom)
+       for(int i_mom = 0; i_mom < 4; ++i_mom)
        {
 	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	 // cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
@@ -136,11 +136,11 @@ int genMassHypo::end()
     std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
     for(int i_pid = 0; i_pid < 6; ++i_pid)
     {
-      for(int i_vx = 0; i_vx < 5; ++i_vx)
+      for(int i_vx = 0; i_vx < 2; ++i_vx)
       {
-	for(int i_vy = 0; i_vy < 5; ++i_vy)
+	for(int i_vy = 0; i_vy < 2; ++i_vy)
 	{
-	  for(int i_mom = 0; i_mom < 10; ++i_mom)
+	  for(int i_mom = 0; i_mom < 4; ++i_mom)
 	  {
 	    string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	    // cout << "genMassHypo::end(), write histogram: " << key_events.c_str() << endl;

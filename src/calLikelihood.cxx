@@ -51,18 +51,18 @@ int calLikelihood::init()
  std::string PID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
  for(int i_pid = 0; i_pid < 6; ++i_pid)
  {
-   for(int i_vx = 0; i_vx < 5; ++i_vx)
+   for(int i_vx = 0; i_vx < 2; ++i_vx)
    {
-     for(int i_vy = 0; i_vy < 5; ++i_vy)
+     for(int i_vy = 0; i_vy < 2; ++i_vy)
      {
-       for(int i_mom = 0; i_mom < 10; ++i_mom)
+       for(int i_mom = 0; i_mom < 4; ++i_mom)
        {
 	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	 cout << "calLikelihood::init(), read database histogram: " << key_events.c_str() << endl;
+	 // cout << "calLikelihood::init(), read database histogram: " << key_events.c_str() << endl;
 	 hNEvtvsP[key_events] = (TH1D*)File_InPutDataBase->Get(key_events.c_str())->Clone();
 
 	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	 cout << "calLikelihood::init(), read database histogram: " << key_photon.c_str() << endl;
+	 // cout << "calLikelihood::init(), read database histogram: " << key_photon.c_str() << endl;
 	 h_photonDist[key_photon] = (TH2D*)File_InPutDataBase->Get(key_photon.c_str())->Clone();
        }
      }
@@ -90,7 +90,7 @@ int calLikelihood::init()
  mTree->Branch("Lpion",&mDst.Lpion,"Lpion/D");
  mTree->Branch("LKaon",&mDst.LKaon,"LKaon/D");
  mTree->Branch("Lproton",&mDst.Lproton,"Lproton/D");
- mTree->SetAutoSave(5000000);
+//  mTree->SetAutoSave(5000000);
 
  return 0;
 }
@@ -128,8 +128,8 @@ int calLikelihood::process_event(event *aevt, hit *ahit)
   TH2D *h_database_pion;
   TH1D *h_NumofEvents_kaon;
   TH2D *h_database_kaon;
-  TH2D *h_database_proton;
   TH1D *h_NumofEvents_proton;
+  TH2D *h_database_proton;
   
   if(pid_gen > 0)
   {
@@ -208,7 +208,13 @@ int calLikelihood::process_event(event *aevt, hit *ahit)
   mDst.Lpion = probability(h_database_pion, h_photonDist_PID);
   mDst.LKaon = probability(h_database_kaon, h_photonDist_PID);
   mDst.Lproton = probability(h_database_proton, h_photonDist_PID);
-  
+
+  // cout << "pid = " << pid_gen << ", vx_gen = " << vx_gen << ", indexSpaceX = " << indexSpaceX << endl;
+  // cout << "vy_gen = " << vy_gen << ", indexSpaceY = " << indexSpaceY << ", indexMomentumP = " << indexMomentumP << endl;
+  // cout << "probability pion = " << probability(h_database_pion, h_photonDist_PID) << endl;
+  // cout << "probability kaon = " << probability(h_database_kaon, h_photonDist_PID) << endl;
+  // cout << "probability proton = " << probability(h_database_proton, h_photonDist_PID) << endl;
+
   if(mTree) mTree->Fill();
   
   delete h_photonDist_PID;
@@ -282,7 +288,7 @@ int main(int argc, char **argv)
   string date = "May10_2018";
 
   string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",date.c_str());
-  string InPutList = Form("/work/eic/xusun/list/modular_rich/mRICH_PDF_%s.list",date.c_str());
+  string InPutList = Form("/work/eic/xusun/list/modular_rich/mRICH_PID_%s.list",date.c_str());
 
   string inputdatabase = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
   string outputfile = Form("/work/eic/xusun/output/likelihood/PID_Likelihood_%s.root",date.c_str());

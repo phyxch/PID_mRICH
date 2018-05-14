@@ -48,7 +48,7 @@ int Utility::get_indexSpaceX(float vx)
 {
   // const float vx_start = -57.0; // aerogel halfx is 55.25
   // const float vx_stop = 57.0; // this is to make sure 0 is in cente of [-1,1] and minimize edge effect
-  const float delta_vx = 2.0; // in mm
+  const float delta_vx = 5.0; // in mm
   const float vx_start = -5.0;
   const float vx_stop = 5.0;
   const int NumOfIndex = (int)(vx_stop - vx_start)/delta_vx;
@@ -72,7 +72,7 @@ int Utility::get_indexSpaceY(float vy)
 {
   // const float vy_start = -57.0; // aerogel halfy is 55.25
   // const float vy_stop = 57.0;
-  const float delta_vy = 2.0;
+  const float delta_vy = 5.0;
   const float vy_start = -5.0; // aerogel halfy is 55.25
   const float vy_stop = 5.0;
   const int NumOfIndex = (int)(vy_stop - vy_start)/delta_vy;
@@ -99,7 +99,7 @@ int Utility::get_indexMomentumP(float px, float py, float pz)
   // const float p_stop  = 15.5;
   const float p_start = 4.0;
   const float p_stop  = 6.0;
-  const float delta_p = 0.2;
+  const float delta_p = 0.5;
   const int NumOfIndex = (int)(p_stop - p_start)/delta_p;
 
   int index = -1;
