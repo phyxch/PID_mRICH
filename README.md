@@ -12,6 +12,6 @@
 - [x] add a new ROOT class for log likelihood calculation
 > generate an ROOT tree to store likelihood to be a pion, Kaon and proton
 - [ ] update LLTreeDst class to a ROOT class
-- [ ] re-write Makefile to generate ROOT shared library
-- [ ] add macros to analysis likelihood
+- [x] re-write Makefile to generate ROOT shared library
+- [x] add macros to analysis likelihood
 

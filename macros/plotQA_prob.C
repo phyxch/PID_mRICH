@@ -52,17 +52,17 @@ void plotQA_prob(int pid = 211)
   TFile *File_InPut = TFile::Open(inputfile.c_str());
   assert(File_InPut);
 
-  string gQA_identified = Form("g_prob_%s%s",particle.second.c_str(),particle.second.c_str());
-  TGraph *g_prob_identified = (TGraph*)File_InPut->Get(gQA_identified.c_str());
-  assert(g_prob_identified);
+  string QA_identified = Form("h_prob_%s%s",particle.second.c_str(),particle.second.c_str());
+  TGraph *h_prob_identified = (TGraph*)File_InPut->Get(QA_identified.c_str());
+  assert(h_prob_identified);
 
-  string gQA_misIdentified_1st = Form("g_prob_%s%s",particle.second.c_str(),misIdentified.first.c_str());
-  TGraph *g_prob_misIdentified_1st = (TGraph*)File_InPut->Get(gQA_misIdentified_1st.c_str());
-  assert(g_prob_misIdentified_1st);
+  string QA_misIdentified_1st = Form("h_prob_%s%s",particle.second.c_str(),misIdentified.first.c_str());
+  TGraph *h_prob_misIdentified_1st = (TGraph*)File_InPut->Get(QA_misIdentified_1st.c_str());
+  assert(h_prob_misIdentified_1st);
 
-  string gQA_misIdentified_2nd = Form("g_prob_%s%s",particle.second.c_str(),misIdentified.second.c_str());
-  TGraph *g_prob_misIdentified_2nd = (TGraph*)File_InPut->Get(gQA_misIdentified_2nd.c_str());
-  assert(g_prob_misIdentified_2nd);
+  string QA_misIdentified_2nd = Form("h_prob_%s%s",particle.second.c_str(),misIdentified.second.c_str());
+  TGraph *h_prob_misIdentified_2nd = (TGraph*)File_InPut->Get(QA_misIdentified_2nd.c_str());
+  assert(h_prob_misIdentified_2nd);
 
   TCanvas *c_probability = new TCanvas("c_probability","c_probability",10,10,800,800);
   c_probability->cd()->SetLeftMargin(0.15);
@@ -90,30 +90,30 @@ void plotQA_prob(int pid = 211)
   h_play->GetYaxis()->SetRangeUser(-0.05,1.1);
   h_play->Draw("pE");
 
-  g_prob_identified->SetMarkerStyle(24);
-  g_prob_identified->SetMarkerColor(kGray+3);
-  g_prob_identified->SetMarkerSize(1.4);
-  g_prob_identified->Draw("P Same");
-  string leg_identified = Form("%s to %s",particle.second.c_str(),particle.second.c_str());
+  h_prob_identified->SetMarkerStyle(24);
+  h_prob_identified->SetMarkerColor(kGray+3);
+  h_prob_identified->SetMarkerSize(1.4);
+  h_prob_identified->Draw("P Same");
+  string leh_identified = Form("%s to %s",particle.second.c_str(),particle.second.c_str());
 
-  g_prob_misIdentified_1st->SetMarkerStyle(24);
-  g_prob_misIdentified_1st->SetMarkerColor(2);
-  g_prob_misIdentified_1st->SetMarkerSize(1.5);
-  g_prob_misIdentified_1st->Draw("P Same");
-  string leg_misIdentified_1st = Form("%s to %s",particle.second.c_str(),misIdentified.first.c_str());
+  h_prob_misIdentified_1st->SetMarkerStyle(24);
+  h_prob_misIdentified_1st->SetMarkerColor(2);
+  h_prob_misIdentified_1st->SetMarkerSize(1.5);
+  h_prob_misIdentified_1st->Draw("P Same");
+  string leh_misIdentified_1st = Form("%s to %s",particle.second.c_str(),misIdentified.first.c_str());
 
-  g_prob_misIdentified_2nd->SetMarkerStyle(20);
-  g_prob_misIdentified_2nd->SetMarkerColor(4);
-  g_prob_misIdentified_2nd->SetMarkerSize(1.0);
-  g_prob_misIdentified_2nd->Draw("P Same");
-  string leg_misIdentified_2nd = Form("%s to %s",particle.second.c_str(),misIdentified.second.c_str());
+  h_prob_misIdentified_2nd->SetMarkerStyle(20);
+  h_prob_misIdentified_2nd->SetMarkerColor(4);
+  h_prob_misIdentified_2nd->SetMarkerSize(1.0);
+  h_prob_misIdentified_2nd->Draw("P Same");
+  string leh_misIdentified_2nd = Form("%s to %s",particle.second.c_str(),misIdentified.second.c_str());
 
   TLegend *leg = new TLegend(0.4,0.4,0.8,0.7);
   leg->SetFillColor(10);
   leg->SetBorderSize(0);
-  leg->AddEntry(g_prob_identified,leg_identified.c_str(),"P");
-  leg->AddEntry(g_prob_misIdentified_1st,leg_misIdentified_1st.c_str(),"P");
-  leg->AddEntry(g_prob_misIdentified_2nd,leg_misIdentified_2nd.c_str(),"P");
+  leg->AddEntry(h_prob_identified,leh_identified.c_str(),"P");
+  leg->AddEntry(h_prob_misIdentified_1st,leh_misIdentified_1st.c_str(),"P");
+  leg->AddEntry(h_prob_misIdentified_2nd,leh_misIdentified_2nd.c_str(),"P");
   leg->Draw("same");
 
   TLine *line = new TLine(-0.5,0.0,19.5,0.0);
