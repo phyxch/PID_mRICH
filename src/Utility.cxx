@@ -99,7 +99,7 @@ int Utility::get_indexMomentumP(float px, float py, float pz)
   // const float p_stop  = 15.5;
   const float p_start = 4.0;
   const float p_stop  = 6.0;
-  const float delta_p = 0.5;
+  const float delta_p = 0.2;
   const int NumOfIndex = (int)(p_stop - p_start)/delta_p;
 
   int index = -1;

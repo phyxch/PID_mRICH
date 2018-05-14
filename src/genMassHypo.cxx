@@ -58,7 +58,7 @@ int genMassHypo::init()
    {
      for(int i_vy = 0; i_vy < 2; ++i_vy)
      {
-       for(int i_mom = 0; i_mom < 4; ++i_mom)
+       for(int i_mom = 0; i_mom < 10; ++i_mom)
        {
 	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	 // cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
@@ -140,7 +140,7 @@ int genMassHypo::end()
       {
 	for(int i_vy = 0; i_vy < 2; ++i_vy)
 	{
-	  for(int i_mom = 0; i_mom < 4; ++i_mom)
+	  for(int i_mom = 0; i_mom < 10; ++i_mom)
 	  {
 	    string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",PID[i_pid].c_str(),i_vx,i_vy,i_mom);
 	    // cout << "genMassHypo::end(), write histogram: " << key_events.c_str() << endl;
