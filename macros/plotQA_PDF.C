@@ -25,7 +25,7 @@ std::pair<int,std::string> get_particle(int pid)
 
 void plotQA_PDF()
 {
-  string date = "May10_2018";
+  string date = "May14_2018";
   string inputfile = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
   cout << "read in file: " << inputfile.c_str() << endl;
   TFile *File_InPut = TFile::Open(inputfile.c_str());
@@ -113,9 +113,9 @@ void plotQA_PDF()
   c_Identified->cd()->SetGrid(0,0);
   c_Identified->cd()->SetTicks(1,1);
 
-  h_PDF_pion->Draw("colz");
-  h_PDF_kaon->Draw("same");
+  h_PDF_kaon->Draw("colz");
   h_PDF_proton->Draw("same");
+  h_PDF_pion->Draw("same ");
 
   outputfile = "../figures/masshypo_dist/mass_hypotheses_identify.pdf";
   cout << "save plot to: " << outputfile.c_str() << endl;

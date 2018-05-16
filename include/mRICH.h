@@ -27,20 +27,24 @@ namespace mRICH
   const int mNumOfIndexMomentumP = 10;
 
   const double DEG=180./TMath::Pi();
-  /*
   const double mMomTheta_start = 0.0*DEG;
   const double mMomTheta_stop  = 0.25*TMath::Pi()*DEG;
-  const int mNumOfIndexMomentumTheta = 10;
+  const int mNumOfIndexMomentumTheta = 1;
 
   const double mMomPhi_start = -1.0*TMath::Pi()*DEG;
   const double mMomPhi_stop  = TMath::Pi()*DEG;
-  const int mNumOfIndexMomentumPhi = 36;
-  */
+  const int mNumOfIndexMomentumPhi = 1;
 
   // initialization for mass hypotheses histogram
+  const int mNumOfParType = 6;
   const std::string mPID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
+  const int mPid[mNumOfParType] = {211,321,2212,-211,-321,-2212};
   const int mNPads=105;   ///// number of photonsenor segmentation pads
   const double mHalfWidth=52.5; // (mm) half width (x) and height (y) of the photon sensor
+
+  const int mLieklihood_start = -50;
+  const int mLieklihood_stop  = 450;
+  const int mNumOfLieklihood = 500;
 }
 
 #endif

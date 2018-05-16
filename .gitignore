@@ -11,6 +11,7 @@ obj/*.o
 bin/analysis
 bin/genMassHypo
 bin/calLikelihood
+bin/pid
 
 macros/AutoDict_*
 

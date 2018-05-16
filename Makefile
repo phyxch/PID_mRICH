@@ -106,6 +106,9 @@ calLikelihood : $(OBJ)calLikelihood.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o
 	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
 	@echo
 
+pid : $(OBJ)PID_mRICH.o $(OBJ)Utility.o
+	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
+	@echo
 
 ######################################################
 $(OBJ)%.o : 	$(MAIN)%.c $(INCS)
