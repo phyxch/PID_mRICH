@@ -79,7 +79,7 @@ int PID_mRICH::initChain()
    }
  }
 
- mChainInPut->SetBranchAddress("pid", &mPID);
+ mChainInPut->SetBranchAddress("pid", &mPid);
  mChainInPut->SetBranchAddress("px", &mPx);
  mChainInPut->SetBranchAddress("py", &mPy);
  mChainInPut->SetBranchAddress("pz", &mPz);
@@ -115,11 +115,11 @@ int PID_mRICH::initHistoMap_Likelihood()
 	{
 	  for(int i_phi = 0; i_phi < mRICH::mNumOfIndexMomentumPhi; ++i_phi)
 	  {
-	    string key_likelihood_first = utility->gen_KeyLikelihood(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,1);
+	    string key_likelihood_first = utility->gen_KeyLikelihood(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,1);
 	    // cout << key_likelihood_first.c_str() << endl;
 	    h_mLikelihoodDiff[key_likelihood_first] = new TH2D(key_likelihood_first.c_str(),key_likelihood_first.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop,mRICH::mNumOfLieklihood,mRICH::mLieklihood_start,mRICH::mLieklihood_stop);
 
-	    string key_likelihood_second = utility->gen_KeyLikelihood(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,2);
+	    string key_likelihood_second = utility->gen_KeyLikelihood(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,2);
 	    // cout << key_likelihood_second.c_str() << endl;
 	    h_mLikelihoodDiff[key_likelihood_second] = new TH2D(key_likelihood_second.c_str(),key_likelihood_second.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop,mRICH::mNumOfLieklihood,mRICH::mLieklihood_start,mRICH::mLieklihood_stop);
 	  }
@@ -145,10 +145,10 @@ int PID_mRICH::writeHistoMap_Likelihood()
 	{
 	  for(int i_phi = 0; i_phi < mRICH::mNumOfIndexMomentumPhi; ++i_phi)
 	  {
-	    string key_likelihood_first = utility->gen_KeyLikelihood(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,1);
+	    string key_likelihood_first = utility->gen_KeyLikelihood(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,1);
 	    h_mLikelihoodDiff[key_likelihood_first]->Write();
 
-	    string key_likelihood_second = utility->gen_KeyLikelihood(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,2);
+	    string key_likelihood_second = utility->gen_KeyLikelihood(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,2);
 	    h_mLikelihoodDiff[key_likelihood_second]->Write();
 	  }
 	}
@@ -173,19 +173,19 @@ int PID_mRICH::initHistoMap_Probability()
 	{
 	  for(int i_phi = 0; i_phi < mRICH::mNumOfIndexMomentumPhi; ++i_phi)
 	  {
-	    string key_prob_identified = utility->gen_KeyProb(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,0);
+	    string key_prob_identified = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,0);
 	    // cout << key_prob_identified.c_str() << endl;
 	    h_mProbability[key_prob_identified] = new TH1D(key_prob_identified.c_str(),key_prob_identified.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop);
 	    h_mProbability[key_prob_identified]->Sumw2();
 	    NumOfPID[key_prob_identified] = 0.0;
 
-	    string key_prob_misIdentified_first = utility->gen_KeyProb(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,1);
+	    string key_prob_misIdentified_first = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,1);
 	    // cout << key_prob_misIdentified_first.c_str() << endl;
 	    h_mProbability[key_prob_misIdentified_first] = new TH1D(key_prob_misIdentified_first.c_str(),key_prob_misIdentified_first.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop);
 	    h_mProbability[key_prob_misIdentified_first]->Sumw2();
 	    NumOfPID[key_prob_misIdentified_first] = 0.0;
 
-	    string key_prob_misIdentified_second = utility->gen_KeyProb(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,2);
+	    string key_prob_misIdentified_second = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,2);
 	    // cout << key_prob_misIdentified_second.c_str() << endl;
 	    h_mProbability[key_prob_misIdentified_second] = new TH1D(key_prob_misIdentified_second.c_str(),key_prob_misIdentified_second.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop);
 	    h_mProbability[key_prob_misIdentified_second]->Sumw2();
@@ -213,15 +213,15 @@ int PID_mRICH::writeHistoMap_Probability()
 	{
 	  for(int i_phi = 0; i_phi < mRICH::mNumOfIndexMomentumPhi; ++i_phi)
 	  {
-	    string key_prob_identified = utility->gen_KeyProb(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,0);
+	    string key_prob_identified = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,0);
 	    // cout << key_prob_identified.c_str() << endl;
 	    h_mProbability[key_prob_identified]->Write();
 
-	    string key_prob_misIdentified_first = utility->gen_KeyProb(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,1);
+	    string key_prob_misIdentified_first = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,1);
 	    // cout << key_prob_misIdentified_first.c_str() << endl;
 	    h_mProbability[key_prob_misIdentified_first]->Write();
 
-	    string key_prob_misIdentified_second = utility->gen_KeyProb(mRICH::mPid[i_pid],i_vx,i_vy,i_theta,i_phi,2);
+	    string key_prob_misIdentified_second = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,2);
 	    // cout << key_prob_misIdentified_second.c_str() << endl;
 	    h_mProbability[key_prob_misIdentified_second]->Write();
 	  }
@@ -280,25 +280,25 @@ int PID_mRICH::Make()
       break;
 
     const int indexSpaceX = utility->get_indexSpaceX(mVx);
-    const int indexSpaceY = utility->get_indexSpaceX(mVy);
+    const int indexSpaceY = utility->get_indexSpaceY(mVy);
     const int indexMomentumTheta = utility->get_indexMomentumTheta(mPx,mPy,mPz);
     const int indexMomentumPhi = utility->get_indexMomentumPhi(mPx,mPy);
     const double momentum = TMath::Sqrt(mPx*mPx+mPy*mPy+mPz*mPz); // in GeV
 
-    std::pair<double,double> likelihood_diff = this->get_LikelihoodDiff(mPID,mLpion,mLKaon,mLproton);
+    std::pair<double,double> likelihood_diff = this->get_LikelihoodDiff(mPid,mLpion,mLKaon,mLproton);
 
     //---- likelihood difference QA ----
-    string key_likelihood_first = utility->gen_KeyLikelihood(mPID,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,1);
+    string key_likelihood_first = utility->gen_KeyLikelihood(mPid,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,1);
     h_mLikelihoodDiff[key_likelihood_first]->Fill(momentum,likelihood_diff.first);
 
-    string key_likelihood_second = utility->gen_KeyLikelihood(mPID,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,2);
+    string key_likelihood_second = utility->gen_KeyLikelihood(mPid,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,2);
     h_mLikelihoodDiff[key_likelihood_second]->Fill(momentum,likelihood_diff.second);
     //---- likelihood difference QA ----
 
-    int rank = this->get_rank(mPID,mLpion,mLKaon,mLproton);
+    int rank = this->get_rank(mPid,mLpion,mLKaon,mLproton);
     if(rank < 0) continue;
 
-    string key_prob = utility->gen_KeyProb(mPID,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,rank);
+    string key_prob = utility->gen_KeyProb(mPid,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,rank);
     h_mProbability[key_prob]->Fill(momentum);
     NumOfPID[key_prob]++;
   }

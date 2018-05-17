@@ -20,11 +20,12 @@ class Utility
     int get_indexMomentumTheta(double px, double py, double pz);
     int get_indexMomentumPhi(double px, double py);
 
-    // std::string gen_KeyMassHypo(int pid, int index_vx, int index_vy, int index_p, int index_theta, int index_phi);
+    std::string gen_KeyNumOfEvents(int pid, int index_vx, int index_vy, int index_p, int index_theta, int index_phi);
+    std::string gen_KeyMassHypo(int pid, int index_vx, int index_vy, int index_p, int index_theta, int index_phi);
 
-    // order: 0 for identified | 1 for 1st misIdentified | 2 for 2nd misIdentified
-    std::string gen_KeyLikelihood(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int order);
-    std::string gen_KeyProb(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int order);
+    // rank: 0 for identified | 1 for 1st misIdentified | 2 for 2nd misIdentified
+    std::string gen_KeyLikelihood(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int rank);
+    std::string gen_KeyProb(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int rank);
 
 
   private:

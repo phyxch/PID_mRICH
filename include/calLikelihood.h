@@ -11,7 +11,6 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
-#include "LLTreeDst.h"
 #include "type.h"
 
 using namespace std;
@@ -24,12 +23,18 @@ class Utility;
 class calLikelihood
 {
  public:
-  calLikelihood(string inputdatebase, string outputfile);
+  calLikelihood(string date, string inputdatabase, string outputfile);
   ~calLikelihood();
   
-  int init();
-  int process_event(event *aevt, hit *ahit);
-  int end();
+  int Init();
+  int initChain();
+  int initTree();
+  int initHistoMap();
+
+  int Make();
+
+  int Finish();
+  int writeTree();
   
   bool isPhoton(hit *ahit, int i);
   bool isReflection(hit *ahit, int i);
@@ -40,16 +45,37 @@ class calLikelihood
  private:
   material *mat;
   Utility *utility;
+  string mDate;
   string mInPutDataBase;
   string mOutPutFile;
-  TFile *File_InPutDataBase;
-  TFile *File_OutPut;
+  TFile *mFile_InPutDataBase;
+  TFile *mFile_OutPut;
 
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumP | indexMomentumTheta | indexMomentumPhi
-  TH1DMap hNEvtvsP; // number of total events
-  TH2DMap h_photonDist; // x: photon out_x | y: photon out_y 
+  TH1DMap h_mNumOfEvents; // number of total events
+  TH2DMap h_mPhotonDist; // x: photon out_x | y: photon out_y 
   
   TTree *mTree;
-  LLTreeDst mDst;
+  int mPid;
+  double mPx;
+  double mPy;
+  double mPz;
+  double mVx;
+  double mVy;
+  double mVz;
+  double mTheta;
+  double mPhi;
+  int mNHit;
+  int mNHitAegl;
+  int mNHitPhoDet;
+  int mNelSbKCs;
+  int mNelGaAsP;
+  int mNelGaAs;
+  double mLpion;
+  double mLKaon;
+  double mLproton;
+
+  TChain *mChainInPut_Events;
+  TChain *mChainInPut_Tracks;
 };
 #endif

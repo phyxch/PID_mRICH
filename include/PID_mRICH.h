@@ -47,15 +47,15 @@ class PID_mRICH
   Utility *utility;
 
   TChain *mChainInPut; // branches list below
-  int mPID;
-  float mPx;
-  float mPy;
-  float mPz;
-  float mVx;
-  float mVy;
-  float mVz;
-  float mTheta;
-  float mPhi;
+  int mPid;
+  double mPx;
+  double mPy;
+  double mPz;
+  double mVx;
+  double mVy;
+  double mVz;
+  double mTheta;
+  double mPhi;
   int mNHit;
   int mNHitAegl;
   int mNHitPhoDet;

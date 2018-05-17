@@ -5,13 +5,11 @@
 #include <fstream>
 #include <stdlib.h>
 #include "string.h"
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
+#include <TH1D.h>
+#include <TH2D.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
-#include "LLTreeDst.h"
 #include "type.h"
 
 using namespace std;
@@ -24,27 +22,35 @@ class Utility;
 class genMassHypo
 {
  public:
-  genMassHypo(string outputfile);
+  genMassHypo(string date, string outputfile);
   ~genMassHypo();
   
-  int init();
-  int process_event(event *aevt, hit *ahit);
-  int end();
+  int Init();
+  int initChain();
+  int initHistoMap();
+
+  int Make();
+
+  int Finish();
+  int writeHistoMap();
   
   bool isPhoton(hit *ahit, int i);
   bool isReflection(hit *ahit, int i);
   bool isOnAerogel(hit *ahit, int i);
   bool isOnPhotonSensor(hit *ahit, int i);
-  double probability(TH2D* db, TH2D *hXY);
   
  private:
   material *mat;
   Utility *utility;
+  string mDate;
   string mOutPutFile;
-  TFile *File_OutPut;
+  TFile *File_mOutPut;
 
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumP | indexMomentumTheta | indexMomentumPhi
-  TH1DMap hNEvtvsP; // number of total events
-  TH2DMap h_photonDist; // x: photon out_x | y: photon out_y 
+  TH1DMap h_mNumOfEvents; // number of total events
+  TH2DMap h_mPhotonDist; // x: photon out_x | y: photon out_y 
+
+  TChain *mChainInPut_Events;
+  TChain *mChainInPut_Tracks;
 };
 #endif

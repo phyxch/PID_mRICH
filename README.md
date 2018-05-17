@@ -1,4 +1,4 @@
-### this is a terrible code now
+### this is a fine code now
 
 #### TODO: `Xu Sun @ 05/08/2018`
 
@@ -11,7 +11,7 @@
 - [ ] update track class to a ROOT class
 - [x] add a new ROOT class for log likelihood calculation
 > generate an ROOT tree to store likelihood to be a pion, Kaon and proton
-- [ ] update LLTreeDst class to a ROOT class
+- [] ~~update LLTreeDst class to a ROOT class~~
 - [x] re-write Makefile to generate ROOT shared library
 - [x] add macros to analysis likelihood
 

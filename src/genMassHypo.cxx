@@ -23,13 +23,14 @@ using namespace std;
 using namespace TMath;
 
 
-genMassHypo::genMassHypo(string outputfile)
+genMassHypo::genMassHypo(string date, string outputfile)
 {
  cout<<endl;
  cout<<"genMassHypo::genMassHypo() ----- Constructor ! ------"<<endl;
  cout<<endl;
  mOutPutFile = outputfile;
- init();
+ mDate = date;
+ utility = new Utility(); // initialize utility class
 }
 
 genMassHypo::~genMassHypo()
@@ -37,123 +38,189 @@ genMassHypo::~genMassHypo()
  cout<<"genMassHypo::~genMassHypo() ----- Release memory ! ------"<<endl;
  delete mat;
  delete utility;
- delete File_OutPut;
+ delete File_mOutPut;
 }
 
-int genMassHypo::init()
+int genMassHypo::Init()
 {
- cout<<"genMassHypo::init() ----- Initialization ! ------"<<endl;
+  cout<<"genMassHypo::Init() ----- Initialization ! ------"<<endl;
+  cout<<"genMassHypo::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
+  File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
+  mat = new material(); //// initialize the material
 
- mat = new material(); //// initialize the material
- utility = new Utility(); // initialize utility class
-
- cout<<"genMassHypo::init(), create output file: "<< mOutPutFile.c_str() <<endl;
- File_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
-
- cout<<"genMassHypo::init(), initialize database histograms ;"<<endl;
-
- for(int i_pid = 0; i_pid < 6; ++i_pid)
- {
-   for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
-   {
-     for(int i_vy = 0; i_vy < mRICH::mNumOfIndexSpaceY; ++i_vy)
-     {
-       for(int i_mom = 0; i_mom < mRICH::mNumOfIndexMomentumP; ++i_mom)
-       {
-	 string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	 // cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
-	 hNEvtvsP[key_events] = new TH1D(key_events.c_str(),key_events.c_str(),1,-0.5,0.5);
-
-	 string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	 // cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
-	 h_photonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
-       }
-     }
-   }
- }
-
- return 0;
+  initChain();
+  initHistoMap();
+  return 0;
 }
 
-int genMassHypo::process_event(event *aevt, hit *ahit)
+int genMassHypo::initChain()
 {
-  int pid_gen=0;
-  float px_gen=0;
-  float py_gen=0;
-  float pz_gen=0;
-  float vx_gen=0;
-  float vy_gen=0;
-  float vz_gen=0;
-  float p_gen=0;
-  float theta_gen=0;
-  float phi_gen=0;
-  // cout<< "tree generated size: "<< aevt->get_pid()->size() <<";    tree flux size:  "<< ahit->get_hitn()->size() <<endl;
-  for (unsigned int i=0;i<aevt->get_pid()->size();i++) {
-    pid_gen=aevt->get_pid()->at(i);
-    px_gen=aevt->get_px()->at(i)/1e3;    //in MeV, convert to GeV
-    py_gen=aevt->get_py()->at(i)/1e3;    //in MeV, convert to GeV
-    pz_gen=aevt->get_pz()->at(i)/1e3;    //in MeV, convert to GeV
-    vx_gen=aevt->get_vx()->at(i);        //in mm
-    vy_gen=aevt->get_vy()->at(i);        //in mm
-    vz_gen=aevt->get_vz()->at(i);        //in mm
-    p_gen=sqrt(px_gen*px_gen+py_gen*py_gen+pz_gen*pz_gen);
-    theta_gen=acos(pz_gen/p_gen)*mRICH::DEG;    //in deg
-    phi_gen=atan2(py_gen,px_gen)*mRICH::DEG;    //in deg            
-  }  
+  string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
+  string InPutList = Form("/work/eic/xusun/list/modular_rich/mRICH_PDF_%s.list",mDate.c_str());
   
-  string identifiedParticle = utility->get_IdentifiedParticle(pid_gen);
-  int indexSpaceX = utility->get_indexSpaceX(vx_gen);
-  int indexSpaceY = utility->get_indexSpaceX(vy_gen);
-  int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
+  mChainInPut_Events = new TChain("generated");
+  mChainInPut_Tracks = new TChain("eic_rich");
 
-  string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",identifiedParticle.c_str(),indexSpaceX,indexSpaceY,indexMomentumP);
-  // cout << "fill histogram: " << key_events.c_str() << endl;
-  hNEvtvsP[key_events]->Fill(0);
-
-  string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",identifiedParticle.c_str(),indexSpaceX,indexSpaceY,indexMomentumP);
-  // cout << "fill histogram: " << key_photon.c_str() << endl;
-  int nhits = ahit->get_hitn()->size();
-  for (int i=0;i<nhits;i++) 
+  if (!InPutList.empty())   // if input file is ok
   {
-    if(isPhoton(ahit,i) && !isReflection(ahit,i) && isOnPhotonSensor(ahit,i))
+    cout << "Open test file list " << endl;
+    ifstream in(InPutList.c_str());  // input stream
+    if(in)
     {
-      double out_x = ahit->get_out_x()->at(i);
-      double out_y = ahit->get_out_y()->at(i);
-      h_photonDist[key_photon]->Fill(out_x,out_y);
+      cout << "input file list is ok" << endl;
+      char str[255];       // char array for each file name
+      Long64_t entries_save = 0;
+      while(in)
+      {
+	in.getline(str,255);  // take the lines of the file list
+	if(str[0] != 0)
+	{
+	  string addfile;
+	  addfile = str;
+	  addfile = inputdir+addfile;
+	  mChainInPut_Events->AddFile(addfile.c_str(),-1,"generated");
+	  mChainInPut_Tracks->AddFile(addfile.c_str(),-1,"eic_rich");
+	  long file_entries = mChainInPut_Events->GetEntries();
+	  cout << "File added to data chain: " << addfile.c_str() << " with " << (file_entries-entries_save) << " entries" << endl;
+	  entries_save = file_entries;
+	}
+      }
+    }
+    else
+    {
+      cout << "WARNING: test file input is problemtic" << endl;
+    }
+  }
+  return 0;
+}
+
+int genMassHypo::initHistoMap()
+{
+  cout<<"genMassHypo::initHistoMap(), initialize database histograms ;"<<endl;
+
+  for(int i_pid = 0; i_pid < 6; ++i_pid)
+  {
+    for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
+    {
+      for(int i_vy = 0; i_vy < mRICH::mNumOfIndexSpaceY; ++i_vy)
+      {
+	for(int i_mom = 0; i_mom < mRICH::mNumOfIndexMomentumP; ++i_mom)
+	{
+	  for(int i_theta = 0; i_theta < mRICH::mNumOfIndexMomentumTheta; ++i_theta)
+	  {
+	    for(int i_phi = 0; i_phi < mRICH::mNumOfIndexMomentumPhi; ++i_phi)
+	    {
+	      string key_events = utility->gen_KeyNumOfEvents(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
+	      // cout << "genMassHypo::init(), initialize histogram: " << key_events.c_str() << endl;
+	      h_mNumOfEvents[key_events] = new TH1D(key_events.c_str(),key_events.c_str(),1,-0.5,0.5);
+
+	      string key_photon = utility->gen_KeyMassHypo(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
+	      // cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
+	      h_mPhotonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
+	    }
+	  }
+	}
+      }
     }
   }
 
   return 0;
 }
 
-int genMassHypo::end()
+int genMassHypo::Make()
+{
+  event *aevt = new event(mChainInPut_Events);  /// declear and save info to branchs for event
+  hit *ahit = new hit(mChainInPut_Tracks);	/// declear and save info to branchs for track
+
+  long NumOfEvents = (long)mChainInPut_Events->GetEntries();
+  mChainInPut_Events->GetEntry(0);
+  mChainInPut_Tracks->GetEntry(0);
+
+  // for(int i_event = 0; i_event < 1024; ++i_event) // test event loop
+  for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
+  { 
+    if(i_event%100==0) cout << "processing event:  " << i_event << " ;"<<endl;
+
+    mChainInPut_Events->GetEntry(i_event);  
+    mChainInPut_Tracks->GetEntry(i_event);
+
+    const int  pid_gen = aevt->get_pid()->at(0);
+    const double px_gen = aevt->get_px()->at(0)/1e3;    //in MeV, convert to GeV
+    const double py_gen = aevt->get_py()->at(0)/1e3;    //in MeV, convert to GeV
+    const double pz_gen = aevt->get_pz()->at(0)/1e3;    //in MeV, convert to GeV
+    const double vx_gen = aevt->get_vx()->at(0);        //in mm
+    const double vy_gen = aevt->get_vy()->at(0);        //in mm
+    const double vz_gen = aevt->get_vz()->at(0);        //in mm
+
+    const int indexSpaceX = utility->get_indexSpaceX(vx_gen);
+    const int indexSpaceY = utility->get_indexSpaceY(vy_gen);
+    const int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
+    const int indexMomentumTheta = utility->get_indexMomentumTheta(px_gen,py_gen,pz_gen);
+    const int indexMomentumPhi = utility->get_indexMomentumPhi(px_gen,py_gen);
+
+    string key_events = utility->gen_KeyNumOfEvents(pid_gen,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
+    // cout << "fill histogram: " << key_events.c_str() << endl;
+    h_mNumOfEvents[key_events]->Fill(0);
+
+    string key_photon = utility->gen_KeyMassHypo(pid_gen,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
+    // cout << "fill histogram: " << key_photon.c_str() << endl;
+
+    int NumOfTracks = ahit->get_hitn()->size();
+    for (int i_track = 0; i_track < NumOfTracks; ++i_track) // track loop
+    {
+      if(isPhoton(ahit,i_track) && !isReflection(ahit,i_track) && isOnPhotonSensor(ahit,i_track))
+      {
+	double out_x = ahit->get_out_x()->at(i_track);
+	double out_y = ahit->get_out_y()->at(i_track);
+	h_mPhotonDist[key_photon]->Fill(out_x,out_y);
+      }
+    }
+  }
+
+  return 0;
+}
+
+int genMassHypo::Finish()
 {
   cout<<endl;
-  cout<<"genMassHypo::end() ----- Write out tree and histogram to files !------"<<endl;
+  cout<<"genMassHypo::Finish() ----- Write out tree and histogram to files !------"<<endl;
   cout<<"This is the end of this program !"<<endl;
-  if(File_OutPut != NULL){
-    File_OutPut->cd();
-    for(int i_pid = 0; i_pid < 6; ++i_pid)
-    {
-      for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
-      {
-	for(int i_vy = 0; i_vy < mRICH::mNumOfIndexSpaceY; ++i_vy)
-	{
-	  for(int i_mom = 0; i_mom < mRICH::mNumOfIndexMomentumP; ++i_mom)
-	  {
-	    string key_events = Form("h_NumofEvents_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	    // cout << "genMassHypo::end(), write histogram: " << key_events.c_str() << endl;
-	    hNEvtvsP[key_events]->Write();
+  if(File_mOutPut != NULL){
+    File_mOutPut->cd();
+    writeHistoMap();
+    File_mOutPut->Close();
+  }
+  return 0;
+}
 
-	    string key_photon = Form("h_photonDist_%s_vx_%d_vy_%d_mom_%d",mRICH::mPID[i_pid].c_str(),i_vx,i_vy,i_mom);
-	    // cout << "genMassHypo::end(), write histogram: " << key_photon.c_str() << endl;
-	    h_photonDist[key_photon]->Write();
+int genMassHypo::writeHistoMap()
+{
+  for(int i_pid = 0; i_pid < 6; ++i_pid)
+  {
+    for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
+    {
+      for(int i_vy = 0; i_vy < mRICH::mNumOfIndexSpaceY; ++i_vy)
+      {
+	for(int i_mom = 0; i_mom < mRICH::mNumOfIndexMomentumP; ++i_mom)
+	{
+	  for(int i_theta = 0; i_theta < mRICH::mNumOfIndexMomentumTheta; ++i_theta)
+	  {
+	    for(int i_phi = 0; i_phi < mRICH::mNumOfIndexMomentumPhi; ++i_phi)
+	    {
+	      string key_events = utility->gen_KeyNumOfEvents(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
+	      // cout << "genMassHypo::end(), write histogram: " << key_events.c_str() << endl;
+	      h_mNumOfEvents[key_events]->Write();
+
+	      string key_photon = utility->gen_KeyMassHypo(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
+	      // cout << "genMassHypo::end(), write histogram: " << key_photon.c_str() << endl;
+	      h_mPhotonDist[key_photon]->Write();
+	    }
 	  }
 	}
       }
     }
-    File_OutPut->Close();
   }
+
   return 0;
 }
 
@@ -184,70 +251,16 @@ bool genMassHypo::isOnPhotonSensor(hit *ahit, int i)
 }
 
 ////// This is the main function 
-int main(int argc, char **argv)
+int main()
 {
   string date = "May10_2018";
-
-  string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",date.c_str());
-  string InPutList = Form("/work/eic/xusun/list/modular_rich/mRICH_PDF_%s.list",date.c_str());
-
+  
   string outputfile = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
+  genMassHypo *genMassHypotheses = new genMassHypo(date,outputfile);
   
-  TChain *fevt  = new TChain("generated");
-  TChain *fhit  = new TChain("eic_rich");
-
-  if (!InPutList.empty())   // if input file is ok
-  {
-    TString InFo_List ="Open test file list ";
-    cout << InFo_List.Data() << endl;
-    ifstream in(InPutList.c_str());  // input stream
-    if(in)
-    {
-      cout << "input file list is ok" << endl;
-      char str[255];       // char array for each file name
-      Long64_t entries_save = 0;
-      while(in)
-      {
-	in.getline(str,255);  // take the lines of the file list
-	if(str[0] != 0)
-	{
-	  TString addfile;
-	  addfile = str;
-	  addfile = inputdir+addfile;
-	  fevt->AddFile(addfile.Data(),-1,"generated");
-	  fhit->AddFile(addfile.Data(),-1,"eic_rich");
-	  Long64_t file_entries = fevt->GetEntries();
-	  cout << "File added to data chain: " << addfile.Data() << " with " << (file_entries-entries_save) << " entries" << endl;
-	  entries_save = file_entries;
-	}
-      }
-    }
-    else
-    {
-      TString InFo_Warning = "WARNING: test file input is problemtic";
-      cout << InFo_Warning.Data() << endl;
-    }
-  }
-  
-  event *aevt = new event(fevt);  /// declear and save info to branchs for event
-  hit *ahit = new hit(fhit);	/// declear and save info to branchs for track
-  
-  genMassHypo *genMassHypotheses = new genMassHypo(outputfile);
-  
-  int nevent = (int)fevt->GetEntries();
-  cout << "total number of events:  " << nevent << endl;
-  for (Int_t i=0;i<nevent;i++) { 
-    if(i%100==0) cout << "processing event:  " << i << " ;"<<endl;
-    fevt->GetEntry(i);  
-    fhit->GetEntry(i);
-    genMassHypotheses->process_event(aevt, ahit);
-  }
-  
-  genMassHypotheses->end();
-  delete ahit;
-  delete aevt;
-  delete fhit;
-  delete fevt;
+  genMassHypotheses->Init();
+  genMassHypotheses->Make();
+  genMassHypotheses->Finish();
   
   return 0;
 }

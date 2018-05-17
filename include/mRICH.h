@@ -37,8 +37,7 @@ namespace mRICH
 
   // initialization for mass hypotheses histogram
   const int mNumOfParType = 6;
-  const std::string mPID[6] = {"piplus","Kplus","proton","piminus","Kminus","antiproton"};
-  const int mPid[mNumOfParType] = {211,321,2212,-211,-321,-2212};
+  const int mPIDArray[mNumOfParType] = {211,321,2212,-211,-321,-2212};
   const int mNPads=105;   ///// number of photonsenor segmentation pads
   const double mHalfWidth=52.5; // (mm) half width (x) and height (y) of the photon sensor
 
