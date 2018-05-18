@@ -26,6 +26,7 @@ class Utility
     // rank: 0 for identified | 1 for 1st misIdentified | 2 for 2nd misIdentified
     std::string gen_KeyLikelihood(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int rank);
     std::string gen_KeyProb(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int rank);
+    std::string gen_KeySumOfPID(int pid, int index_vx, int index_vy, int index_theta, int index_phi);
 
 
   private:

@@ -172,11 +172,11 @@ std::string Utility::gen_KeyLikelihood(int pid, int index_vx, int index_vy, int 
 
   if(rank == 1)
   {
-    key_likelihood = Form("h_likelihood_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);
+    key_likelihood = Form("h_mLikelihoodDiff_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);
   }
   if(rank == 2)
   {
-    key_likelihood = Form("h_likelihood_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
+    key_likelihood = Form("h_mLikelihoodDiff_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
   }
 
   return key_likelihood;
@@ -190,16 +190,25 @@ std::string Utility::gen_KeyProb(int pid, int index_vx, int index_vy, int index_
 
   if(rank == 0)
   {
-    key_prob = Form("h_prob_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),identifiedParticle.c_str(),index_vx,index_vy,index_theta,index_phi);
+    key_prob = Form("h_mProbability_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),identifiedParticle.c_str(),index_vx,index_vy,index_theta,index_phi);
   }
   if(rank == 1)
   {
-    key_prob = Form("h_prob_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);
+    key_prob = Form("h_mProbability_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);
   }
   if(rank == 2)
   {
-    key_prob = Form("h_prob_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
+    key_prob = Form("h_mProbability_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
   }
 
   return key_prob;
+}
+
+std::string Utility::gen_KeySumOfPID(int pid, int index_vx, int index_vy, int index_theta, int index_phi)
+{
+  std::string identifiedParticle = this->get_IdentifiedParticle(pid);
+
+  std::string key_sumofpid = Form("h_mSumOfPID_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),index_vx,index_vy,index_theta,index_phi);
+
+  return key_sumofpid;
 }

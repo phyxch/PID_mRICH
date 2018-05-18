@@ -68,8 +68,8 @@ class PID_mRICH
 
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumTheta | indexMomentumPhi
   TH1DMap h_mProbability; // p vs. probability
+  TH1DMap h_mSumOfPID; // p vs. total number
   TH2DMap h_mLikelihoodDiff; // x: p | y: likelihood difference 
-  doubleMap NumOfPID;
   // doubleMap SumOfPID;
   
 };

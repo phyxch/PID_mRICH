@@ -56,18 +56,18 @@ int genMassHypo::Init()
 int genMassHypo::initChain()
 {
   string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
-  string InPutList = Form("/work/eic/xusun/list/modular_rich/mRICH_PDF_%s.list",mDate.c_str());
+  string InPutList = Form("/work/eic/xusun/list/database/mRICH_PDF_%s.list",mDate.c_str());
   
   mChainInPut_Events = new TChain("generated");
   mChainInPut_Tracks = new TChain("eic_rich");
 
   if (!InPutList.empty())   // if input file is ok
   {
-    cout << "Open test file list " << endl;
+    cout << "Open input database file list " << endl;
     ifstream in(InPutList.c_str());  // input stream
     if(in)
     {
-      cout << "input file list is ok" << endl;
+      cout << "input database file list is ok" << endl;
       char str[255];       // char array for each file name
       Long64_t entries_save = 0;
       while(in)
@@ -88,9 +88,13 @@ int genMassHypo::initChain()
     }
     else
     {
-      cout << "WARNING: test file input is problemtic" << endl;
+      cout << "WARNING: input database file input is problemtic" << endl;
     }
   }
+
+  long NumOfEvents = (long)mChainInPut_Events->GetEntries();
+  cout << "total number of events: " << NumOfEvents << endl;
+
   return 0;
 }
 
@@ -133,6 +137,7 @@ int genMassHypo::Make()
   hit *ahit = new hit(mChainInPut_Tracks);	/// declear and save info to branchs for track
 
   long NumOfEvents = (long)mChainInPut_Events->GetEntries();
+
   mChainInPut_Events->GetEntry(0);
   mChainInPut_Tracks->GetEntry(0);
 
@@ -253,7 +258,7 @@ bool genMassHypo::isOnPhotonSensor(hit *ahit, int i)
 ////// This is the main function 
 int main()
 {
-  string date = "May10_2018";
+  string date = "May15_2018";
   
   string outputfile = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
   genMassHypo *genMassHypotheses = new genMassHypo(date,outputfile);

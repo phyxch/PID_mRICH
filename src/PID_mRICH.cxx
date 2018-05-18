@@ -45,17 +45,17 @@ int PID_mRICH::Init()
 int PID_mRICH::initChain()
 {
  string inputdir = "/work/eic/xusun/output/likelihood/";
- string InPutList = Form("/work/eic/xusun/list/modular_rich/mRICH_Prob_%s.list",mDate.c_str());
+ string InPutList = Form("/work/eic/xusun/list/probability/mRICH_Prob_%s.list",mDate.c_str());
 
  mChainInPut = new TChain("LLTreeDst");
 
  if (!InPutList.empty())   // if input file is ok
  {
-   cout << "Open test file list" << endl;
+   cout << "Open input probability file list" << endl;
    ifstream in(InPutList.c_str());  // input stream
    if(in)
    {
-     cout << "input file list is ok" << endl;
+     cout << "input file probability list is ok" << endl;
      char str[255];       // char array for each file name
      Long64_t entries_save = 0;
      while(in)
@@ -75,7 +75,7 @@ int PID_mRICH::initChain()
    }
    else
    {
-     cout << "WARNING: test file input is problemtic" << endl;
+     cout << "WARNING: input probability file input is problemtic" << endl;
    }
  }
 
@@ -97,6 +97,9 @@ int PID_mRICH::initChain()
  mChainInPut->SetBranchAddress("Lpion", &mLpion);
  mChainInPut->SetBranchAddress("LKaon", &mLKaon);
  mChainInPut->SetBranchAddress("Lproton", &mLproton);
+
+ long NumOfEvents = (long)mChainInPut->GetEntries();
+ cout << "total number of events: " << NumOfEvents << endl;
 
  return 0;
 }
@@ -177,19 +180,21 @@ int PID_mRICH::initHistoMap_Probability()
 	    // cout << key_prob_identified.c_str() << endl;
 	    h_mProbability[key_prob_identified] = new TH1D(key_prob_identified.c_str(),key_prob_identified.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop);
 	    h_mProbability[key_prob_identified]->Sumw2();
-	    NumOfPID[key_prob_identified] = 0.0;
 
 	    string key_prob_misIdentified_first = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,1);
 	    // cout << key_prob_misIdentified_first.c_str() << endl;
 	    h_mProbability[key_prob_misIdentified_first] = new TH1D(key_prob_misIdentified_first.c_str(),key_prob_misIdentified_first.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop);
 	    h_mProbability[key_prob_misIdentified_first]->Sumw2();
-	    NumOfPID[key_prob_misIdentified_first] = 0.0;
 
 	    string key_prob_misIdentified_second = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,2);
 	    // cout << key_prob_misIdentified_second.c_str() << endl;
 	    h_mProbability[key_prob_misIdentified_second] = new TH1D(key_prob_misIdentified_second.c_str(),key_prob_misIdentified_second.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop);
 	    h_mProbability[key_prob_misIdentified_second]->Sumw2();
-	    NumOfPID[key_prob_misIdentified_second] = 0.0;
+
+	    // total number of particles to be identified
+	    string key_sumofpid = utility->gen_KeySumOfPID(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi);
+	    h_mSumOfPID[key_sumofpid] = new TH1D(key_sumofpid.c_str(),key_sumofpid.c_str(),mRICH::mNumOfIndexMomentumP,mRICH::mMomP_start,mRICH::mMomP_stop);
+	    h_mSumOfPID[key_sumofpid]->Sumw2();
 	  }
 	}
       }
@@ -224,6 +229,10 @@ int PID_mRICH::writeHistoMap_Probability()
 	    string key_prob_misIdentified_second = utility->gen_KeyProb(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,2);
 	    // cout << key_prob_misIdentified_second.c_str() << endl;
 	    h_mProbability[key_prob_misIdentified_second]->Write();
+
+	    // total number of particles to be identified
+	    string key_sumofpid = utility->gen_KeySumOfPID(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi);
+	    h_mSumOfPID[key_sumofpid]->Write();
 	  }
 	}
       }
@@ -271,6 +280,7 @@ int PID_mRICH::get_rank(int pid, double Lpion, double LKaon, double Lproton)
 int PID_mRICH::Make()
 {
   long NumOfEvents = (long)mChainInPut->GetEntries();
+
   mChainInPut->GetEntry(0); // For unknown reasons root doesn't like it if someone starts to read a file not from the 0 entry
 
   for(long i_event = 0; i_event < NumOfEvents; ++i_event)
@@ -278,6 +288,8 @@ int PID_mRICH::Make()
   {
     if (!mChainInPut->GetEntry(i_event)) // take the event -> information is stored in event
       break;
+
+    if(i_event%100==0) cout << "processing event:  " << i_event << " ;"<<endl;
 
     const int indexSpaceX = utility->get_indexSpaceX(mVx);
     const int indexSpaceY = utility->get_indexSpaceY(mVy);
@@ -300,7 +312,9 @@ int PID_mRICH::Make()
 
     string key_prob = utility->gen_KeyProb(mPid,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,rank);
     h_mProbability[key_prob]->Fill(momentum);
-    NumOfPID[key_prob]++;
+
+    string key_sumofpid = utility->gen_KeySumOfPID(mPid,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi);
+    h_mSumOfPID[key_sumofpid]->Fill(momentum);
   }
 
   return 0;
@@ -323,7 +337,7 @@ int PID_mRICH::Finish()
 ////// This is the main function 
 int main()
 {
-  string date = "May10_2018";
+  string date = "May15_2018";
   string outputfile = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
 
   PID_mRICH *mPID_mRICH = new PID_mRICH(date,outputfile);
