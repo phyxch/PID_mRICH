@@ -230,7 +230,8 @@ int calLikelihood::Make()
     // cout << endl;
 
     // fill photon distribution of unknown PID
-    TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
+    // TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
+    TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
     int NumOfTracks = ahit->get_hitn()->size();
     for (int i_track = 0; i_track < NumOfTracks; ++i_track) // track loop
     {
@@ -322,11 +323,11 @@ bool calLikelihood::isOnPhotonSensor(hit *ahit, int i)
 double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
 {
   double prob=1.0;
-  const double noise = 2./mRICH::mNPads/mRICH::mNPads; // force every photon from inject particles used in likelihood calculation
+  const double noise = 2./mRICH::mNumOfPixels/mRICH::mNumOfPixels; // force every photon from inject particles used in likelihood calculation
 
-  for(unsigned int i_x = 0; i_x < mRICH::mNPads; i_x++)
+  for(unsigned int i_x = 0; i_x < mRICH::mNumOfPixels; i_x++)
   {
-    for(unsigned int i_y = 0; i_y < mRICH::mNPads; i_y++)
+    for(unsigned int i_y = 0; i_y < mRICH::mNumOfPixels; i_y++)
     {
       double k = h_photonDist_PID->GetBinContent(i_x+1,i_y+1); // detected photon number
       double lambda = h_database->GetBinContent(i_x+1,i_y+1); // averaged photon number
@@ -341,7 +342,7 @@ double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
 ////// This is the main function 
 int main()
 {
-  string date = "May15_2018";
+  string date = "May18_2018";
   string inputdatabase = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
   string outputfile = Form("/work/eic/xusun/output/likelihood/PID_Likelihood_%s.root",date.c_str());
 

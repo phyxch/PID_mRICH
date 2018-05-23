@@ -23,12 +23,12 @@ using namespace std;
 using namespace TMath;
 
 
-genMassHypo::genMassHypo(string date, string outputfile)
+genMassHypo::genMassHypo(string numoflist, string date)
 {
  cout<<endl;
  cout<<"genMassHypo::genMassHypo() ----- Constructor ! ------"<<endl;
  cout<<endl;
- mOutPutFile = outputfile;
+ mNumOfList = numoflist;
  mDate = date;
  utility = new Utility(); // initialize utility class
 }
@@ -44,6 +44,8 @@ genMassHypo::~genMassHypo()
 int genMassHypo::Init()
 {
   cout<<"genMassHypo::Init() ----- Initialization ! ------"<<endl;
+
+  mOutPutFile = Form("/work/eic/xusun/output/database/PDF_database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
   cout<<"genMassHypo::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
   mat = new material(); //// initialize the material
@@ -56,14 +58,14 @@ int genMassHypo::Init()
 int genMassHypo::initChain()
 {
   string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
-  string InPutList = Form("/work/eic/xusun/list/database/mRICH_PDF_%s.list",mDate.c_str());
+  string InPutList = Form("/work/eic/xusun/list/database/mRICH_PDF_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
   
   mChainInPut_Events = new TChain("generated");
   mChainInPut_Tracks = new TChain("eic_rich");
 
   if (!InPutList.empty())   // if input file is ok
   {
-    cout << "Open input database file list " << endl;
+    cout << "Open input database file list: " << InPutList.c_str() << endl;
     ifstream in(InPutList.c_str());  // input stream
     if(in)
     {
@@ -120,7 +122,8 @@ int genMassHypo::initHistoMap()
 
 	      string key_photon = utility->gen_KeyMassHypo(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
 	      // cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
-	      h_mPhotonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNPads,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
+	      // h_mPhotonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
+	      h_mPhotonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
 	    }
 	  }
 	}
@@ -141,10 +144,10 @@ int genMassHypo::Make()
   mChainInPut_Events->GetEntry(0);
   mChainInPut_Tracks->GetEntry(0);
 
-  // for(int i_event = 0; i_event < 1024; ++i_event) // test event loop
+  // for(int i_event = 0; i_event < 50000; ++i_event) // test event loop
   for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
   { 
-    if(i_event%100==0) cout << "processing event:  " << i_event << " ;"<<endl;
+    if(i_event%1000==0) cout << "processing event:  " << i_event << " ;"<<endl;
 
     mChainInPut_Events->GetEntry(i_event);  
     mChainInPut_Tracks->GetEntry(i_event);
@@ -157,11 +160,20 @@ int genMassHypo::Make()
     const double vy_gen = aevt->get_vy()->at(0);        //in mm
     const double vz_gen = aevt->get_vz()->at(0);        //in mm
 
+    const double momentum = TMath::Sqrt(px_gen*px_gen+py_gen*py_gen+pz_gen*pz_gen);
+    const double theta = TMath::ACos(pz_gen/momentum)*mRICH::DEG;    //in deg
+    const double phi = TMath::ATan2(py_gen,px_gen)*mRICH::DEG;    //in deg            
+
     const int indexSpaceX = utility->get_indexSpaceX(vx_gen);
     const int indexSpaceY = utility->get_indexSpaceY(vy_gen);
     const int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
     const int indexMomentumTheta = utility->get_indexMomentumTheta(px_gen,py_gen,pz_gen);
     const int indexMomentumPhi = utility->get_indexMomentumPhi(px_gen,py_gen);
+
+    if(indexSpaceX < 0 || indexSpaceY < 0 || indexMomentumP < 0 || indexMomentumTheta < 0 || indexMomentumPhi < 0) continue;
+
+    // if(indexMomentumTheta == 1 && indexMomentumPhi == 2)
+    //   cout << "vx_gen = " << vx_gen << ", vy_gen = " << vy_gen << ", momentum = " << momentum << ", theta = " << theta << ", phi = " << phi << endl;
 
     string key_events = utility->gen_KeyNumOfEvents(pid_gen,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
     // cout << "fill histogram: " << key_events.c_str() << endl;
@@ -256,12 +268,18 @@ bool genMassHypo::isOnPhotonSensor(hit *ahit, int i)
 }
 
 ////// This is the main function 
-int main()
+int main(int argc, char **argv)
 {
-  string date = "May15_2018";
+  if(argc!=2) return 0;
+
+  const char *input = argv[1];
+  string numoflist(input);
   
-  string outputfile = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
-  genMassHypo *genMassHypotheses = new genMassHypo(date,outputfile);
+  string date = "May21_2018";
+  // string date = Form("May21_2018_%d",list);
+  
+  cout << "numoflist = " << numoflist.c_str() << endl;
+  genMassHypo *genMassHypotheses = new genMassHypo(numoflist,date);
   
   genMassHypotheses->Init();
   genMassHypotheses->Make();

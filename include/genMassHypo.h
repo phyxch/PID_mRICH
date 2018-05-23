@@ -22,7 +22,7 @@ class Utility;
 class genMassHypo
 {
  public:
-  genMassHypo(string date, string outputfile);
+  genMassHypo(string numoflist, string date);
   ~genMassHypo();
   
   int Init();
@@ -42,6 +42,7 @@ class genMassHypo
  private:
   material *mat;
   Utility *utility;
+  string mNumOfList;
   string mDate;
   string mOutPutFile;
   TFile *File_mOutPut;

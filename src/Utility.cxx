@@ -48,14 +48,15 @@ std::pair<std::string,std::string> Utility::get_misIdentifiedParticle(int pid)
 
 int Utility::get_indexSpaceX(double vx)
 {
-  const double delta_vx = (mRICH::mVx_stop-mRICH::mVx_start)/mRICH::mNumOfIndexSpaceX; 
+  // const double delta_vx = (mRICH::mVx_stop-mRICH::mVx_start)/mRICH::mNumOfIndexSpaceX; 
 
   int index = -1;
   if(vx >= mRICH::mVx_start && vx < mRICH::mVx_stop)
   {
     for(int i_index = 0; i_index < mRICH::mNumOfIndexSpaceX; ++i_index)
     {
-      if(vx >= mRICH::mVx_start+i_index*delta_vx && vx < mRICH::mVx_start+(i_index+1)*delta_vx)
+      // if(vx >= mRICH::mVx_start+i_index*delta_vx && vx < mRICH::mVx_start+(i_index+1)*delta_vx)
+      if(vx >= mRICH::mBin_Vx[i_index]-mRICH::mDelta_Vx && vx < mRICH::mBin_Vx[i_index]+mRICH::mDelta_Vx)
       {
 	index = i_index;
       }
@@ -67,14 +68,15 @@ int Utility::get_indexSpaceX(double vx)
 
 int Utility::get_indexSpaceY(double vy)
 {
-  const double delta_vy = (mRICH::mVy_stop-mRICH::mVy_start)/mRICH::mNumOfIndexSpaceY; 
+  // const double delta_vy = (mRICH::mVy_stop-mRICH::mVy_start)/mRICH::mNumOfIndexSpaceY; 
 
   int index = -1;
   if(vy >= mRICH::mVy_start && vy < mRICH::mVy_stop)
   {
     for(int i_index = 0; i_index < mRICH::mNumOfIndexSpaceY; ++i_index)
     {
-      if(vy >= mRICH::mVy_start+i_index*delta_vy && vy < mRICH::mVy_start+(i_index+1)*delta_vy)
+      // if(vy >= mRICH::mVy_start+i_index*delta_vy && vy < mRICH::mVy_start+(i_index+1)*delta_vy)
+      if(vy >= mRICH::mBin_Vy[i_index]-mRICH::mDelta_Vy && vy < mRICH::mBin_Vy[i_index]+mRICH::mDelta_Vy)
       {
 	index = i_index;
       }
@@ -88,14 +90,15 @@ int Utility::get_indexMomentumP(double px, double py, double pz)
 {
   const double momentum = TMath::Sqrt(px*px+py*py+pz*pz); // in GeV
 
-  const double delta_p = (mRICH::mMomP_stop-mRICH::mMomP_start)/mRICH::mNumOfIndexMomentumP; 
+  // const double delta_p = (mRICH::mMomP_stop-mRICH::mMomP_start)/mRICH::mNumOfIndexMomentumP; 
 
   int index = -1;
   if(momentum >= mRICH::mMomP_start && momentum < mRICH::mMomP_stop)
   {
     for(int i_index = 0; i_index < mRICH::mNumOfIndexMomentumP; ++i_index)
     {
-      if(momentum >= mRICH::mMomP_start+i_index*delta_p && momentum < mRICH::mMomP_start+(i_index+1)*delta_p)
+      // if(momentum >= mRICH::mMomP_start+i_index*delta_p && momentum < mRICH::mMomP_start+(i_index+1)*delta_p)
+      if(momentum >= mRICH::mBin_MomP[i_index]-mRICH::mDelta_MomP && momentum < mRICH::mBin_MomP[i_index]+mRICH::mDelta_MomP)
       {
 	index = i_index;
       }
@@ -109,7 +112,7 @@ int Utility::get_indexMomentumTheta(double px, double py, double pz)
 {
   const double momentum = TMath::Sqrt(px*px+py*py+pz*pz); // in GeV
 
-  const double delta_theta = (mRICH::mMomTheta_stop-mRICH::mMomTheta_start)/mRICH::mNumOfIndexMomentumTheta; 
+  // const double delta_theta = (mRICH::mMomTheta_stop-mRICH::mMomTheta_start)/mRICH::mNumOfIndexMomentumTheta; 
   const double theta = TMath::ACos(pz/momentum)*mRICH::DEG;    //in deg
 
   int index = -1;
@@ -117,7 +120,8 @@ int Utility::get_indexMomentumTheta(double px, double py, double pz)
   {
     for(int i_index = 0; i_index < mRICH::mNumOfIndexMomentumTheta; ++i_index)
     {
-      if(theta >= mRICH::mMomTheta_start+i_index*delta_theta && theta < mRICH::mMomTheta_start+(i_index+1)*delta_theta)
+      // if(theta >= mRICH::mMomTheta_start+i_index*delta_theta && theta < mRICH::mMomTheta_start+(i_index+1)*delta_theta)
+      if(theta >= mRICH::mBin_MomTheta[i_index]-mRICH::mDelta_MomTheta && theta < mRICH::mBin_MomTheta[i_index]+mRICH::mDelta_MomTheta)
       {
 	index = i_index;
       }
@@ -129,7 +133,7 @@ int Utility::get_indexMomentumTheta(double px, double py, double pz)
 
 int Utility::get_indexMomentumPhi(double px, double py)
 {
-  const double delta_phi = (mRICH::mMomPhi_stop-mRICH::mMomPhi_start)/mRICH::mNumOfIndexMomentumPhi; 
+  // const double delta_phi = (mRICH::mMomPhi_stop-mRICH::mMomPhi_start)/mRICH::mNumOfIndexMomentumPhi; 
   const double phi = TMath::ATan2(py,px)*mRICH::DEG;    //in deg            
 
   int index = -1;
@@ -137,7 +141,8 @@ int Utility::get_indexMomentumPhi(double px, double py)
   {
     for(int i_index = 0; i_index < mRICH::mNumOfIndexMomentumPhi; ++i_index)
     {
-      if(phi >= mRICH::mMomPhi_start+i_index*delta_phi && phi < mRICH::mMomPhi_start+(i_index+1)*delta_phi)
+      // if(phi >= mRICH::mMomPhi_start+i_index*delta_phi && phi < mRICH::mMomPhi_start+(i_index+1)*delta_phi)
+      if(phi >= mRICH::mBin_MomPhi[i_index]-mRICH::mDelta_MomPhi && phi < mRICH::mBin_MomPhi[i_index]+mRICH::mDelta_MomPhi)
       {
 	index = i_index;
       }
