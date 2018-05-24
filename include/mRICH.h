@@ -11,16 +11,18 @@ namespace mRICH
   const double mVx_stop = 57.0; // this is to make sure 0 is in cente of [-1,1] and minimize edge effect
   // const double mVx_start = -5.0;
   // const double mVx_stop = 5.0;
-  const int mNumOfIndexSpaceX = 5;
-  const double mBin_Vx[mNumOfIndexSpaceX] = {-15,-10,0,10,15};
+  const int mNumOfIndexSpaceX = 1;
+  const double mBin_Vx[2] = {0,10};
+  // const double mBin_Vx[mNumOfIndexSpaceX] = {-15,-10,0,10,15};
   const double mDelta_Vx = 5;
 
   const double mVy_start = -57.0;
   const double mVy_stop = 57.0;
   // const double mVy_start = -5.0;
   // const double mVy_stop = 5.0;
-  const int mNumOfIndexSpaceY = 5;
-  const double mBin_Vy[mNumOfIndexSpaceY] = {-15,-10,0,10,15};
+  const int mNumOfIndexSpaceY = 1;
+  const double mBin_Vy[2] = {0,10};
+  // const double mBin_Vy[mNumOfIndexSpaceY] = {-15,-10,0,10,15};
   const double mDelta_Vy = 5;
 
   // momentum segamentation

@@ -18,13 +18,13 @@
 
 using namespace std;
 
-calLikelihood::calLikelihood(string date, string inputdatabase, string outputfile)
+calLikelihood::calLikelihood(string numoflist, string date, string inputdatabase)
 {
  cout<<endl;
  cout<<"calLikelihood::calLikelihood() ----- Constructor ! ------"<<endl;
  cout<<endl;
  mInPutDataBase = inputdatabase;
- mOutPutFile = outputfile;
+ mNumOfList = numoflist;
  mDate = date;
  utility = new Utility(); // initialize utility class
 }
@@ -43,6 +43,8 @@ int calLikelihood::Init()
 {
   cout<<"calLikelihood::Init() ----- Initialization ! ------"<<endl;
 
+  // mOutPutFile = Form("/work/eic/xusun/output/likelihood/PID_Likelihood_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  mOutPutFile = "./out.root"; // batch mode
   cout<<"calLikelihood::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   mFile_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
   mat = new material(); //// initialize the material
@@ -56,7 +58,7 @@ int calLikelihood::Init()
 int calLikelihood::initChain()
 {
   string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
-  string InPutList = Form("/work/eic/xusun/list/likelihood/mRICH_PID_%s.list",mDate.c_str());
+  string InPutList = Form("/work/eic/xusun/list/likelihood/mRICH_PID_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
   
   mChainInPut_Events = new TChain("generated");
   mChainInPut_Tracks = new TChain("eic_rich");
@@ -172,7 +174,7 @@ int calLikelihood::Make()
   // for(int i_event = 0; i_event < 1024; ++i_event) // test event loop
   for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
   { 
-    if(i_event%100==0) cout << "processing event:  " << i_event << " ;"<<endl;
+    if(i_event%1000==0) cout << "processing event:  " << i_event << " ;"<<endl;
 
     mChainInPut_Events->GetEntry(i_event);  
     mChainInPut_Tracks->GetEntry(i_event);
@@ -193,6 +195,8 @@ int calLikelihood::Make()
     const int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
     const int indexMomentumTheta = utility->get_indexMomentumTheta(px_gen,py_gen,pz_gen);
     const int indexMomentumPhi = utility->get_indexMomentumPhi(px_gen,py_gen);
+
+    if(indexSpaceX < 0 || indexSpaceY < 0 || indexMomentumP < 0 || indexMomentumTheta < 0 || indexMomentumPhi < 0) continue;
 
     int charge = (pid_gen > 0) ? 1 : -1;
 
@@ -340,17 +344,24 @@ double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
 }
 
 ////// This is the main function 
-int main()
+int main(int argc, char **argv)
 {
-  string date = "May18_2018";
-  string inputdatabase = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
-  string outputfile = Form("/work/eic/xusun/output/likelihood/PID_Likelihood_%s.root",date.c_str());
+  if(argc!=2) return 0;
 
-  calLikelihood *likelihood = new calLikelihood(date,inputdatabase,outputfile);
+  const char *input = argv[1];
+  string numoflist(input);
+  
+  string date = "May21_2018";
+  string inputdatabase = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
+
+  cout << "numoflist = " << numoflist.c_str() << endl;
+  calLikelihood *likelihood = new calLikelihood(numoflist,date,inputdatabase);
   
   likelihood->Init();
   likelihood->Make();
   likelihood->Finish();
+
+  cout << "This is the end of calLikelihood!!!" << endl;
 
   return 0;
 }

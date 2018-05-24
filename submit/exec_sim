@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+# Perl module to run
+############################################################
+# Set defaults
+@files[0]="\*";
+#================= Processing Arguments ======
+while($_ = @ARGV[0],/^-/){
+    shift;
+    last if /^$/;
+    substr($_,0,1) = "";
+    if($_,/^r/){
+# Get the run number to process
+        substr($_,0,1)="";
+        @runs = split('\,',$_);
+    }
+    elsif($_,/^h/){
+# Get the input file name
+                &print_usage();
+                exit;
+    }
+}
+#
+# Lopp over runs
+#
+die"\n Run number is not specified, will terminate\! \n Use -h for usage \n\n" if !$runs[0];
+
+my $mode = @ARGV[0];
+die"\n PID mode is not specified, will terminate\! \n Use -h for usage \n\n" if !$mode;
+
+foreach (@runs) {
+        $rnum=$_;
+# Creat jsub for this job
+        $usrnam=`whoami`;
+        chop($usrnam);
+        $cdir=`pwd`;
+        chop($cdir);
+        $filedir="/work/eic/xusun/output/$mode";
+        $logdir="/work/eic/xusun/log/$mode";
+        $outroot="PDF_${mode}_May21_2018_$rnum\.root";
+        $outlog="out\.$mode\.$rnum\.log";
+
+        $S_script_name = "/work/eic/xusun/script/$mode/jsc$rnum";
+        open(SCRIPT_FILE,">$S_script_name");
+        printf SCRIPT_FILE "JOBNAME: $mode\_$rnum \n";
+        printf SCRIPT_FILE "PROJECT: eic \n";
+#         printf SCRIPT_FILE "TRACK : debug \n";
+        printf SCRIPT_FILE "TRACK : simulation \n";
+        printf SCRIPT_FILE "MAIL: $usrnam\@jlab.org \n";
+        printf SCRIPT_FILE "OS: centos7\n";
+# 	printf SCRIPT_FILE "TIME: 720\n";
+        printf SCRIPT_FILE "MEMORY: 2500 MB\n";
+        printf SCRIPT_FILE "DISK_SPACE: 10 GB\n";
+        printf SCRIPT_FILE "COMMAND: $cdir/do_it_all.sh $rnum \n";
+        printf SCRIPT_FILE "OTHER_FILES:\n";
+        printf SCRIPT_FILE "/work/eic/xusun/analysis/modular_rich/PID_mRICH/bin/genMassHypo\n";
+        # printf SCRIPT_FILE "/work/eic/xusun/analysis/modular_rich/PID_mRICH/bin/calLikelihood\n";
+        printf SCRIPT_FILE "OUTPUT_DATA: out.root\n";
+        printf SCRIPT_FILE "OUTPUT_TEMPLATE: $filedir/$outroot\n";
+        printf SCRIPT_FILE "OUTPUT_DATA: out.log\n";
+        printf SCRIPT_FILE "OUTPUT_TEMPLATE: $logdir/$outlog\n";
+        close(SCRIPT_FILE);
+        $sbj=`jsub $S_script_name`;
+        print "Job ${mode}/jsc$rnum is launched \n";
+}
+
+#
+################################################
+sub print_usage{
+#
+        print <<ALL;
+exec_gsim: Creates a script to run GSIM_BAT on the farm and
+                  copy results to the desired locations.
+                  Only required argument is a run number.
+                  Rest of arguments have their defaults.
+
+Usage: exec_do_it_all -r[RunNumber(s)]
+
+ALL
+                return;
+#
+}

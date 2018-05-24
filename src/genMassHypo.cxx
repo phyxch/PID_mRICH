@@ -45,7 +45,8 @@ int genMassHypo::Init()
 {
   cout<<"genMassHypo::Init() ----- Initialization ! ------"<<endl;
 
-  mOutPutFile = Form("/work/eic/xusun/output/database/PDF_database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  // mOutPutFile = Form("/work/eic/xusun/output/database/PDF_database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  mOutPutFile = "./out.root"; // batch mode
   cout<<"genMassHypo::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
   mat = new material(); //// initialize the material
@@ -172,8 +173,7 @@ int genMassHypo::Make()
 
     if(indexSpaceX < 0 || indexSpaceY < 0 || indexMomentumP < 0 || indexMomentumTheta < 0 || indexMomentumPhi < 0) continue;
 
-    // if(indexMomentumTheta == 1 && indexMomentumPhi == 2)
-    //   cout << "vx_gen = " << vx_gen << ", vy_gen = " << vy_gen << ", momentum = " << momentum << ", theta = " << theta << ", phi = " << phi << endl;
+    // cout << "indexMomentumP = " << indexMomentumP << ", indexMomentumTheta = " << indexMomentumTheta << ", indexMomentumPhi = " << indexMomentumPhi << endl;
 
     string key_events = utility->gen_KeyNumOfEvents(pid_gen,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
     // cout << "fill histogram: " << key_events.c_str() << endl;
@@ -276,7 +276,6 @@ int main(int argc, char **argv)
   string numoflist(input);
   
   string date = "May21_2018";
-  // string date = Form("May21_2018_%d",list);
   
   cout << "numoflist = " << numoflist.c_str() << endl;
   genMassHypo *genMassHypotheses = new genMassHypo(numoflist,date);
@@ -284,6 +283,8 @@ int main(int argc, char **argv)
   genMassHypotheses->Init();
   genMassHypotheses->Make();
   genMassHypotheses->Finish();
+
+  cout << "This is the end of genMassHypo!!!" << endl;
   
   return 0;
 }

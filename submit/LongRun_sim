@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+# Perl module to run 
+############################################################
+print "Give the start run number [2000]\n";
+$srunnum = <STDIN>;
+chop($srunnum);
+
+print "Give the end run number [2010]\n";
+$erunnum = <STDIN>;
+chop($erunnum);
+
+if($srunnum<=$erunnum){
+    for($i=$srunnum;$i<=$erunnum;$i++){
+	print `./exec_sim -r$i database \n`;
+	# print `./exec_sim -r$i likelihood \n`;
+    }
+}
+else {
+    die "End run number should be greater than start run number\n";
+}

@@ -23,7 +23,7 @@ class Utility;
 class calLikelihood
 {
  public:
-  calLikelihood(string date, string inputdatabase, string outputfile);
+  calLikelihood(string numoflist, string date, string inputdatabase);
   ~calLikelihood();
   
   int Init();
@@ -45,6 +45,7 @@ class calLikelihood
  private:
   material *mat;
   Utility *utility;
+  string mNumOfList;
   string mDate;
   string mInPutDataBase;
   string mOutPutFile;
