@@ -11,8 +11,10 @@ source /group/eic/eic_svn/set_eic 1.3
 # source /group/eic/eic_svn/set_eic 2.2 
 
 echo input list: $1 | cat >> out.log
+echo input exe:  $2 | cat >> out.log
 
-./genMassHypo $1 >> out.log
-# ./calLikelihood $1 >> out.log
+./$2 $1 >> out.log # database
+# ./genMassHypo $1 >> out.log # database
+# ./calLikelihood $1 >> out.log # likelihood
 
 

@@ -27,6 +27,9 @@ die"\n Run number is not specified, will terminate\! \n Use -h for usage \n\n" i
 my $mode = @ARGV[0];
 die"\n PID mode is not specified, will terminate\! \n Use -h for usage \n\n" if !$mode;
 
+my $date = @ARGV[1];
+my $exe  = @ARGV[2];
+
 foreach (@runs) {
         $rnum=$_;
 # Creat jsub for this job
@@ -36,7 +39,9 @@ foreach (@runs) {
         chop($cdir);
         $filedir="/work/eic/xusun/output/$mode";
         $logdir="/work/eic/xusun/log/$mode";
-        $outroot="PDF_${mode}_May21_2018_$rnum\.root";
+        $outroot="PDF_${mode}_${date}_$rnum\.root";
+        # $outroot="PDF_${mode}_May23_2018_$rnum\.root"; # database
+        # $outroot="PID_${mode}_May23_2018_$rnum\.root"; # likelihood
         $outlog="out\.$mode\.$rnum\.log";
 
         $S_script_name = "/work/eic/xusun/script/$mode/jsc$rnum";
@@ -50,16 +55,17 @@ foreach (@runs) {
 # 	printf SCRIPT_FILE "TIME: 720\n";
         printf SCRIPT_FILE "MEMORY: 2500 MB\n";
         printf SCRIPT_FILE "DISK_SPACE: 10 GB\n";
-        printf SCRIPT_FILE "COMMAND: $cdir/do_it_all.sh $rnum \n";
+        printf SCRIPT_FILE "COMMAND: $cdir/do_it_all.sh $rnum $exe \n";
         printf SCRIPT_FILE "OTHER_FILES:\n";
-        printf SCRIPT_FILE "/work/eic/xusun/analysis/modular_rich/PID_mRICH/bin/genMassHypo\n";
-        # printf SCRIPT_FILE "/work/eic/xusun/analysis/modular_rich/PID_mRICH/bin/calLikelihood\n";
+        printf SCRIPT_FILE "/work/eic/xusun/analysis/modular_rich/PID_mRICH/bin/$exe\n"; # database
+        # printf SCRIPT_FILE "/work/eic/xusun/analysis/modular_rich/PID_mRICH/bin/genMassHypo\n"; # database
+        # printf SCRIPT_FILE "/work/eic/xusun/analysis/modular_rich/PID_mRICH/bin/calLikelihood\n"; # likelihood
         printf SCRIPT_FILE "OUTPUT_DATA: out.root\n";
         printf SCRIPT_FILE "OUTPUT_TEMPLATE: $filedir/$outroot\n";
         printf SCRIPT_FILE "OUTPUT_DATA: out.log\n";
         printf SCRIPT_FILE "OUTPUT_TEMPLATE: $logdir/$outlog\n";
         close(SCRIPT_FILE);
-        $sbj=`jsub $S_script_name`;
+        # $sbj=`jsub $S_script_name`;
         print "Job ${mode}/jsc$rnum is launched \n";
 }
 

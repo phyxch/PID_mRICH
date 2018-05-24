@@ -30,8 +30,8 @@ namespace mRICH
   const double mMomP_stop  = 15.5;
   // const double mMomP_start = 9.8;
   // const double mMomP_stop  = 10.2;
-  const int mNumOfIndexMomentumP = 10;
-  const double mBin_MomP[mNumOfIndexMomentumP] = {3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0};
+  const int mNumOfIndexMomentumP = 13;
+  const double mBin_MomP[mNumOfIndexMomentumP] = {3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0};
   const double mDelta_MomP = 0.5;
 
   const double DEG=180./TMath::Pi();

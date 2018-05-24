@@ -31,9 +31,9 @@ void plotQA_photon(int pid = 211)
 
   if(particle.first == -1) return;
 
-  int runid = 4;
+  int runid = 14;
 
-  string date = "May10_2018/";
+  string date = "May21_2018/";
   string input_dir = Form("/work/eic/xusun/output/modular_rich/%s",date.c_str());
   string inputfile = Form("%sout.%s.%d.root",input_dir.c_str(),particle.second.c_str(),runid);
   cout << "read in file: " << inputfile.c_str() << endl;
@@ -66,7 +66,7 @@ void plotQA_photon(int pid = 211)
   h_photon_mRICH->GetZaxis()->CenterTitle();
   h_photon_mRICH->GetZaxis()->SetNdivisions(505);
 
-  string outputfile = Form("../figures/photon_dist/mRICH_photon_%s.pdf",particle.second.c_str());
+  string outputfile = Form("../figures/photon_dist/%s/mRICH_photon_%s.pdf",date.c_str(),particle.second.c_str());
   cout << "save plot to: " << outputfile.c_str() << endl;
   c_mRICH->SaveAs(outputfile.c_str());
 
@@ -88,7 +88,7 @@ void plotQA_photon(int pid = 211)
   h_photon_sensor->GetYaxis()->CenterTitle();
   h_photon_sensor->GetYaxis()->SetNdivisions(505);
 
-  outputfile = Form("../figures/photon_dist/sensor_photon_%s.pdf",particle.second.c_str());
+  outputfile = Form("../figures/photon_dist/%s/sensor_photon_%s.pdf",date.c_str(),particle.second.c_str());
   cout << "save plot to: " << outputfile.c_str() << endl;
   c_sensor->SaveAs(outputfile.c_str());
 }

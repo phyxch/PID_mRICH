@@ -145,7 +145,7 @@ int genMassHypo::Make()
   mChainInPut_Events->GetEntry(0);
   mChainInPut_Tracks->GetEntry(0);
 
-  // for(int i_event = 0; i_event < 50000; ++i_event) // test event loop
+  // for(int i_event = 0; i_event < 10000; ++i_event) // test event loop
   for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
   { 
     if(i_event%1000==0) cout << "processing event:  " << i_event << " ;"<<endl;
@@ -275,7 +275,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "May21_2018";
+  string date = "May23_2018";
   
   cout << "numoflist = " << numoflist.c_str() << endl;
   genMassHypo *genMassHypotheses = new genMassHypo(numoflist,date);
