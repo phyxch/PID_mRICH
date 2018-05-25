@@ -41,7 +41,7 @@ namespace mRICH
   // const double mMomTheta_start = 0.0*DEG;
   // const double mMomTheta_stop  = TMath::Pi()*DEG/6.0;
   const int mNumOfIndexMomentumTheta = 5;
-  const double mBin_MomTheta[mNumOfIndexMomentumTheta] = {0.0,10.0,20.0,30.0,40.0};
+  const double mBin_MomTheta[mNumOfIndexMomentumTheta] = {2.5,12.5,22.5,32.5,42.5};
   const double mDelta_MomTheta = 2.5;
 
   const double mMomPhi_start = -1.0*TMath::Pi()*DEG;

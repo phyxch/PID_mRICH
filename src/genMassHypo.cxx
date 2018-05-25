@@ -45,7 +45,7 @@ int genMassHypo::Init()
 {
   cout<<"genMassHypo::Init() ----- Initialization ! ------"<<endl;
 
-  // mOutPutFile = Form("/work/eic/xusun/output/database/PDF_database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  // mOutPutFile = Form("/work/eic/xusun/output/database/database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
   mOutPutFile = "./out.root"; // batch mode
   cout<<"genMassHypo::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");

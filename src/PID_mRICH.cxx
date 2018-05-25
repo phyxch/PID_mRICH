@@ -337,7 +337,7 @@ int PID_mRICH::Finish()
 ////// This is the main function 
 int main()
 {
-  string date = "May15_2018";
+  string date = "May23_2018";
   string outputfile = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
 
   PID_mRICH *mPID_mRICH = new PID_mRICH(date,outputfile);
@@ -345,6 +345,8 @@ int main()
   mPID_mRICH->Init();
   mPID_mRICH->Make();
   mPID_mRICH->Finish();
+
+  cout << "This is the end of pid!!!" << endl;
   
   return 0;
 }

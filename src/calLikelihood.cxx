@@ -43,7 +43,7 @@ int calLikelihood::Init()
 {
   cout<<"calLikelihood::Init() ----- Initialization ! ------"<<endl;
 
-  // mOutPutFile = Form("/work/eic/xusun/output/likelihood/PID_Likelihood_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  // mOutPutFile = Form("/work/eic/xusun/output/likelihood/Likelihood_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
   mOutPutFile = "./out.root"; // batch mode
   cout<<"calLikelihood::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   mFile_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
@@ -351,8 +351,8 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "May21_2018";
-  string inputdatabase = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
+  string date = "May23_2018";
+  string inputdatabase = Form("/work/eic/xusun/output/database/database_%s.root",date.c_str());
 
   cout << "numoflist = " << numoflist.c_str() << endl;
   calLikelihood *likelihood = new calLikelihood(numoflist,date,inputdatabase);
