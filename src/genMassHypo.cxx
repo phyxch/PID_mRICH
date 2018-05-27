@@ -10,7 +10,7 @@
 #include <TMath.h>
 #include <TTree.h>
 #include <TChain.h>
-#include <TRandom.h>
+#include <TRandom3.h>
 #include "TString.h"
 #include "../include/event.h"
 #include "../include/hit.h"
@@ -31,6 +31,8 @@ genMassHypo::genMassHypo(string numoflist, string date)
  mNumOfList = numoflist;
  mDate = date;
  utility = new Utility(); // initialize utility class
+ mat = new material(); //// initialize the material
+ gRandom->SetSeed();
 }
 
 genMassHypo::~genMassHypo()
@@ -49,7 +51,6 @@ int genMassHypo::Init()
   mOutPutFile = "./out.root"; // batch mode
   cout<<"genMassHypo::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
-  mat = new material(); //// initialize the material
 
   initChain();
   initHistoMap();
@@ -187,9 +188,16 @@ int genMassHypo::Make()
     {
       if(isPhoton(ahit,i_track) && !isReflection(ahit,i_track) && isOnPhotonSensor(ahit,i_track))
       {
-	double out_x = ahit->get_out_x()->at(i_track);
-	double out_y = ahit->get_out_y()->at(i_track);
-	h_mPhotonDist[key_photon]->Fill(out_x,out_y);
+	double photonE = ahit->get_trackE()->at(i_track);   /// in MeV (GEANT4 default)
+	double wavelength = 1240./(photonE*1.e6);  /// MeV->eV,wavelength in "nm"
+	double QE_GaAsP = mat->extrapQE_GaAsP(wavelength); // get quantum efficiency for photon sensor => need to be updated
+
+	if( QE_GaAsP > gRandom->Uniform(0.0,1.0) )
+	{
+	  double out_x = ahit->get_out_x()->at(i_track);
+	  double out_y = ahit->get_out_y()->at(i_track);
+	  h_mPhotonDist[key_photon]->Fill(out_x,out_y);
+	}
       }
     }
   }

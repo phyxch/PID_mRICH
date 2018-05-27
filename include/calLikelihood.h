@@ -30,11 +30,13 @@ class calLikelihood
   int initChain();
   int initTree();
   int initHistoMap();
+  int initHistoQA();
 
   int Make();
 
   int Finish();
   int writeTree();
+  int writeQA();
   
   bool isPhoton(hit *ahit, int i);
   bool isReflection(hit *ahit, int i);
@@ -55,6 +57,12 @@ class calLikelihood
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumP | indexMomentumTheta | indexMomentumPhi
   TH1DMap h_mNumOfEvents; // number of total events
   TH2DMap h_mPhotonDist; // x: photon out_x | y: photon out_y 
+
+  TH2D *h_mPhotonEnergy_Wavelength;
+  TH2D *hnHitAeglPerEvtvsMom;
+  TH2D *hnPhotonElvsnHits_SbKCs;
+  TH2D *hnPhotonElvsnHits_GaAsP;
+  TH2D *hnPhotonElvsnHits_GaAs;
   
   TTree *mTree;
   int mPid;
@@ -69,9 +77,9 @@ class calLikelihood
   int mNHit;
   int mNHitAegl;
   int mNHitPhoDet;
-  int mNelSbKCs;
-  int mNelGaAsP;
-  int mNelGaAs;
+  int mNElSbKCs;
+  int mNElGaAsP;
+  int mNElGaAs;
   double mLpion;
   double mLKaon;
   double mLproton;

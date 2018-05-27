@@ -9,6 +9,7 @@
 #include <TMath.h>
 #include <TTree.h>
 #include <TChain.h>
+#include <TRandom3.h>
 #include "../include/event.h"
 #include "../include/hit.h"
 #include "../include/material.h"
@@ -43,7 +44,7 @@ int calLikelihood::Init()
 {
   cout<<"calLikelihood::Init() ----- Initialization ! ------"<<endl;
 
-  // mOutPutFile = Form("/work/eic/xusun/output/likelihood/Likelihood_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  // mOutPutFile = Form("/work/eic/xusun/output/likelihood/likelihood_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
   mOutPutFile = "./out.root"; // batch mode
   cout<<"calLikelihood::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   mFile_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
@@ -133,6 +134,15 @@ int calLikelihood::initHistoMap()
   }
 }
 
+int calLikelihood::initHistoQA()
+{
+  h_mPhotonEnergy_Wavelength = new TH2D("h_mPhotonEnergy_Wavelength","h_mPhotonEnergy_Wavelength",100,0.0,5.0,100,250.0,750.0);
+  hnHitAeglPerEvtvsMom = new TH2D ("hnHitAeglPerEvtvsMom","hnHitAeglPerEvtvsMom",100,0.,10.,200,0.,200.);
+  hnPhotonElvsnHits_SbKCs = new TH2D ("hnPhotonElvsnHits_SbKCs","hnPhotonElvsnHits_SbKCs",50,0.,50.,25,0.,25.);
+  hnPhotonElvsnHits_GaAsP = new TH2D ("hnPhotonElvsnHits_GaAsP","hnPhotonElvsnHits_GaAsP",50,0.,50.,25,0.,25.);
+  hnPhotonElvsnHits_GaAs = new TH2D ("hnPhotonElvsnHits_GaAs","hnPhotonElvsnHits_GaAs",50,0.,50.,25,0.,25.);
+}
+
 int calLikelihood::initTree()
 {
   cout<<"calLikelihood::init(), initialize tree  ; "<<endl;
@@ -150,9 +160,9 @@ int calLikelihood::initTree()
   mTree->Branch("nhit",&mNHit,"nhit/I");
   mTree->Branch("nhitAegl",&mNHitAegl,"nhitAegl/I");
   mTree->Branch("nhitPhoDet",&mNHitPhoDet,"nhitPhoDet/I");
-  mTree->Branch("nelSbKCs",&mNelSbKCs,"nelSbKCs/I");
-  mTree->Branch("nelGaAsP",&mNelGaAsP,"nelGaAsP/I");
-  mTree->Branch("nelGaAs",&mNelGaAs,"nelGaAs/I");
+  mTree->Branch("nelSbKCs",&mNElSbKCs,"nelSbKCs/I");
+  mTree->Branch("nelGaAsP",&mNElGaAsP,"nelGaAsP/I");
+  mTree->Branch("nelGaAs",&mNElGaAs,"nelGaAs/I");
   mTree->Branch("Lpion",&mLpion,"Lpion/D");
   mTree->Branch("LKaon",&mLKaon,"LKaon/D");
   mTree->Branch("Lproton",&mLproton,"Lproton/D");
@@ -236,16 +246,62 @@ int calLikelihood::Make()
     // fill photon distribution of unknown PID
     // TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
     TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
+    int NumOfHitAegl = 0;
+    int NumOfHitPhoDet = 0;
+    int NumOfElSbKCs = 0;
+    int NumOfElGaAsP = 0;
+    int NumOfElGaAs = 0;
     int NumOfTracks = ahit->get_hitn()->size();
     for (int i_track = 0; i_track < NumOfTracks; ++i_track) // track loop
     {
+      double photonE = ahit->get_trackE()->at(i_track);   // in MeV (GEANT4 default)
+      double wavelength = 1240.0/(photonE*1.0e6);  // MeV->eV,wavelength in "nm"
+
+      if(isPhoton(ahit,i_track) && !isReflection(ahit,i_track) && isOnAerogel(ahit,i_track))
+      {
+	NumOfHitAegl++;
+	h_mPhotonEnergy_Wavelength->Fill(photonE*1.0e6,wavelength);
+      }
+
       if(isPhoton(ahit,i_track) && !isReflection(ahit,i_track) && isOnPhotonSensor(ahit,i_track))
       {
-	double out_x = ahit->get_out_x()->at(i_track);
-	double out_y = ahit->get_out_y()->at(i_track);
-	h_photonDist_PID->Fill(out_x,out_y);
+	NumOfHitPhoDet++;
+
+	double QE_SbKCs = mat->extrapQE_SbKCs(wavelength);
+	if(QE_SbKCs > gRandom->Uniform(0.0,1.0))
+	{
+	  NumOfElSbKCs++;
+	}
+
+	double QE_GaAsP = mat->extrapQE_GaAsP(wavelength); // quantum efficiency of photon sensor => need to be updated
+	if(QE_GaAsP > gRandom->Uniform(0.0,1.0))
+	{
+	  NumOfElGaAsP++; 
+	  double out_x = ahit->get_out_x()->at(i_track);
+	  double out_y = ahit->get_out_y()->at(i_track);
+	  h_photonDist_PID->Fill(out_x,out_y);
+	}
+
+	double QE_GaAs = mat->extrapQE_GaAs(wavelength);
+	if(QE_GaAs > gRandom->Uniform(0.0,1.0))
+	{
+	  NumOfElGaAs++;
+	}
       }
     }
+
+    for(int i_electron = 0; i_electron < 2; i_electron++) 
+    {
+      double out_x = gRandom->Uniform(-1.0,1.0)*mRICH::mHalfWidth;
+      double out_y = gRandom->Uniform(-1.0,1.0)*mRICH::mHalfWidth;
+      h_photonDist_PID->Fill(out_x,out_y);
+    }
+  
+
+    hnHitAeglPerEvtvsMom->Fill(p_gen,NumOfHitAegl);
+    hnPhotonElvsnHits_SbKCs->Fill(NumOfHitPhoDet,NumOfElSbKCs);
+    hnPhotonElvsnHits_GaAsP->Fill(NumOfHitPhoDet,NumOfElGaAsP);
+    hnPhotonElvsnHits_GaAs->Fill(NumOfHitPhoDet,NumOfElGaAs);
 
     mPid = pid_gen;
     mPx  = px_gen;
@@ -257,11 +313,11 @@ int calLikelihood::Make()
     mTheta = theta_gen;
     mPhi = phi_gen;
     mNHit = NumOfTracks;
-    mNHitAegl = 0;
-    mNHitPhoDet = 0;
-    mNelSbKCs = 0;
-    mNelGaAsP = 0;
-    mNelGaAs = 0;
+    mNHitAegl = NumOfHitAegl;
+    mNHitPhoDet = NumOfHitPhoDet;
+    mNElSbKCs = NumOfElSbKCs;
+    mNElGaAsP = NumOfElGaAsP;
+    mNElGaAs = NumOfElGaAs;
     mLpion = probability(h_database_pion, h_photonDist_PID);
     mLKaon = probability(h_database_kaon, h_photonDist_PID);
     mLproton = probability(h_database_proton, h_photonDist_PID);
@@ -296,6 +352,17 @@ int calLikelihood::Finish()
 int calLikelihood::writeTree()
 {
   mTree->Write();
+
+  return 0;
+}
+
+int calLikelihood::writeQA()
+{
+  h_mPhotonEnergy_Wavelength->Write();
+  hnHitAeglPerEvtvsMom->Write();
+  hnPhotonElvsnHits_SbKCs->Write();
+  hnPhotonElvsnHits_GaAsP->Write();
+  hnPhotonElvsnHits_GaAs->Write();
 }
 
 bool calLikelihood::isPhoton(hit *ahit, int i)
