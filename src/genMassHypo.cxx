@@ -263,8 +263,7 @@ bool genMassHypo::isReflection(hit *ahit, int i)
 
 bool genMassHypo::isOnAerogel(hit *ahit, int i)
 {
-  if(ahit->get_out_z()->at(i)>=55.5 && ahit->get_out_z()->at(i)<=85.5) return true;
-  //if(ahit->get_out_z()->at(i)>=50.5 && ahit->get_out_z()->at(i)<=70.5) return true;
+  if(ahit->get_out_z()->at(i)>=63.5874 && ahit->get_out_z()->at(i)<=96.5876) return true;
   else return false;
 }
 

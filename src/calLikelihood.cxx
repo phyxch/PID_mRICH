@@ -28,6 +28,8 @@ calLikelihood::calLikelihood(string numoflist, string date, string inputdatabase
  mNumOfList = numoflist;
  mDate = date;
  utility = new Utility(); // initialize utility class
+ mat = new material(); //// initialize the material
+ gRandom->SetSeed();
 }
 
 calLikelihood::~calLikelihood()
@@ -48,10 +50,10 @@ int calLikelihood::Init()
   mOutPutFile = "./out.root"; // batch mode
   cout<<"calLikelihood::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   mFile_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
-  mat = new material(); //// initialize the material
 
   initChain();
   initHistoMap();
+  initHistoQA();
   initTree();
   return 0;
 }
@@ -136,11 +138,13 @@ int calLikelihood::initHistoMap()
 
 int calLikelihood::initHistoQA()
 {
-  h_mPhotonEnergy_Wavelength = new TH2D("h_mPhotonEnergy_Wavelength","h_mPhotonEnergy_Wavelength",100,0.0,5.0,100,250.0,750.0);
-  hnHitAeglPerEvtvsMom = new TH2D ("hnHitAeglPerEvtvsMom","hnHitAeglPerEvtvsMom",100,0.,10.,200,0.,200.);
-  hnPhotonElvsnHits_SbKCs = new TH2D ("hnPhotonElvsnHits_SbKCs","hnPhotonElvsnHits_SbKCs",50,0.,50.,25,0.,25.);
-  hnPhotonElvsnHits_GaAsP = new TH2D ("hnPhotonElvsnHits_GaAsP","hnPhotonElvsnHits_GaAsP",50,0.,50.,25,0.,25.);
-  hnPhotonElvsnHits_GaAs = new TH2D ("hnPhotonElvsnHits_GaAs","hnPhotonElvsnHits_GaAs",50,0.,50.,25,0.,25.);
+  h_mPhotonEnergy_Wavelength = new TH2D("h_mPhotonEnergy_Wavelength","h_mPhotonEnergy_Wavelength",100,0.0,10.0,1000,0.0,1000.0);
+  hnHitAeglPerEvtvsMom = new TH2D ("hnHitAeglPerEvtvsMom","hnHitAeglPerEvtvsMom",200,0.,20.0,400,0.,400.);
+  hnPhotonElvsnHits_SbKCs = new TH2D ("hnPhotonElvsnHits_SbKCs","hnPhotonElvsnHits_SbKCs",100,0.,100.,50,0.,50.);
+  hnPhotonElvsnHits_GaAsP = new TH2D ("hnPhotonElvsnHits_GaAsP","hnPhotonElvsnHits_GaAsP",100,0.,100.,50,0.,50.);
+  hnPhotonElvsnHits_GaAs = new TH2D ("hnPhotonElvsnHits_GaAs","hnPhotonElvsnHits_GaAs",100,0.,100.,50,0.,50.);
+
+  return 0;
 }
 
 int calLikelihood::initTree()
@@ -344,6 +348,7 @@ int calLikelihood::Finish()
   if(mFile_OutPut!= NULL){
     mFile_OutPut->cd();
     writeTree();
+    writeQA();
     mFile_OutPut->Close();
   }
   return 0;
@@ -363,6 +368,8 @@ int calLikelihood::writeQA()
   hnPhotonElvsnHits_SbKCs->Write();
   hnPhotonElvsnHits_GaAsP->Write();
   hnPhotonElvsnHits_GaAs->Write();
+
+  return 0;
 }
 
 bool calLikelihood::isPhoton(hit *ahit, int i)
@@ -379,8 +386,7 @@ bool calLikelihood::isReflection(hit *ahit, int i)
 
 bool calLikelihood::isOnAerogel(hit *ahit, int i)
 {
-  if(ahit->get_out_z()->at(i)>=55.5 && ahit->get_out_z()->at(i)<=85.5) return true;
-  //if(ahit->get_out_z()->at(i)>=50.5 && ahit->get_out_z()->at(i)<=70.5) return true;
+  if(ahit->get_out_z()->at(i)>=63.5874 && ahit->get_out_z()->at(i)<=96.5876) return true;
   else return false;
 }
 
