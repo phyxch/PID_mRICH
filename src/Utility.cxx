@@ -217,3 +217,22 @@ std::string Utility::gen_KeySumOfPID(int pid, int index_vx, int index_vy, int in
 
   return key_sumofpid;
 }
+
+std::string Utility::gen_KeyNSigma(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int rank)
+{
+  std::string identifiedParticle = this->get_IdentifiedParticle(pid);
+  std::pair<std::string,std::string> misIdentifiedParticle = this->get_misIdentifiedParticle(pid);
+  std::string key_nsigma = "undifined";
+
+  if(rank == 1)
+  {
+    key_nsigma = Form("h_mNSigma_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);
+  }
+  if(rank == 2)
+  {
+    key_nsigma = Form("h_mNSigma_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d",identifiedParticle.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
+  }
+
+  return key_nsigma;
+}
+

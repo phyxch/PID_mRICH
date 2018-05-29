@@ -12,6 +12,7 @@ bin/analysis
 bin/genMassHypo
 bin/calLikelihood
 bin/pid
+bin/nsigma
 
 macros/AutoDict_*
 

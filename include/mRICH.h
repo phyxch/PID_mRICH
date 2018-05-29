@@ -27,11 +27,15 @@ namespace mRICH
 
   // momentum segamentation
   const double mMomP_start = 2.5;
-  const double mMomP_stop  = 15.5;
+  const double mMomP_stop  = 10.5;
+  // const double mMomP_start = 2.5;
+  // const double mMomP_stop  = 15.5;
   // const double mMomP_start = 9.8;
   // const double mMomP_stop  = 10.2;
-  const int mNumOfIndexMomentumP = 13;
-  const double mBin_MomP[mNumOfIndexMomentumP] = {3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0};
+  // const int mNumOfIndexMomentumP = 13;
+  // const double mBin_MomP[mNumOfIndexMomentumP] = {3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0};
+  const int mNumOfIndexMomentumP = 8;
+  const double mBin_MomP[mNumOfIndexMomentumP] = {3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0};
   const double mDelta_MomP = 0.5;
 
   const double DEG=180./TMath::Pi();
@@ -41,7 +45,7 @@ namespace mRICH
   // const double mMomTheta_start = 0.0*DEG;
   // const double mMomTheta_stop  = TMath::Pi()*DEG/6.0;
   const int mNumOfIndexMomentumTheta = 5;
-  const double mBin_MomTheta[mNumOfIndexMomentumTheta] = {2.5,12.5,22.5,32.5,42.5};
+  const double mBin_MomTheta[mNumOfIndexMomentumTheta] = {0.0,12.5,22.5,32.5,42.5};
   const double mDelta_MomTheta = 2.5;
 
   const double mMomPhi_start = -1.0*TMath::Pi()*DEG;
