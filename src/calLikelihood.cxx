@@ -281,8 +281,15 @@ int calLikelihood::Make()
 	if(QE_GaAsP > gRandom->Uniform(0.0,1.0))
 	{
 	  NumOfElGaAsP++; 
-	  double out_x = ahit->get_out_x()->at(i_track);
-	  double out_y = ahit->get_out_y()->at(i_track);
+	  double out_x = 0.0;
+	  double out_y = 0.0;
+	  // double out_x = ahit->get_out_x()->at(i_track);
+	  // double out_y = ahit->get_out_y()->at(i_track);
+	  double out_x_input = ahit->get_out_x()->at(i_track);
+	  double out_y_input = ahit->get_out_y()->at(i_track);
+	  Smearing2D(out_x_input,out_y_input,out_x,out_y);
+	  // cout << "out_x_input = " << out_x_input << ", out_x = " << out_x << endl;
+	  // cout << "out_y_input = " << out_y_input << ", out_y = " << out_y << endl;
 	  h_photonDist_PID->Fill(out_x,out_y);
 	}
 
@@ -414,6 +421,23 @@ double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
     }
   }
   return log(prob);
+}
+
+void calLikelihood::Smearing2D(double inx, double iny, double& outx, double& outy)
+{
+  TF1 *fx = new TF1("fx","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",inx-20.,inx+20.);
+  fx->SetParameter(0,inx);
+  fx->SetParameter(1,1.); //// 1 mm smearing in photon position x
+  outx = fx->GetRandom();
+
+  TF1 *fy = new TF1("fy","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",iny-20.,iny+20.);
+  fy->SetParameter(0,iny);
+  fy->SetParameter(1,1.); //// 1 mm smearing in photon position y
+  outy = fy->GetRandom();
+
+  delete fx;
+  delete fy;
+  return ;
 }
 
 ////// This is the main function 

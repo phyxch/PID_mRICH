@@ -146,7 +146,7 @@ int genMassHypo::Make()
   mChainInPut_Events->GetEntry(0);
   mChainInPut_Tracks->GetEntry(0);
 
-  // for(int i_event = 0; i_event < 10000; ++i_event) // test event loop
+  // for(int i_event = 0; i_event < 100; ++i_event) // test event loop
   for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
   { 
     if(i_event%1000==0) cout << "processing event:  " << i_event << " ;"<<endl;
@@ -194,8 +194,15 @@ int genMassHypo::Make()
 
 	if( QE_GaAsP > gRandom->Uniform(0.0,1.0) )
 	{
-	  double out_x = ahit->get_out_x()->at(i_track);
-	  double out_y = ahit->get_out_y()->at(i_track);
+	  double out_x = 0.0;
+	  double out_y = 0.0;
+	  // double out_x = ahit->get_out_x()->at(i_track);
+	  // double out_y = ahit->get_out_y()->at(i_track);
+	  double out_x_input = ahit->get_out_x()->at(i_track);
+	  double out_y_input = ahit->get_out_y()->at(i_track);
+	  Smearing2D(out_x_input,out_y_input,out_x,out_y);
+	  // cout << "out_x_input = " << out_x_input << ", out_x = " << out_x << endl;
+	  // cout << "out_y_input = " << out_y_input << ", out_y = " << out_y << endl;
 	  h_mPhotonDist[key_photon]->Fill(out_x,out_y);
 	}
       }
@@ -272,6 +279,23 @@ bool genMassHypo::isOnPhotonSensor(hit *ahit, int i)
   double out_z = ahit->get_out_z()->at(i);
   if(out_z > 253.6624 && out_z < 255.1626) return true;
   else return false;
+}
+
+void genMassHypo::Smearing2D(double inx, double iny, double& outx, double& outy)
+{
+  TF1 *fx = new TF1("fx","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",inx-20.,inx+20.);
+  fx->SetParameter(0,inx);
+  fx->SetParameter(1,1.); //// 1 mm smearing in photon position x
+  outx = fx->GetRandom();
+
+  TF1 *fy = new TF1("fy","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",iny-20.,iny+20.);
+  fy->SetParameter(0,iny);
+  fy->SetParameter(1,1.); //// 1 mm smearing in photon position y
+  outy = fy->GetRandom();
+
+  delete fx;
+  delete fy;
+  return ;
 }
 
 ////// This is the main function 

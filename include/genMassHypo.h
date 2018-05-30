@@ -38,6 +38,8 @@ class genMassHypo
   bool isReflection(hit *ahit, int i);
   bool isOnAerogel(hit *ahit, int i);
   bool isOnPhotonSensor(hit *ahit, int i);
+
+  void Smearing2D(double inx, double iny, double& outx, double& outy);
   
  private:
   material *mat;

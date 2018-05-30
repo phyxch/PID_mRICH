@@ -42,7 +42,9 @@ class calLikelihood
   bool isReflection(hit *ahit, int i);
   bool isOnAerogel(hit *ahit, int i);
   bool isOnPhotonSensor(hit *ahit, int i);
+
   double probability(TH2D* h_database, TH2D *h_photonDist_PID);
+  void Smearing2D(double inx, double iny, double& outx, double& outy);
   
  private:
   material *mat;
