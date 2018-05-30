@@ -25,21 +25,21 @@ std::pair<int,std::string> get_particle(int pid)
 
 void plotQA_PDF()
 {
-  string date = "May14_2018";
-  string inputfile = Form("/work/eic/xusun/output/database/PDF_database_%s.root",date.c_str());
+  string date = "May23_2018";
+  string inputfile = Form("/work/eic/xusun/output/database/database_%s.root",date.c_str());
   cout << "read in file: " << inputfile.c_str() << endl;
   TFile *File_InPut = TFile::Open(inputfile.c_str());
   assert(File_InPut);
 
-  string key_pion = "h_mPhotonDist_piplus_vx_0_vy_1_mom_1_theta_0_phi_0";
+  string key_pion = "h_mPhotonDist_piplus_vx_0_vy_0_mom_5_theta_3_phi_1";
   TH2D *h_PDF_pion = (TH2D*)File_InPut->Get(key_pion.c_str());
   assert(h_PDF_pion);
 
-  string key_kaon = "h_mPhotonDist_Kplus_vx_0_vy_1_mom_1_theta_0_phi_0";
+  string key_kaon = "h_mPhotonDist_Kplus_vx_0_vy_0_mom_5_theta_3_phi_1";
   TH2D *h_PDF_kaon = (TH2D*)File_InPut->Get(key_kaon.c_str());
   assert(h_PDF_kaon);
 
-  string key_proton = "h_mPhotonDist_proton_vx_0_vy_1_mom_1_theta_0_phi_0";
+  string key_proton = "h_mPhotonDist_proton_vx_0_vy_0_mom_5_theta_3_phi_1";
   TH2D *h_PDF_proton = (TH2D*)File_InPut->Get(key_proton.c_str());
   assert(h_PDF_proton);
 
