@@ -11,6 +11,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
+#include <TF1.h>
 #include "type.h"
 
 using namespace std;
@@ -31,6 +32,7 @@ class calLikelihood
   int initTree();
   int initHistoMap();
   int initHistoQA();
+  int initGausSmearing();
 
   int Make();
 
@@ -44,7 +46,8 @@ class calLikelihood
   bool isOnPhotonSensor(hit *ahit, int i);
 
   double probability(TH2D* h_database, TH2D *h_photonDist_PID);
-  void Smearing2D(double inx, double iny, double& outx, double& outy);
+  double GausSmearing(TF1 *f_gaus);
+  bool isInSensorPlane(double out_x, double out_y);
   
  private:
   material *mat;
@@ -55,6 +58,10 @@ class calLikelihood
   string mOutPutFile;
   TFile *mFile_InPutDataBase;
   TFile *mFile_OutPut;
+
+  TF1 *f_mGaus;
+  TH2D *h_mXGausSmearing;
+  TH2D *h_mYGausSmearing;
 
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumP | indexMomentumTheta | indexMomentumPhi
   TH1DMap h_mNumOfEvents; // number of total events

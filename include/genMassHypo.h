@@ -8,6 +8,7 @@
 #include <TH1D.h>
 #include <TH2D.h>
 #include <TFile.h>
+#include <TF1.h>
 #include <TTree.h>
 #include <TChain.h>
 #include "type.h"
@@ -28,18 +29,22 @@ class genMassHypo
   int Init();
   int initChain();
   int initHistoMap();
+  int initGausSmearing();
+  int initHistoQA();
 
   int Make();
 
   int Finish();
   int writeHistoMap();
+  int writeHistoQA();
   
   bool isPhoton(hit *ahit, int i);
   bool isReflection(hit *ahit, int i);
   bool isOnAerogel(hit *ahit, int i);
   bool isOnPhotonSensor(hit *ahit, int i);
 
-  void Smearing2D(double inx, double iny, double& outx, double& outy);
+  double GausSmearing(TF1 *f_gaus);
+  bool isInSensorPlane(double out_x, double out_y);
   
  private:
   material *mat;
@@ -48,6 +53,10 @@ class genMassHypo
   string mDate;
   string mOutPutFile;
   TFile *File_mOutPut;
+
+  TF1 *f_mGaus;
+  TH2D *h_mXGausSmearing;
+  TH2D *h_mYGausSmearing;
 
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumP | indexMomentumTheta | indexMomentumPhi
   TH1DMap h_mNumOfEvents; // number of total events

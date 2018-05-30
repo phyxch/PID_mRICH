@@ -54,7 +54,9 @@ int calLikelihood::Init()
   initChain();
   initHistoMap();
   initHistoQA();
+  initGausSmearing();
   initTree();
+
   return 0;
 }
 
@@ -144,8 +146,20 @@ int calLikelihood::initHistoQA()
   hnPhotonElvsnHits_GaAsP = new TH2D ("hnPhotonElvsnHits_GaAsP","hnPhotonElvsnHits_GaAsP",100,0.,100.,50,0.,50.);
   hnPhotonElvsnHits_GaAs = new TH2D ("hnPhotonElvsnHits_GaAs","hnPhotonElvsnHits_GaAs",100,0.,100.,50,0.,50.);
 
+  h_mXGausSmearing = new TH2D("h_mXGausSmearing","h_mXGausSmearing",121,-60.5,60.5,121,-60.5,60.5);
+  h_mYGausSmearing = new TH2D("h_mYGausSmearing","h_mYGausSmearing",121,-60.5,60.5,121,-60.5,60.5);
+
   return 0;
 }
+
+int calLikelihood::initGausSmearing()
+{
+  f_mGaus = new TF1("f_mGaus","gaus",-20.0,20.0);
+  f_mGaus->SetParameter(0,1.0);
+  f_mGaus->SetParameter(1,0.0);
+  f_mGaus->SetParameter(2,1.0);
+}
+
 
 int calLikelihood::initTree()
 {
@@ -281,16 +295,22 @@ int calLikelihood::Make()
 	if(QE_GaAsP > gRandom->Uniform(0.0,1.0))
 	{
 	  NumOfElGaAsP++; 
-	  double out_x = 0.0;
-	  double out_y = 0.0;
-	  // double out_x = ahit->get_out_x()->at(i_track);
-	  // double out_y = ahit->get_out_y()->at(i_track);
 	  double out_x_input = ahit->get_out_x()->at(i_track);
 	  double out_y_input = ahit->get_out_y()->at(i_track);
-	  Smearing2D(out_x_input,out_y_input,out_x,out_y);
-	  // cout << "out_x_input = " << out_x_input << ", out_x = " << out_x << endl;
-	  // cout << "out_y_input = " << out_y_input << ", out_y = " << out_y << endl;
-	  h_photonDist_PID->Fill(out_x,out_y);
+	  double delta_x = GausSmearing(f_mGaus);
+	  double delta_y = GausSmearing(f_mGaus);
+
+	  double out_x = out_x_input+delta_x;
+	  double out_y = out_y_input+delta_y;
+	  if( isInSensorPlane(out_x,out_y) )
+	  {
+	    h_photonDist_PID->Fill(out_x,out_y);
+	    // cout << "out_x_input = " << out_x_input << ", out_x = " << out_x << endl;
+	    // cout << "out_y_input = " << out_y_input << ", out_y = " << out_y << endl;
+	    // cout << endl;
+	  }
+	  h_mXGausSmearing->Fill(out_x_input,out_x);
+	  h_mYGausSmearing->Fill(out_y_input,out_y);
 	}
 
 	double QE_GaAs = mat->extrapQE_GaAs(wavelength);
@@ -301,11 +321,18 @@ int calLikelihood::Make()
       }
     }
 
+    // add noise with 2 electrons
     for(int i_electron = 0; i_electron < 2; i_electron++) 
     {
-      double out_x = gRandom->Uniform(-1.0,1.0)*mRICH::mHalfWidth;
-      double out_y = gRandom->Uniform(-1.0,1.0)*mRICH::mHalfWidth;
-      h_photonDist_PID->Fill(out_x,out_y);
+      double out_x = gRandom->Uniform(2.5,mRICH::mHalfWidth-2.0);
+      double out_y = gRandom->Uniform(2.5,mRICH::mHalfWidth-2.0);
+      double sign_x = 1.0;
+      double sign_y = 1.0;
+      if(gRandom->Rndm() > 0.5) sign_x = -1.0;
+      if(gRandom->Rndm() > 0.5) sign_y = -1.0;
+      h_photonDist_PID->Fill(out_x*sign_x,out_y*sign_y);
+      // cout << "out_x = " << out_x << ", sign_x = " << sign_x << endl;
+      // cout << "out_y = " << out_y << ", sign_y = " << sign_y << endl;
     }
   
 
@@ -375,6 +402,8 @@ int calLikelihood::writeQA()
   hnPhotonElvsnHits_SbKCs->Write();
   hnPhotonElvsnHits_GaAsP->Write();
   hnPhotonElvsnHits_GaAs->Write();
+  h_mXGausSmearing->Write();
+  h_mYGausSmearing->Write();
 
   return 0;
 }
@@ -423,21 +452,17 @@ double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
   return log(prob);
 }
 
-void calLikelihood::Smearing2D(double inx, double iny, double& outx, double& outy)
+double calLikelihood::GausSmearing(TF1 *f_gaus)
 {
-  TF1 *fx = new TF1("fx","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",inx-20.,inx+20.);
-  fx->SetParameter(0,inx);
-  fx->SetParameter(1,1.); //// 1 mm smearing in photon position x
-  outx = fx->GetRandom();
+  double delta_pos = f_gaus->GetRandom();
+  return delta_pos;
+}
 
-  TF1 *fy = new TF1("fy","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",iny-20.,iny+20.);
-  fy->SetParameter(0,iny);
-  fy->SetParameter(1,1.); //// 1 mm smearing in photon position y
-  outy = fy->GetRandom();
-
-  delete fx;
-  delete fy;
-  return ;
+bool calLikelihood::isInSensorPlane(double out_x, double out_y)
+{
+  if( !(TMath::Abs(out_x) >= 2.5 && TMath::Abs(out_x) <= mRICH::mHalfWidth-2.0) ) return false;
+  if( !(TMath::Abs(out_y) >= 2.5 && TMath::Abs(out_y) <= mRICH::mHalfWidth-2.0) ) return false;
+  return true;
 }
 
 ////// This is the main function 

@@ -54,6 +54,9 @@ int genMassHypo::Init()
 
   initChain();
   initHistoMap();
+  initGausSmearing();
+  initHistoQA();
+
   return 0;
 }
 
@@ -136,6 +139,24 @@ int genMassHypo::initHistoMap()
   return 0;
 }
 
+int genMassHypo::initGausSmearing()
+{
+  f_mGaus = new TF1("f_mGaus","gaus",-20.0,20.0);
+  f_mGaus->SetParameter(0,1.0);
+  f_mGaus->SetParameter(1,0.0);
+  f_mGaus->SetParameter(2,1.0);
+
+  return 0;
+}
+
+int genMassHypo::initHistoQA()
+{
+  h_mXGausSmearing = new TH2D("h_mXGausSmearing","h_mXGausSmearing",121,-60.5,60.5,121,-60.5,60.5);
+  h_mYGausSmearing = new TH2D("h_mYGausSmearing","h_mYGausSmearing",121,-60.5,60.5,121,-60.5,60.5);
+
+  return 0;
+}
+
 int genMassHypo::Make()
 {
   event *aevt = new event(mChainInPut_Events);  /// declear and save info to branchs for event
@@ -146,7 +167,7 @@ int genMassHypo::Make()
   mChainInPut_Events->GetEntry(0);
   mChainInPut_Tracks->GetEntry(0);
 
-  // for(int i_event = 0; i_event < 100; ++i_event) // test event loop
+  // for(int i_event = 0; i_event < 1024; ++i_event) // test event loop
   for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
   { 
     if(i_event%1000==0) cout << "processing event:  " << i_event << " ;"<<endl;
@@ -194,16 +215,22 @@ int genMassHypo::Make()
 
 	if( QE_GaAsP > gRandom->Uniform(0.0,1.0) )
 	{
-	  double out_x = 0.0;
-	  double out_y = 0.0;
-	  // double out_x = ahit->get_out_x()->at(i_track);
-	  // double out_y = ahit->get_out_y()->at(i_track);
 	  double out_x_input = ahit->get_out_x()->at(i_track);
 	  double out_y_input = ahit->get_out_y()->at(i_track);
-	  Smearing2D(out_x_input,out_y_input,out_x,out_y);
-	  // cout << "out_x_input = " << out_x_input << ", out_x = " << out_x << endl;
-	  // cout << "out_y_input = " << out_y_input << ", out_y = " << out_y << endl;
-	  h_mPhotonDist[key_photon]->Fill(out_x,out_y);
+	  double delta_x = GausSmearing(f_mGaus);
+	  double delta_y = GausSmearing(f_mGaus);
+
+	  double out_x = out_x_input+delta_x;
+	  double out_y = out_y_input+delta_y;
+	  if( isInSensorPlane(out_x,out_y) )
+	  {
+	    h_mPhotonDist[key_photon]->Fill(out_x,out_y);
+	    // cout << "out_x_input = " << out_x_input << ", out_x = " << out_x << endl;
+	    // cout << "out_y_input = " << out_y_input << ", out_y = " << out_y << endl;
+	    // cout << endl;
+	  }
+	  h_mXGausSmearing->Fill(out_x_input,out_x);
+	  h_mYGausSmearing->Fill(out_y_input,out_y);
 	}
       }
     }
@@ -220,6 +247,7 @@ int genMassHypo::Finish()
   if(File_mOutPut != NULL){
     File_mOutPut->cd();
     writeHistoMap();
+    writeHistoQA();
     File_mOutPut->Close();
   }
   return 0;
@@ -256,6 +284,12 @@ int genMassHypo::writeHistoMap()
   return 0;
 }
 
+int genMassHypo::writeHistoQA()
+{
+  h_mXGausSmearing->Write();
+  h_mYGausSmearing->Write();
+}
+
 bool genMassHypo::isPhoton(hit *ahit, int i)
 {
   if(ahit->get_pid()->at(i)==0) return true;
@@ -281,21 +315,17 @@ bool genMassHypo::isOnPhotonSensor(hit *ahit, int i)
   else return false;
 }
 
-void genMassHypo::Smearing2D(double inx, double iny, double& outx, double& outy)
+double genMassHypo::GausSmearing(TF1 *f_gaus)
 {
-  TF1 *fx = new TF1("fx","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",inx-20.,inx+20.);
-  fx->SetParameter(0,inx);
-  fx->SetParameter(1,1.); //// 1 mm smearing in photon position x
-  outx = fx->GetRandom();
+  double delta_pos = f_gaus->GetRandom();
+  return delta_pos;
+}
 
-  TF1 *fy = new TF1("fy","1/([1]*sqrt(2*3.1415926))*exp(-1*pow(x-[0],2)/(2.*[1]*[1]))",iny-20.,iny+20.);
-  fy->SetParameter(0,iny);
-  fy->SetParameter(1,1.); //// 1 mm smearing in photon position y
-  outy = fy->GetRandom();
-
-  delete fx;
-  delete fy;
-  return ;
+bool genMassHypo::isInSensorPlane(double out_x, double out_y)
+{
+  if( !(TMath::Abs(out_x) >= 2.5 && TMath::Abs(out_x) <= mRICH::mHalfWidth-2.0) ) return false;
+  if( !(TMath::Abs(out_y) >= 2.5 && TMath::Abs(out_y) <= mRICH::mHalfWidth-2.0) ) return false;
+  return true;
 }
 
 ////// This is the main function 
