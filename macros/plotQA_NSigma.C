@@ -38,8 +38,9 @@ std::pair<std::string,std::string> get_misIdentifiedParticle(int pid)
 
 void plotQA_NSigma(int pid = 211, int rank = 0)
 {
-  string date = "May27_2018";
-  string input_likelihood = Form("/work/eic/xusun/output/probability/3mm/PID_prob_%s.root",date.c_str());
+  string date = "May23_2018";
+  // string input_likelihood = Form("/work/eic/xusun/output/probability/3mm/PID_prob_%s.root",date.c_str());
+  string input_likelihood = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
   cout << "read in file: " << input_likelihood.c_str() << endl;
   TFile *File_InPut_Likelihood = TFile::Open(input_likelihood.c_str());
   assert(File_InPut_Likelihood);
@@ -48,7 +49,7 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
   std::pair<std::string,std::string> misIdentifiedParticle = get_misIdentifiedParticle(pid);
   const int index_vx = 0;
   const int index_vy = 0;
-  const int index_theta = 0;
+  const int index_theta = 2;
   const int index_phi = 3;
 
   string key_likelihood;
@@ -126,12 +127,16 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
 
     double mean_diff = f_gaus->GetParameter(1);
     double width_diff = f_gaus->GetParameter(2);
-    string leg_likelihood = Form("#Deltaln(likelihood) = %3.1f",mean_diff);
+    // string leg_likelihood = Form("#Deltaln(likelihood) = %3.1f",mean_diff);
+    string leg_likelihood = Form("#Deltaln(likelihood) = %3.1f",mean);
     plotTopLegend(leg_likelihood.c_str(),0.45,0.5,0.05,1,0.0,42,1,1);
 
-    double sigma_diff = TMath::Sqrt(2.0*mean_diff);
-    double err_diff = width_diff/TMath::Sqrt(2.0*mean_diff);
-    string leg_nSigma = Form("N_{#sigma} = %3.1f",TMath::Sqrt(2.0*mean_diff));
+    // double sigma_diff = TMath::Sqrt(2.0*mean_diff);
+    // double err_diff = width_diff/TMath::Sqrt(2.0*mean_diff);
+    // string leg_nSigma = Form("N_{#sigma} = %3.1f",TMath::Sqrt(2.0*mean_diff));
+    double sigma_diff = TMath::Sqrt(2.0*mean);
+    double err_diff = width/TMath::Sqrt(2.0*mean);
+    string leg_nSigma = Form("N_{#sigma} = %3.1f",TMath::Sqrt(2.0*mean));
     plotTopLegend(leg_nSigma.c_str(),0.45,0.4,0.05,1,0.0,42,1,1);
   }
 
@@ -140,7 +145,8 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
   if(rank == 1) output_proj = Form("../figures/nSigma/c_mProj_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d.pdf",identifiedParticle.second.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
   c_proj->SaveAs(output_proj.c_str());
 
-  string input_nsigma = Form("/work/eic/xusun/output/probability/3mm/PID_nSigma_%s.root",date.c_str());
+  // string input_nsigma = Form("/work/eic/xusun/output/probability/3mm/PID_nSigma_%s.root",date.c_str());
+  string input_nsigma = Form("/work/eic/xusun/output/probability/PID_nSigma_%s.root",date.c_str());
   cout << endl;
   cout << "read in file: " << input_nsigma.c_str() << endl;
   TFile *File_InPut_NSigma = TFile::Open(input_nsigma.c_str());
@@ -152,6 +158,10 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
 
   TH1D *h_mNSigma = (TH1D*)File_InPut_NSigma->Get(key_nsigma.c_str());
   assert(h_mNSigma);
+  for(int i_bin = 0; i_bin < h_mNSigma->GetNbinsX(); ++i_bin)
+  {
+    h_mNSigma->SetBinError(i_bin+1,0.0);
+  }
 
   TCanvas *c_nsigma = new TCanvas("c_nsigma","c_nsigma",10,10,800,800);
   c_nsigma->cd(1);
@@ -160,6 +170,8 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
   c_nsigma->cd(1)->SetGrid(0,0);
   c_nsigma->cd(1)->SetTicks(1,1);
 
+  h_mNSigma->SetTitle("");
+  h_mNSigma->SetStats(0);
   h_mNSigma->GetXaxis()->SetTitle("momentum (GeV/c)");
   h_mNSigma->GetXaxis()->CenterTitle();
   h_mNSigma->GetXaxis()->SetTitleOffset(1.25);
@@ -169,11 +181,13 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
   h_mNSigma->GetYaxis()->CenterTitle();
   h_mNSigma->GetYaxis()->SetTitleOffset(1.25);
   h_mNSigma->GetYaxis()->SetNdivisions(505);
+  h_mNSigma->GetYaxis()->SetRangeUser(-0.1,13.1);
   h_mNSigma->SetMarkerStyle(24);
   h_mNSigma->SetMarkerSize(1.2);
   h_mNSigma->SetMarkerColor(1);
-  h_mNSigma->Draw("pE");
+  h_mNSigma->Draw("P");
   PlotLine(2.5,10.5,3.0,3.0,1,2,2);
+  plotTopLegend("3#sigma",9.55,3.1,0.04,1,0.0,42,0,1);
 
   string output_nsigma;
   if(rank == 0) output_nsigma = Form("../figures/nSigma/c_nSigma_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d.pdf",identifiedParticle.second.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);

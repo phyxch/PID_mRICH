@@ -43,7 +43,7 @@ namespace mRICH
   // const double mMomTheta_start = 0.0*DEG;
   // const double mMomTheta_stop  = TMath::Pi()*DEG/6.0;
   const int mNumOfIndexMomentumTheta = 5;
-  const double mBin_MomTheta[mNumOfIndexMomentumTheta] = {0.0,12.5,22.5,32.5,42.5};
+  const double mBin_MomTheta[mNumOfIndexMomentumTheta] = {2.5,7.5,12.5,32.5,42.5};
   const double mDelta_MomTheta = 2.5;
 
   const double mMomPhi_start = -1.0*TMath::Pi()*DEG;
@@ -60,6 +60,13 @@ namespace mRICH
 
   // const int mNumOfPixels = 105;   ///// number of photonsenor segmentation pads
   const double mHalfWidth = 52.5; // (mm) half width (x) and height (y) of the glass window
+
+  // const int mNumOfPixels = 101; // 48*2 1mm-pixels + 2*2 2mm-glasswindow + 1 1mm-gap
+  // const double mPixels[mNumOfPixels+1] = {-52.5,-50.5,-49.5,-48.5,-47.5,-46.5,-45.5,-44.5,-43.5,-42.5,-41.5,-40.5,-39.5,-38.5,-37.5,-36.5,-35.5,-34.5,-33.5,-32.5,-31.5,-30.5,-29.5,-28.5,-27.5,-26.5,-25.5,-24.5,-23.5,-22.5,-21.5,-20.5,-19.5,-18.5,-17.5,-16.5,-15.5,-14.5,-13.5,-12.5,-11.5,-10.5,-9.5,-8.5,-7.5,-6.5,-5.5,-4.5,-3.5,-2.5,-0.5,0.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5,21.5,22.5,23.5,24.5,25.5,26.5,27.5,28.5,29.5,30.5,31.5,32.5,33.5,34.5,35.5,36.5,37.5,38.5,39.5,40.5,41.5,42.5,43.5,44.5,45.5,46.5,47.5,48.5,49.5,50.5,52.5};
+
+  // const int mNumOfPixels = 53; // 24*2 2mm-pixels + 2*2 2mm-glasswindow + 1 1mm-gap
+  // const double mPixels[mNumOfPixels+1] = {-52.5,-50.5,-48.5,-46.5,-44.5,-42.5,-40.5,-38.5,-36.5,-34.5,-32.5,-30.5,-28.5,-26.5,-24.5,-22.5,-20.5,-18.5,-16.5,-14.5,-12.5,-10.5,-8.5,-6.5,-4.5,-2.5,-0.5,0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5,18.5,20.5,22.5,24.5,26.5,28.5,30.5,32.5,34.5,36.5,38.5,40.5,42.5,44.5,46.5,48.5,50.5,52.5};
+
   const int mNumOfPixels = 37; // 16*2 3mm-pixels + 2*2 2mm-glasswindow + 1 1mm-gap
   const double mPixels[mNumOfPixels+1] = {-52.5,-50.5,-47.5,-44.5,-41.5,-38.5,-35.5,-32.5,-29.5,-26.5,-23.5,-20.5,-17.5,-14.5,-11.5,-8.5,-5.5,-2.5,-0.5,0.5,2.5,5.5,8.5,11.5,14.5,17.5,20.5,23.5,26.5,29.5,32.5,35.5,38.5,41.5,44.5,47.5,50.5,52.5};
 

@@ -262,7 +262,6 @@ int calLikelihood::Make()
     // cout << endl;
 
     // fill photon distribution of unknown PID
-    // TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
     TH2D *h_photonDist_PID = new TH2D("h_photonDist_PID","h_photonDist_PID",mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
     int NumOfHitAegl = 0;
     int NumOfHitPhoDet = 0;
@@ -473,7 +472,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "May27_2018";
+  string date = "May23_2018";
   string inputdatabase = Form("/work/eic/xusun/output/database/database_%s.root",date.c_str());
 
   cout << "numoflist = " << numoflist.c_str() << endl;

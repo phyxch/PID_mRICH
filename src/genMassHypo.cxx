@@ -127,7 +127,6 @@ int genMassHypo::initHistoMap()
 
 	      string key_photon = utility->gen_KeyMassHypo(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
 	      // cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
-	      // h_mPhotonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,mRICH::mNumOfPixels,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth);
 	      h_mPhotonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
 	    }
 	  }
