@@ -472,7 +472,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "May23_2018";
+  string date = "Jun03_2018";
   string inputdatabase = Form("/work/eic/xusun/output/database/database_%s.root",date.c_str());
 
   cout << "numoflist = " << numoflist.c_str() << endl;

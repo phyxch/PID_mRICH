@@ -38,7 +38,7 @@ std::pair<std::string,std::string> get_misIdentifiedParticle(int pid)
 
 void plotQA_NSigma(int pid = 211, int rank = 0)
 {
-  string date = "May23_2018";
+  string date = "Jun03_2018";
   // string input_likelihood = Form("/work/eic/xusun/output/probability/3mm/PID_prob_%s.root",date.c_str());
   string input_likelihood = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
   cout << "read in file: " << input_likelihood.c_str() << endl;
@@ -49,7 +49,7 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
   std::pair<std::string,std::string> misIdentifiedParticle = get_misIdentifiedParticle(pid);
   const int index_vx = 0;
   const int index_vy = 0;
-  const int index_theta = 2;
+  const int index_theta = 1;
   const int index_phi = 3;
 
   string key_likelihood;
@@ -127,16 +127,16 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
 
     double mean_diff = f_gaus->GetParameter(1);
     double width_diff = f_gaus->GetParameter(2);
-    // string leg_likelihood = Form("#Deltaln(likelihood) = %3.1f",mean_diff);
-    string leg_likelihood = Form("#Deltaln(likelihood) = %3.1f",mean);
+    string leg_likelihood = Form("#Deltaln(likelihood) = %3.1f",mean_diff);
+    // string leg_likelihood = Form("#Deltaln(likelihood) = %3.1f",mean);
     plotTopLegend(leg_likelihood.c_str(),0.45,0.5,0.05,1,0.0,42,1,1);
 
-    // double sigma_diff = TMath::Sqrt(2.0*mean_diff);
-    // double err_diff = width_diff/TMath::Sqrt(2.0*mean_diff);
-    // string leg_nSigma = Form("N_{#sigma} = %3.1f",TMath::Sqrt(2.0*mean_diff));
-    double sigma_diff = TMath::Sqrt(2.0*mean);
-    double err_diff = width/TMath::Sqrt(2.0*mean);
-    string leg_nSigma = Form("N_{#sigma} = %3.1f",TMath::Sqrt(2.0*mean));
+    double sigma_diff = TMath::Sqrt(2.0*mean_diff);
+    double err_diff = width_diff/TMath::Sqrt(2.0*mean_diff);
+    string leg_nSigma = Form("N_{#sigma} = %3.1f",TMath::Sqrt(2.0*mean_diff));
+    // double sigma_diff = TMath::Sqrt(2.0*mean);
+    // double err_diff = width/TMath::Sqrt(2.0*mean);
+    // string leg_nSigma = Form("N_{#sigma} = %3.1f",TMath::Sqrt(2.0*mean));
     plotTopLegend(leg_nSigma.c_str(),0.45,0.4,0.05,1,0.0,42,1,1);
   }
 

@@ -283,13 +283,13 @@ int PID_mRICH::Make()
 
   mChainInPut->GetEntry(0); // For unknown reasons root doesn't like it if someone starts to read a file not from the 0 entry
 
-  for(long i_event = 0; i_event < NumOfEvents; ++i_event)
   // for(long i_event = 0; i_event < 100; ++i_event)
+  for(long i_event = 0; i_event < NumOfEvents; ++i_event)
   {
     if (!mChainInPut->GetEntry(i_event)) // take the event -> information is stored in event
       break;
 
-    if(i_event%100==0) cout << "processing event:  " << i_event << " ;"<<endl;
+    if(i_event%1000==0) cout << "processing event:  " << i_event << " ;"<<endl;
 
     const int indexSpaceX = utility->get_indexSpaceX(mVx);
     const int indexSpaceY = utility->get_indexSpaceY(mVy);
@@ -337,7 +337,7 @@ int PID_mRICH::Finish()
 ////// This is the main function 
 int main()
 {
-  string date = "May23_2018";
+  string date = "Jun03_2018";
   string outputfile = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
 
   PID_mRICH *mPID_mRICH = new PID_mRICH(date,outputfile);

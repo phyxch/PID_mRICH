@@ -169,10 +169,10 @@ int calNSigma::Make()
 		  double mean_diff = f_gaus->GetParameter(1);
 		  double width_diff = f_gaus->GetParameter(2);
 
-		  // double sigma_diff = TMath::Sqrt(2.0*mean_diff);
-		  // double err_diff = width_diff/TMath::Sqrt(2.0*mean_diff);
-		  double sigma_diff = TMath::Sqrt(2.0*mean);
-		  double err_diff = width/TMath::Sqrt(2.0*mean);
+		  double sigma_diff = TMath::Sqrt(2.0*mean_diff);
+		  double err_diff = width_diff/TMath::Sqrt(2.0*mean_diff);
+		  // double sigma_diff = TMath::Sqrt(2.0*mean);
+		  // double err_diff = width/TMath::Sqrt(2.0*mean);
 
 		  string key_nsigma = utility->gen_KeyNSigma(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_theta,i_phi,i_rank+1);
 		  h_mNSigma[key_nsigma]->SetBinContent(i_pt+1,sigma_diff);
@@ -203,7 +203,7 @@ int calNSigma::Finish()
 // This is the main function 
 int main()
 {
-  string date = "May23_2018";
+  string date = "Jun03_2018";
   string outputfile = Form("/work/eic/xusun/output/probability/PID_nSigma_%s.root",date.c_str());
 
   calNSigma *mcalNSigma = new calNSigma(date,outputfile);

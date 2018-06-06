@@ -19,3 +19,4 @@ macros/AutoDict_*
 figures/*/*.pdf
 figures/*/*/*.pdf
 figures/*/*/*/*.pdf
+figures/*.eps

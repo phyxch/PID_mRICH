@@ -335,7 +335,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "May27_2018";
+  string date = "Jun03_2018";
   
   cout << "numoflist = " << numoflist.c_str() << endl;
   genMassHypo *genMassHypotheses = new genMassHypo(numoflist,date);
