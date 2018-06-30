@@ -24,6 +24,7 @@ double radius(double *x_val, double *par)
 void plotQA_radius()
 {
   double f = 6.0*25.4; // mm
+  // double f = 200; // mm
   // double f = 1.0; // mm
   double n = 1.03; // refractive index
   double mass[4] = {0.138,0.494,0.938,0.00051}; // GeV
@@ -46,7 +47,8 @@ void plotQA_radius()
   h_frame->GetXaxis()->SetTitleOffset(1.2);
   h_frame->GetXaxis()->CenterTitle();
 
-  h_frame->GetYaxis()->SetRangeUser(0.0,44.0);
+  // h_frame->GetYaxis()->SetRangeUser(0.0,44.0);
+  h_frame->GetYaxis()->SetRangeUser(0.0,84.0);
   h_frame->GetYaxis()->SetNdivisions(505,'N');
   h_frame->GetYaxis()->SetTitle("radius (mm)");
   h_frame->GetYaxis()->SetTitleSize(0.05);
