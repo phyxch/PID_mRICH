@@ -169,6 +169,14 @@ std::string Utility::gen_KeyMassHypo(int pid, int index_vx, int index_vy, int in
   return key_photon;
 }
 
+std::string Utility::gen_KeyMassHypoGenerated(int pid, int index_vx, int index_vy, int index_p, int index_theta, int index_phi)
+{
+  std::string identifiedParticle = this->get_IdentifiedParticle(pid);
+  std::string key_photon = Form("h_mPhotonGenerated_%s_vx_%d_vy_%d_mom_%d_theta_%d_phi_%d",identifiedParticle.c_str(),index_vx,index_vy,index_p,index_theta,index_phi);
+
+  return key_photon;
+}
+
 std::string Utility::gen_KeyLikelihood(int pid, int index_vx, int index_vy, int index_theta, int index_phi, int rank)
 {
   std::string identifiedParticle = this->get_IdentifiedParticle(pid);

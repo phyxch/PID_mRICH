@@ -47,8 +47,8 @@ int genMassHypo::Init()
 {
   cout<<"genMassHypo::Init() ----- Initialization ! ------"<<endl;
 
-  // mOutPutFile = Form("/work/eic/xusun/output/database/database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
-  mOutPutFile = "./out.root"; // batch mode
+  mOutPutFile = Form("/work/eic/xusun/output/database/database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  // mOutPutFile = "./out.root"; // batch mode
   cout<<"genMassHypo::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
 
@@ -62,7 +62,8 @@ int genMassHypo::Init()
 
 int genMassHypo::initChain()
 {
-  string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
+  // string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
+  string inputdir = "/work/eic/xusun/output/modular_rich/BeamTest/PlusMinus/";
   string InPutList = Form("/work/eic/xusun/list/database/mRICH_PDF_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
   
   mChainInPut_Events = new TChain("generated");
@@ -128,6 +129,10 @@ int genMassHypo::initHistoMap()
 	      string key_photon = utility->gen_KeyMassHypo(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
 	      // cout << "genMassHypo::init(), initialize histogram: " << key_photon.c_str() << endl;
 	      h_mPhotonDist[key_photon] = new TH2D(key_photon.c_str(),key_photon.c_str(),mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
+
+	      string key_photon_generated = utility->gen_KeyMassHypoGenerated(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
+	      // cout << "genMassHypo::init(), initialize histogram: " << key_photon_generated.c_str() << endl;
+	      h_mPhotonGenerated[key_photon_generated] = new TH2D(key_photon_generated.c_str(),key_photon_generated.c_str(),mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
 	    }
 	  }
 	}
@@ -203,11 +208,18 @@ int genMassHypo::Make()
     string key_photon = utility->gen_KeyMassHypo(pid_gen,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
     // cout << "fill histogram: " << key_photon.c_str() << endl;
 
+    string key_photon_generated = utility->gen_KeyMassHypoGenerated(pid_gen,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
+    // cout << "fill histogram: " << key_photon_generated.c_str() << endl;
+
     int NumOfTracks = ahit->get_hitn()->size();
     for (int i_track = 0; i_track < NumOfTracks; ++i_track) // track loop
     {
       if(isPhoton(ahit,i_track) && !isReflection(ahit,i_track) && isOnPhotonSensor(ahit,i_track))
       {
+	double out_x_generated = ahit->get_out_x()->at(i_track);
+	double out_y_generated = ahit->get_out_y()->at(i_track);
+	h_mPhotonGenerated[key_photon_generated]->Fill(out_x_generated,out_y_generated);
+
 	double photonE = ahit->get_trackE()->at(i_track);   /// in MeV (GEANT4 default)
 	double wavelength = 1240./(photonE*1.e6);  /// MeV->eV,wavelength in "nm"
 	double QE_GaAsP = mat->extrapQE_GaAsP(wavelength); // get quantum efficiency for photon sensor => need to be updated
@@ -273,6 +285,10 @@ int genMassHypo::writeHistoMap()
 	      string key_photon = utility->gen_KeyMassHypo(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
 	      // cout << "genMassHypo::end(), write histogram: " << key_photon.c_str() << endl;
 	      h_mPhotonDist[key_photon]->Write();
+
+	      string key_photon_generated = utility->gen_KeyMassHypoGenerated(mRICH::mPIDArray[i_pid],i_vx,i_vy,i_mom,i_theta,i_phi);
+	      // cout << "genMassHypo::end(), write histogram: " << key_photon_generated.c_str() << endl;
+	      h_mPhotonGenerated[key_photon_generated]->Write();
 	    }
 	  }
 	}
@@ -303,14 +319,20 @@ bool genMassHypo::isReflection(hit *ahit, int i)
 
 bool genMassHypo::isOnAerogel(hit *ahit, int i)
 {
-  if(ahit->get_out_z()->at(i)>=63.5874 && ahit->get_out_z()->at(i)<=96.5876) return true;
+  // if(ahit->get_out_z()->at(i)>=63.5874 && ahit->get_out_z()->at(i)<=96.5876) return true;
+  // else return false;
+  const int detector_id = ahit->get_id()->at(i);
+  if(detector_id == 1) return true;
   else return false;
 }
 
 bool genMassHypo::isOnPhotonSensor(hit *ahit, int i)
 {
-  double out_z = ahit->get_out_z()->at(i);
-  if(out_z > 253.6624 && out_z < 255.1626) return true;
+  // double out_z = ahit->get_out_z()->at(i);
+  // if(out_z > 253.6624+3.0 && out_z < 255.1626+3.0) return true;
+  // else return false;
+  const int detector_id = ahit->get_id()->at(i);
+  if(detector_id == 2) return true;
   else return false;
 }
 
@@ -322,8 +344,8 @@ double genMassHypo::GausSmearing(TF1 *f_gaus)
 
 bool genMassHypo::isInSensorPlane(double out_x, double out_y)
 {
-  if( !(TMath::Abs(out_x) >= 2.5 && TMath::Abs(out_x) <= mRICH::mHalfWidth-2.0) ) return false;
-  if( !(TMath::Abs(out_y) >= 2.5 && TMath::Abs(out_y) <= mRICH::mHalfWidth-2.0) ) return false;
+  if( !(TMath::Abs(out_x) > 2.5 && TMath::Abs(out_x) < mRICH::mHalfWidth-2.0) ) return false;
+  if( !(TMath::Abs(out_y) > 2.5 && TMath::Abs(out_y) < mRICH::mHalfWidth-2.0) ) return false;
   return true;
 }
 
@@ -335,7 +357,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "Jun03_2018";
+  string date = "BeamTest_PlusMinus";
   
   cout << "numoflist = " << numoflist.c_str() << endl;
   genMassHypo *genMassHypotheses = new genMassHypo(numoflist,date);

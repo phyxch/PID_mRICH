@@ -61,6 +61,7 @@ class genMassHypo
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumP | indexMomentumTheta | indexMomentumPhi
   TH1DMap h_mNumOfEvents; // number of total events
   TH2DMap h_mPhotonDist; // x: photon out_x | y: photon out_y 
+  TH2DMap h_mPhotonGenerated; // x: photon out_x | y: photon out_y 
 
   TChain *mChainInPut_Events;
   TChain *mChainInPut_Tracks;
