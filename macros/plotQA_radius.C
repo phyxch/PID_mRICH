@@ -32,8 +32,8 @@ void plotQA_radius()
   int color[4] = {2,4,1,6};
   int style[4] = {2,4,1,6};
 
-  TH1F *h_frame = new TH1F("h_frame","h_frame",170,-1.2,15.8);
-  for(int i_bin = 0; i_bin < 160; ++i_bin)
+  TH1F *h_frame = new TH1F("h_frame","h_frame",1400,-1.2,138.8);
+  for(int i_bin = 0; i_bin < 1400; ++i_bin)
   {
     h_frame->SetBinContent(i_bin+1,-100.0);
     h_frame->SetBinError(i_bin+1,1.0);
@@ -68,7 +68,7 @@ void plotQA_radius()
     TString FuncName = Form("f_%s",ParType[i_particle].Data());
     double p_min = TMath::Sqrt(mass[i_particle]*mass[i_particle]/(n*n-1.0));
     // cout << "mass = " << mass[i_particle] << ", p_min = " << p_min<< endl;
-    f_radius[i_particle] = new TF1(FuncName.Data(),radius,0,15.0,3);
+    f_radius[i_particle] = new TF1(FuncName.Data(),radius,0,150.0,3);
     f_radius[i_particle]->SetNpx(10000);
     f_radius[i_particle]->FixParameter(0,mass[i_particle]);
     f_radius[i_particle]->FixParameter(1,n);
@@ -76,7 +76,7 @@ void plotQA_radius()
     f_radius[i_particle]->SetLineColor(color[i_particle]);
     f_radius[i_particle]->SetLineStyle(style[i_particle]);
     f_radius[i_particle]->SetLineWidth(4);
-    f_radius[i_particle]->SetRange(p_min*0.8,15.0);
+    f_radius[i_particle]->SetRange(p_min*0.8,150.0);
     f_radius[i_particle]->Draw("l same");
   }
 
@@ -88,6 +88,8 @@ void plotQA_radius()
     leg->AddEntry(f_radius[i_particle],ParType[i_particle].Data(),"L");
   }
   leg->Draw("same");
+
+  cout << "120 GeV/c proton radiaus is: " << f_radius[2]->Eval(120.0) << endl;
 
   c_play->SaveAs("../figures/c_radius.eps");
 }
