@@ -4,11 +4,12 @@
 #include "TH2F.h"
 #include "TH1F.h"
 #include "TCanvas.h"
+#include "TLegend.h"
 using namespace std;
 
-void plotQA_SiPM(const int PMTid = 14, const int SiPMid = 14)
+void plotQA_Timing(const int PMTid = 173, const int SiPMid = 651)
 {
-  string inputPMT = Form("/Users/xusun/Data/mRICH2ndBeamTest/PMT/richTDC_run%d/sspRich.root",PMTid);
+  string inputPMT = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/richTDC_run%d/sspRich.root",PMTid);
   cout << "read in file: " << inputPMT.c_str() << endl;
   TFile *File_InPutPMT = TFile::Open(inputPMT.c_str());
   assert(File_InPutPMT);
@@ -24,7 +25,7 @@ void plotQA_SiPM(const int PMTid = 14, const int SiPMid = 14)
   TTree * tree_mRICH_PMT = (TTree*)File_InPutPMT->Get("data");
   tree_mRICH_PMT->Draw("time>>h_PMT","pol==1");
 
-  string inputSiPM = Form("/Users/xusun/Data/mRICH2ndBeamTest/PMT/richTDC_run%d/sspRich.root",SiPMid);
+  string inputSiPM = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/sipmTDC_run%d/sspRich.root",SiPMid);
   cout << "read in file: " << inputSiPM.c_str() << endl;
   TFile *File_InPutSiPM = TFile::Open(inputSiPM.c_str());
   assert(File_InPutSiPM);
@@ -36,4 +37,11 @@ void plotQA_SiPM(const int PMTid = 14, const int SiPMid = 14)
   tree_mRICH_SiPM->SetAlias("TimeShift","time+shift");
   tree_mRICH_SiPM->Draw("TimeShift>>h_SiPM","pol==1","same");
   // tree_mRICH_SiPM->Draw("time");
+
+  TLegend *leg = new TLegend(0.2,0.5,0.5,0.65);
+  leg->SetFillColor(0);
+  leg->SetBorderSize(0);
+  leg->AddEntry(h_PMT,"PMT time","L");
+  leg->AddEntry(h_SiPM,"SiPM time + 1490","L");
+  leg->Draw("same");
 }

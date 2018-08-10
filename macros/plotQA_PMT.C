@@ -39,10 +39,10 @@ int GetPMT_mRICH(int slot,int fiber,int asic);
 void GenCoord_mRICH(int ipmt, int x1, int y1);
 int GetPixel_mRICH(int fiber, int asic, int maroc_channel);
 
-void plotQA_PMT(const int runID = 292)
+void plotQA_PMT(const string mode = "rich", const int runID = 182)
 {
   int debug = 1;
-  string inputfile = Form("/Users/xusun/Data/mRICH2ndBeamTest/PMT/richTDC_run%d/sspRich.root",runID);
+  string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
 
   InitDisplay_mRICH();
@@ -64,7 +64,7 @@ void plotQA_PMT(const int runID = 292)
   // int NumOfEvents = 10000;
   printf("NEntries %d\n",NumOfEvents);
 
-  // for(int i_event = 0; i_event < NumOfEvents; ++i_event)
+  tree_mRICH->GetEntry(0);
   for(int i_event = 0; i_event < NumOfEvents; ++i_event)
   {
     if(NumOfEvents>20)if(i_event%(NumOfEvents/10)==0)printf("Reading Event %6d\n",i_event);
@@ -101,8 +101,15 @@ void plotQA_PMT(const int runID = 292)
   TCanvas *c_TDC = new TCanvas("c_TDC","c_TDC",10,10,800,800);
   c_TDC->SetLeftMargin(0.15);
   c_TDC->SetBottomMargin(0.15);
+  c_TDC->SetRightMargin(0.15);
   c_TDC->SetTicks(1,1);
   c_TDC->SetGrid(0,0);
+  h2->SetTitle("120 GeV/c proton single event");
+  h2->SetStats(0);
+  h2->GetXaxis()->SetTitle("pixel ID");
+  h2->GetXaxis()->CenterTitle();
+  h2->GetYaxis()->SetTitle("pixel ID");
+  h2->GetYaxis()->CenterTitle();
   h2->Draw("colz");
   c_TDC->SaveAs("../figures/c_TDC.pdf");
 }
