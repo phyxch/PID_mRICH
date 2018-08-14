@@ -27,3 +27,10 @@ typedef std::map<std::string,double> doubleMap;
 typedef std::map<int,std::string> strMap;
 typedef std::map<int,std::pair<std::string,std::string> > pairMap;
 
+struct hitPosition
+{
+  double x;
+  double y;
+}
+
+typedef std::vector<int> intVec;
