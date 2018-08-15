@@ -114,6 +114,11 @@ nsigma : $(OBJ)calNSigma.o $(OBJ)Utility.o
 	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
 	@echo
 
+ring : $(OBJ)ringFinder.o $(OBJ)event.o $(OBJ)hit.o $(OBJ)material.o $(OBJ)Utility.o
+	$(LD) $(LDFLAGS) $(LDINC) $(XM_LIBS) $^ $(LDLIB) $(ROOTLIBS) $(ROOTGLIBS) -o $(BIN)$(notdir $@)
+	@echo
+
+
 ######################################################
 $(OBJ)%.o : 	$(MAIN)%.c $(INCS)
 	$(CC)     $(CFLAGS) -c $(MAIN)$(notdir $<) -o $(OBJ)$(notdir $@)

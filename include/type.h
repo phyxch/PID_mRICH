@@ -1,7 +1,11 @@
+#ifndef type_h
+#define type_h
+
 #include <string>
 #include <map>
 #include <vector>
 #include <utility>
+#include <iostream>
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH1D.h"
@@ -31,6 +35,8 @@ struct hitPosition
 {
   double x;
   double y;
-}
+};
 
 typedef std::vector<int> intVec;
+
+#endif

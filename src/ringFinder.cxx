@@ -19,7 +19,7 @@
 #include "../include/event.h"
 #include "../include/hit.h"
 #include "../include/material.h"
-#include "../include/RingFinder.h"
+#include "../include/ringFinder.h"
 #include "../include/Utility.h"
 #include "../include/mRICH.h"
 
@@ -51,7 +51,7 @@ int RingFinder::Init()
 {
   cout<<"RingFinder::Init() ----- Initialization ! ------"<<endl;
 
-  mOutPutFile = Form("/work/eic/xusun/output/database/database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  mOutPutFile = Form("/work/eic/xusun/output/ringfinder/ringfinder_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
   // mOutPutFile = "./out.root"; // batch mode
   cout<<"RingFinder::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
@@ -68,18 +68,18 @@ int RingFinder::initChain()
 {
   // string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
   string inputdir = "/work/eic/xusun/output/modular_rich/BeamTest/PlusMinus/";
-  string InPutList = Form("/work/eic/xusun/list/database/mRICH_PDF_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
+  string InPutList = Form("/work/eic/xusun/list/ringfinder/mRICH_PDF_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
   
   mChainInPut_Events = new TChain("generated");
   mChainInPut_Tracks = new TChain("eic_rich");
 
   if (!InPutList.empty())   // if input file is ok
   {
-    cout << "Open input database file list: " << InPutList.c_str() << endl;
+    cout << "Open input ringfinder file list: " << InPutList.c_str() << endl;
     ifstream in(InPutList.c_str());  // input stream
     if(in)
     {
-      cout << "input database file list is ok" << endl;
+      cout << "input ringfinder file list is ok" << endl;
       char str[255];       // char array for each file name
       Long64_t entries_save = 0;
       while(in)
@@ -100,7 +100,7 @@ int RingFinder::initChain()
     }
     else
     {
-      cout << "WARNING: input database file input is problemtic" << endl;
+      cout << "WARNING: input ringfinder file input is problemtic" << endl;
     }
   }
 
@@ -162,6 +162,7 @@ int RingFinder::Make()
     mChainInPut_Events->GetEntry(i_event);  
     mChainInPut_Tracks->GetEntry(i_event);
 
+    /*
     const int  pid_gen = aevt->get_pid()->at(0);
     const double px_gen = aevt->get_px()->at(0)/1e3;    //in MeV, convert to GeV
     const double py_gen = aevt->get_py()->at(0)/1e3;    //in MeV, convert to GeV
@@ -174,13 +175,14 @@ int RingFinder::Make()
     const double theta = TMath::ACos(pz_gen/momentum)*mRICH::DEG;    //in deg
     const double phi = TMath::ATan2(py_gen,px_gen)*mRICH::DEG;    //in deg            
 
-    // const int indexSpaceX = utility->get_indexSpaceX(vx_gen);
-    // const int indexSpaceY = utility->get_indexSpaceY(vy_gen);
-    // const int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
-    // const int indexMomentumTheta = utility->get_indexMomentumTheta(px_gen,py_gen,pz_gen);
-    // const int indexMomentumPhi = utility->get_indexMomentumPhi(px_gen,py_gen);
-    //
-    // if(indexSpaceX < 0 || indexSpaceY < 0 || indexMomentumP < 0 || indexMomentumTheta < 0 || indexMomentumPhi < 0) continue;
+    const int indexSpaceX = utility->get_indexSpaceX(vx_gen);
+    const int indexSpaceY = utility->get_indexSpaceY(vy_gen);
+    const int indexMomentumP = utility->get_indexMomentumP(px_gen,py_gen,pz_gen);
+    const int indexMomentumTheta = utility->get_indexMomentumTheta(px_gen,py_gen,pz_gen);
+    const int indexMomentumPhi = utility->get_indexMomentumPhi(px_gen,py_gen);
+
+    if(indexSpaceX < 0 || indexSpaceY < 0 || indexMomentumP < 0 || indexMomentumTheta < 0 || indexMomentumPhi < 0) continue;
+    */
 
 
     int NumOfTracks = ahit->get_hitn()->size();
@@ -209,8 +211,8 @@ int RingFinder::Make()
 	  {
 	    h_mNumOfPhotons->Fill(0);
 	    h_mPhotonDist->Fill(out_x,out_y);
-	    int binX = h_mPhotonDist->GetXais()->FindBin(out_x);
-	    int binY = h_mPhotonDist->GetYais()->FindBin(out_y);
+	    int binX = h_mPhotonDist->GetXaxis()->FindBin(out_x);
+	    int binY = h_mPhotonDist->GetYaxis()->FindBin(out_y);
 	    mXPixelMap.push_back(binX);
 	    mYPixelMap.push_back(binY);
 	    // cout << "out_x_input = " << out_x_input << ", out_x = " << out_x << endl;
@@ -241,36 +243,39 @@ int RingFinder::clearHistoMap()
   return 0;
 }
 
-int RingFinder::HoughTransform(TH1D *h_NumOfPhotons, TH2D *h_PhotonDist, intVec xPixel, intVec yPixel);
+int RingFinder::HoughTransform(TH1D *h_NumOfPhotons, TH2D *h_PhotonDist, intVec xPixel, intVec yPixel)
 {
   // int NumOfPhotons = h_NumOfPhotons->GetBinContent(1);
   int NumOfPhotons = h_NumOfPhotons->GetEntries();
   for(int i_hit_1st = 0; i_hit_1st < NumOfPhotons-2; ++i_hit_1st)
   {
     hitPosition firstHit;
-    firstHit.x = h_PhotonDist->GetXais()->GetBinContent(xPixel[i_hit_1st]);
-    firstHit.y = h_PhotonDist->GetYais()->GetBinContent(yPixel[i_hit_1st]);
+    firstHit.x = h_PhotonDist->GetXaxis()->GetBinCenter(xPixel[i_hit_1st]);
+    firstHit.y = h_PhotonDist->GetYaxis()->GetBinCenter(yPixel[i_hit_1st]);
     for(int i_hit_2nd = 1; i_hit_2nd < NumOfPhotons-1; ++i_hit_2nd)
     {
       hitPosition secondHit;
-      secondHit.x = h_PhotonDist->GetXais()->GetBinContent(xPixel[i_hit_2nd]);
-      secondHit.y = h_PhotonDist->GetYais()->GetBinContent(yPixel[i_hit_2nd]);
+      secondHit.x = h_PhotonDist->GetXaxis()->GetBinCenter(xPixel[i_hit_2nd]);
+      secondHit.y = h_PhotonDist->GetYaxis()->GetBinCenter(yPixel[i_hit_2nd]);
       for(int i_hit_3rd = 2; i_hit_3rd < NumOfPhotons; ++i_hit_3rd)
       {
 	hitPosition thirdHit;
-	thirdHit.x = h_PhotonDist->GetXais()->GetBinContent(xPixel[i_hit_3rd]);
-	thirdHit.y = h_PhotonDist->GetYais()->GetBinContent(yPixel[i_hit_3rd]);
-	double x_Cherenkov = -999.9
-	double y_Cherenkov = -999.9
-	double r_Cherenkov = -999.9
+	thirdHit.x = h_PhotonDist->GetXaxis()->GetBinCenter(xPixel[i_hit_3rd]);
+	thirdHit.y = h_PhotonDist->GetYaxis()->GetBinCenter(yPixel[i_hit_3rd]);
+	double x_Cherenkov = -999.9;
+	double y_Cherenkov = -999.9;
+	double r_Cherenkov = -999.9;
 
 	bool ringStatus = findRing(firstHit,secondHit,thirdHit, x_Cherenkov, y_Cherenkov, r_Cherenkov);
 	if(ringStatus) 
 	{
+	  cout << "x_Cherenkov = " << x_Cherenkov << ", y_Cherenkov = " << y_Cherenkov << ", r_Cherenkov = " << r_Cherenkov << endl;
 	}
       }
     }
   }
+
+  return 0;
 }
 
 bool RingFinder::findRing(hitPosition firstHit, hitPosition secondHit, hitPosition thirdHit, double &x_Cherenkov, double &y_Cherenkov, double &r_Cherenkov)
@@ -394,6 +399,8 @@ int RingFinder::writeHistoQA()
 {
   h_mXGausSmearing->Write();
   h_mYGausSmearing->Write();
+
+  return 0;
 }
 
 //--------------------------------------------------------
@@ -405,7 +412,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "BeamTest_PlusMinus";
+  string date = "BeamTest_Center";
   
   cout << "numoflist = " << numoflist.c_str() << endl;
   RingFinder *ringfinder = new RingFinder(numoflist,date);
