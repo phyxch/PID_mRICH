@@ -51,8 +51,8 @@ int RingFinder::Init()
 {
   cout<<"RingFinder::Init() ----- Initialization ! ------"<<endl;
 
-  mOutPutFile = Form("/work/eic/xusun/output/ringfinder/ringfinder_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
-  // mOutPutFile = "./out.root"; // batch mode
+  // mOutPutFile = Form("/work/eic/xusun/output/ringfinder/ringfinder_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  mOutPutFile = "./out.root"; // batch mode
   cout<<"RingFinder::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
 
@@ -60,6 +60,7 @@ int RingFinder::Init()
   initHistoMap();
   initGausSmearing();
   initHistoQA();
+  initHistoCherenkov();
 
   return 0;
 }
@@ -118,6 +119,7 @@ int RingFinder::initHistoMap()
 
   h_mNumOfPhotons = new TH1D("h_mNumOfPhotons","h_mNumOfPhotons",1,-0.5,0.5);
   h_mPhotonDist = new TH2D("h_mPhotonDist","h_mPhotonDist",mRICH::mNumOfPixels,mRICH::mPixels,mRICH::mNumOfPixels,mRICH::mPixels);
+  h_mHoughTransform = new TH3D("h_mHoughTransform","h_mHoughTransform",210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,105,0,2.0*mRICH::mHalfWidth);
 
   clearHistoMap();
 
@@ -138,6 +140,17 @@ int RingFinder::initHistoQA()
 {
   h_mXGausSmearing = new TH2D("h_mXGausSmearing","h_mXGausSmearing",121,-60.5,60.5,121,-60.5,60.5);
   h_mYGausSmearing = new TH2D("h_mYGausSmearing","h_mYGausSmearing",121,-60.5,60.5,121,-60.5,60.5);
+  h_mQA_HT = new TH3D("h_mQA_HT","h_mQA_HT",210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,105,0,2.0*mRICH::mHalfWidth);
+
+  return 0;
+}
+
+int RingFinder::initHistoCherenkov()
+{
+  cout<<"RingFinder::initHistoCherenkov(), initialize final Cherenkov Ring;"<<endl;
+
+  h_mCherenkovRing = new TH3D("h_mCherenkovRing","h_mCherenkovRing",210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,105,0,2.0*mRICH::mHalfWidth);
+  h_mNumOfCherenkovPhotons = new TH1D("h_mNumOfCherenkovPhotons","h_mNumOfCherenkovPhotons",100,-0.5,99.5);
 
   return 0;
 }
@@ -154,8 +167,10 @@ int RingFinder::Make()
   mChainInPut_Events->GetEntry(0);
   mChainInPut_Tracks->GetEntry(0);
 
+  int NumOfEvent = 1024;
+  for(int i_event = NumOfEvent; i_event < NumOfEvent+1; ++i_event) // test event loop
   // for(int i_event = 0; i_event < 1024; ++i_event) // test event loop
-  for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
+  // for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
   { 
     if(i_event%1000==0) cout << "processing event:  " << i_event << " ;"<<endl;
 
@@ -240,6 +255,8 @@ int RingFinder::clearHistoMap()
   mXPixelMap.clear();
   mYPixelMap.clear();
 
+  h_mHoughTransform->Reset();
+
   return 0;
 }
 
@@ -247,17 +264,19 @@ int RingFinder::HoughTransform(TH1D *h_NumOfPhotons, TH2D *h_PhotonDist, intVec 
 {
   // int NumOfPhotons = h_NumOfPhotons->GetBinContent(1);
   int NumOfPhotons = h_NumOfPhotons->GetEntries();
+  float NumOfCombinations = TMath::Factorial(NumOfPhotons)/(TMath::Factorial(3)*TMath::Factorial(NumOfPhotons-3));
+  cout << "NumOfPhotons = " << NumOfPhotons << ", NumOfCombinations = " << NumOfCombinations << endl;
   for(int i_hit_1st = 0; i_hit_1st < NumOfPhotons-2; ++i_hit_1st)
   {
     hitPosition firstHit;
     firstHit.x = h_PhotonDist->GetXaxis()->GetBinCenter(xPixel[i_hit_1st]);
     firstHit.y = h_PhotonDist->GetYaxis()->GetBinCenter(yPixel[i_hit_1st]);
-    for(int i_hit_2nd = 1; i_hit_2nd < NumOfPhotons-1; ++i_hit_2nd)
+    for(int i_hit_2nd = i_hit_1st+1; i_hit_2nd < NumOfPhotons-1; ++i_hit_2nd)
     {
       hitPosition secondHit;
       secondHit.x = h_PhotonDist->GetXaxis()->GetBinCenter(xPixel[i_hit_2nd]);
       secondHit.y = h_PhotonDist->GetYaxis()->GetBinCenter(yPixel[i_hit_2nd]);
-      for(int i_hit_3rd = 2; i_hit_3rd < NumOfPhotons; ++i_hit_3rd)
+      for(int i_hit_3rd = i_hit_2nd+1; i_hit_3rd < NumOfPhotons; ++i_hit_3rd)
       {
 	hitPosition thirdHit;
 	thirdHit.x = h_PhotonDist->GetXaxis()->GetBinCenter(xPixel[i_hit_3rd]);
@@ -269,10 +288,32 @@ int RingFinder::HoughTransform(TH1D *h_NumOfPhotons, TH2D *h_PhotonDist, intVec 
 	bool ringStatus = findRing(firstHit,secondHit,thirdHit, x_Cherenkov, y_Cherenkov, r_Cherenkov);
 	if(ringStatus) 
 	{
-	  cout << "x_Cherenkov = " << x_Cherenkov << ", y_Cherenkov = " << y_Cherenkov << ", r_Cherenkov = " << r_Cherenkov << endl;
+	  h_mQA_HT->Fill(x_Cherenkov,y_Cherenkov,r_Cherenkov);
+	  h_mHoughTransform->Fill(x_Cherenkov,y_Cherenkov,r_Cherenkov);
+	  // cout << "firstHit.x = " << firstHit.x << ", firstHit.y = " << firstHit.y << endl;
+	  // cout << "secondHit.x = " << secondHit.x << ", secondHit.y = " << secondHit.y << endl;
+	  // cout << "thirdHit.x = " << thirdHit.x << ", thirdHit.y = " << thirdHit.y << endl;
+	  // cout << "x_Cherenkov = " << x_Cherenkov << ", y_Cherenkov = " << y_Cherenkov << ", r_Cherenkov = " << r_Cherenkov << endl;
+	  // cout << endl;
 	}
       }
     }
+  }
+
+  int hBin_x = -1;
+  int hBin_y = -1;
+  int hBin_r = -1;
+
+  int globalBin = h_mHoughTransform->GetMaximumBin(hBin_x,hBin_y,hBin_r);
+  int maxVote = h_mHoughTransform->GetBinContent(globalBin);
+  if(globalBin > 0)
+  {
+    double x_HoughTransform = h_mHoughTransform->GetXaxis()->GetBinCenter(hBin_x);
+    double y_HoughTransform = h_mHoughTransform->GetYaxis()->GetBinCenter(hBin_y);
+    double r_HoughTransform = h_mHoughTransform->GetZaxis()->GetBinCenter(hBin_r);
+    h_mCherenkovRing->Fill(x_HoughTransform,y_HoughTransform,r_HoughTransform);
+    cout << "hBin_x = " << hBin_x << ", hBin_y = " << hBin_y << ", hBin_r = " << hBin_r << ", globalBin = " << globalBin << ", with maxVote = " << maxVote << endl;
+    cout << "x_HoughTransform = " << x_HoughTransform << ", y_HoughTransform = " << y_HoughTransform << ", r_HoughTransform = " << r_HoughTransform << endl;
   }
 
   return 0;
@@ -283,20 +324,16 @@ bool RingFinder::findRing(hitPosition firstHit, hitPosition secondHit, hitPositi
   // check if 3 hit points are at same position or collinear
   if(isSamePosition(firstHit,secondHit,thirdHit) || isCollinear(firstHit,secondHit,thirdHit) ) return false;
 
-  // calculate middle point between 1st $ 2nd and 1st & 3rd
-  hitPosition midPoint12, midPoint13;
-  midPoint12.x = (firstHit.x+secondHit.x)/2.0;
-  midPoint12.y = (firstHit.y+secondHit.y)/2.0;
-  double slope12 = -(firstHit.x-secondHit.x)/(firstHit.y-secondHit.y);
+  double a = firstHit.x - secondHit.x; // a = x1 - x2
+  double b = firstHit.y - secondHit.y; // b = y1 - y2
+  double c = firstHit.x - thirdHit.x;  // c = x1 - x3
+  double d = firstHit.y - thirdHit.y;  // d = y1 - y3
+  double e = ((firstHit.x*firstHit.x - secondHit.x*secondHit.x) + (firstHit.y*firstHit.y - secondHit.y*secondHit.y))/2.0;  //e = ((x1*x1 - x2*x2) + (y1*y1 - y2*y2))/2.0;
+  double f = ((firstHit.x*firstHit.x - thirdHit.x*thirdHit.x) + (firstHit.y*firstHit.y - thirdHit.y*thirdHit.y))/2.0;  //f = ((x1*x1 - x3*x3) + (y1*y1 - y3*y3))/2.0;
+  double det = b*c - a*d;
 
-  midPoint13.x = (firstHit.x+thirdHit.x)/2.0;
-  midPoint13.y = (firstHit.y+thirdHit.y)/2.0;
-  double slope13 = -(firstHit.x-thirdHit.x)/(firstHit.y-thirdHit.y);
-
-  // y_Cherenkov - midPoint12.y = slope12*(x_Cherenkov - midPoint12.x)
-  x_Cherenkov = ((slope12*midPoint12.x-midPoint12.y)-(slope13*midPoint13.x-midPoint13.y))/(slope12-slope13);
-  y_Cherenkov = midPoint12.y+slope12*(x_Cherenkov-midPoint12.x);
-  // y_Cherenkov = (slope13*(midPoint12.y-slope12*midPoint12.x)-slope12*(midPoint13.y-slope13*midPoint13.x))/(slope13-slope12);
+  x_Cherenkov = -(d*e - b*f)/det;
+  y_Cherenkov = -(a*f - c*e)/det;
   r_Cherenkov = TMath::Sqrt((x_Cherenkov-firstHit.x)*(x_Cherenkov-firstHit.x)+(y_Cherenkov-firstHit.y)*(y_Cherenkov-firstHit.y));
 
   return true;
@@ -380,6 +417,7 @@ int RingFinder::Finish()
     File_mOutPut->cd();
     writeHistoMap();
     writeHistoQA();
+    writeHistoCherenkov();
     File_mOutPut->Close();
   }
   return 0;
@@ -392,6 +430,8 @@ int RingFinder::writeHistoMap()
   h_mNumOfPhotons->Write();
   h_mPhotonDist->Write();
 
+  h_mHoughTransform->Write();
+
   return 0;
 }
 
@@ -399,6 +439,15 @@ int RingFinder::writeHistoQA()
 {
   h_mXGausSmearing->Write();
   h_mYGausSmearing->Write();
+  h_mQA_HT->Write();
+
+  return 0;
+}
+
+int RingFinder::writeHistoCherenkov()
+{
+  h_mCherenkovRing->Write();
+  h_mNumOfCherenkovPhotons->Write();
 
   return 0;
 }

@@ -31,6 +31,7 @@ class RingFinder
   int initHistoMap();
   int initGausSmearing();
   int initHistoQA();
+  int initHistoCherenkov();
 
   int Make();
   int clearHistoMap(); 
@@ -42,6 +43,7 @@ class RingFinder
   int Finish();
   int writeHistoMap();
   int writeHistoQA();
+  int writeHistoCherenkov();
   
   bool isPhoton(hit *ahit, int i);
   bool isReflection(hit *ahit, int i);
@@ -69,6 +71,12 @@ class RingFinder
   TH2D *h_mPhotonDist; // x: photon out_x | y: photon out_y with detector effect
   intVec mXPixelMap; // corresponding binX number for each photon hit
   intVec mYPixelMap; // corresponding binY number for each photon hit
+  TH3D *h_mHoughTransform; // x | y | R
+  TH3D *h_mQA_HT; // QA for hough transform
+
+  // all events
+  TH3D *h_mCherenkovRing; // x | y | R
+  TH1D *h_mNumOfCherenkovPhotons; // 
 
   TChain *mChainInPut_Events;
   TChain *mChainInPut_Tracks;
