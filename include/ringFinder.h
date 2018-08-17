@@ -39,6 +39,7 @@ class RingFinder
   bool findRing(hitPosition firstHit, hitPosition secondHit, hitPosition thirdHit, double &x_Cherenkov, double &y_Cherenkov, double &r_Cherenkov);
   bool isSamePosition(hitPosition firstHit, hitPosition secondHit, hitPosition thirdHit);
   bool isCollinear(hitPosition firstHit, hitPosition secondHit, hitPosition thirdHit);
+  bool isOnRing(hitPosition photonHit, double x_HoughTransform, double y_HoughTransform, double r_HoughTransform);
 
   int Finish();
   int writeHistoMap();
@@ -76,7 +77,7 @@ class RingFinder
 
   // all events
   TH3D *h_mCherenkovRing; // x | y | R
-  TH1D *h_mNumOfCherenkovPhotons; // 
+  TH2D *h_mNumOfCherenkovPhotons; // 
 
   TChain *mChainInPut_Events;
   TChain *mChainInPut_Tracks;

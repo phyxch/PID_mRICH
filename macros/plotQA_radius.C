@@ -47,8 +47,8 @@ void plotQA_radius()
   h_frame->GetXaxis()->SetTitleOffset(1.2);
   h_frame->GetXaxis()->CenterTitle();
 
-  // h_frame->GetYaxis()->SetRangeUser(0.0,44.0);
-  h_frame->GetYaxis()->SetRangeUser(0.0,84.0);
+  h_frame->GetYaxis()->SetRangeUser(0.0,44.0);
+  // h_frame->GetYaxis()->SetRangeUser(0.0,84.0);
   h_frame->GetYaxis()->SetNdivisions(505,'N');
   h_frame->GetYaxis()->SetTitle("radius (mm)");
   h_frame->GetYaxis()->SetTitleSize(0.05);

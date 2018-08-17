@@ -68,7 +68,7 @@ int RingFinder::Init()
 int RingFinder::initChain()
 {
   // string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
-  string inputdir = "/work/eic/xusun/output/modular_rich/BeamTest/PlusMinus/";
+  string inputdir = "/work/eic/xusun/output/modular_rich/BeamTest/Center/";
   string InPutList = Form("/work/eic/xusun/list/ringfinder/mRICH_PDF_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
   
   mChainInPut_Events = new TChain("generated");
@@ -150,7 +150,7 @@ int RingFinder::initHistoCherenkov()
   cout<<"RingFinder::initHistoCherenkov(), initialize final Cherenkov Ring;"<<endl;
 
   h_mCherenkovRing = new TH3D("h_mCherenkovRing","h_mCherenkovRing",210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,210,-1.0*mRICH::mHalfWidth,mRICH::mHalfWidth,105,0,2.0*mRICH::mHalfWidth);
-  h_mNumOfCherenkovPhotons = new TH1D("h_mNumOfCherenkovPhotons","h_mNumOfCherenkovPhotons",100,-0.5,99.5);
+  h_mNumOfCherenkovPhotons = new TH2D("h_mNumOfCherenkovPhotons","h_mNumOfCherenkovPhotons",100,-0.5,99.5,100,-0.5,99.5);
 
   return 0;
 }
@@ -167,7 +167,7 @@ int RingFinder::Make()
   mChainInPut_Events->GetEntry(0);
   mChainInPut_Tracks->GetEntry(0);
 
-  int NumOfEvent = 1024;
+  int NumOfEvent = 2046;
   for(int i_event = NumOfEvent; i_event < NumOfEvent+1; ++i_event) // test event loop
   // for(int i_event = 0; i_event < 1024; ++i_event) // test event loop
   // for(int i_event = 0; i_event < NumOfEvents; ++i_event) // event loop
@@ -211,9 +211,11 @@ int RingFinder::Make()
 
 	double photonE = ahit->get_trackE()->at(i_track);   /// in MeV (GEANT4 default)
 	double wavelength = 1240./(photonE*1.e6);  /// MeV->eV,wavelength in "nm"
-	double QE_GaAsP = mat->extrapQE_GaAsP(wavelength); // get quantum efficiency for photon sensor => need to be updated
+	// double QE = mat->extrapQE_GaAsP(wavelength); // get quantum efficiency for photon sensor => need to be updated
+	double QE = mat->extrapQE(wavelength); // get quantum efficiency for photon sensor => need to be updated
+	// cout << "wavelength = " << wavelength << ", QE = " << QE << endl;
 
-	if( QE_GaAsP > gRandom->Uniform(0.0,1.0) )
+	if( QE > gRandom->Uniform(0.0,1.0) )
 	{
 	  double out_x_input = ahit->get_out_x()->at(i_track);
 	  double out_y_input = ahit->get_out_y()->at(i_track);
@@ -264,8 +266,9 @@ int RingFinder::HoughTransform(TH1D *h_NumOfPhotons, TH2D *h_PhotonDist, intVec 
 {
   // int NumOfPhotons = h_NumOfPhotons->GetBinContent(1);
   int NumOfPhotons = h_NumOfPhotons->GetEntries();
+  if(NumOfPhotons < 3) return 0;
   float NumOfCombinations = TMath::Factorial(NumOfPhotons)/(TMath::Factorial(3)*TMath::Factorial(NumOfPhotons-3));
-  cout << "NumOfPhotons = " << NumOfPhotons << ", NumOfCombinations = " << NumOfCombinations << endl;
+  // cout << "NumOfPhotons = " << NumOfPhotons << ", NumOfCombinations = " << NumOfCombinations << endl;
   for(int i_hit_1st = 0; i_hit_1st < NumOfPhotons-2; ++i_hit_1st)
   {
     hitPosition firstHit;
@@ -303,6 +306,7 @@ int RingFinder::HoughTransform(TH1D *h_NumOfPhotons, TH2D *h_PhotonDist, intVec 
   int hBin_x = -1;
   int hBin_y = -1;
   int hBin_r = -1;
+  int NumOfPhotonsOnRing = 0;
 
   int globalBin = h_mHoughTransform->GetMaximumBin(hBin_x,hBin_y,hBin_r);
   int maxVote = h_mHoughTransform->GetBinContent(globalBin);
@@ -312,9 +316,22 @@ int RingFinder::HoughTransform(TH1D *h_NumOfPhotons, TH2D *h_PhotonDist, intVec 
     double y_HoughTransform = h_mHoughTransform->GetYaxis()->GetBinCenter(hBin_y);
     double r_HoughTransform = h_mHoughTransform->GetZaxis()->GetBinCenter(hBin_r);
     h_mCherenkovRing->Fill(x_HoughTransform,y_HoughTransform,r_HoughTransform);
-    cout << "hBin_x = " << hBin_x << ", hBin_y = " << hBin_y << ", hBin_r = " << hBin_r << ", globalBin = " << globalBin << ", with maxVote = " << maxVote << endl;
-    cout << "x_HoughTransform = " << x_HoughTransform << ", y_HoughTransform = " << y_HoughTransform << ", r_HoughTransform = " << r_HoughTransform << endl;
+    // cout << "hBin_x = " << hBin_x << ", hBin_y = " << hBin_y << ", hBin_r = " << hBin_r << ", globalBin = " << globalBin << ", with maxVote = " << maxVote << endl;
+    // cout << "x_HoughTransform = " << x_HoughTransform << ", y_HoughTransform = " << y_HoughTransform << ", r_HoughTransform = " << r_HoughTransform << endl;
+
+    for(int i_hit = 0; i_hit < NumOfPhotons; ++i_hit)
+    {
+      hitPosition photonHit;
+      photonHit.x = h_PhotonDist->GetXaxis()->GetBinCenter(xPixel[i_hit]);
+      photonHit.y = h_PhotonDist->GetYaxis()->GetBinCenter(yPixel[i_hit]);
+      if( isOnRing(photonHit,x_HoughTransform,y_HoughTransform,r_HoughTransform) )
+      {
+	NumOfPhotonsOnRing++;
+      }
+    }
   }
+  // cout << "NumOfPhotons = " << NumOfPhotons << ", NumOfPhotonsOnRing = " << NumOfPhotonsOnRing << endl;
+  h_mNumOfCherenkovPhotons->Fill(NumOfPhotons,NumOfPhotonsOnRing);
 
   return 0;
 }
@@ -358,6 +375,20 @@ bool RingFinder::isCollinear(hitPosition firstHit, hitPosition secondHit, hitPos
 
   if(TMath::Abs(slope12-slope13) < 1e-5) return true;
 
+  return false;
+}
+
+bool RingFinder::isOnRing(hitPosition photonHit, double x_HoughTransform, double y_HoughTransform, double r_HoughTransform)
+{
+  double x_diff = photonHit.x - x_HoughTransform;
+  double y_diff = photonHit.y - y_HoughTransform;
+  double r_diff = TMath::Sqrt(x_diff*x_diff+y_diff*y_diff) - r_HoughTransform;
+
+  double sigma_x = 1.5;
+  double sigma_y = 1.5;
+  double sigma_r = TMath::Sqrt(sigma_x*sigma_x+sigma_y*sigma_y);
+
+  if( TMath::Abs(r_diff) < sigma_r) return true;
 
   return false;
 }
