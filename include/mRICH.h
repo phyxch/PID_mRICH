@@ -26,14 +26,14 @@ namespace mRICH
   const double mDelta_Vy = 10;
 
   // momentum segamentation
-  // const double mMomP_start = 2.5;
-  // const double mMomP_stop  = 15.5;
-  // const int mNumOfIndexMomentumP = 13;
-  // const double mBin_MomP[mNumOfIndexMomentumP] = {3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0};
-  const double mMomP_start = 119.5;
-  const double mMomP_stop  = 120.5;
-  const int mNumOfIndexMomentumP = 1;
-  const double mBin_MomP[2] = {120.0,125.0};
+  const double mMomP_start = 2.5;
+  const double mMomP_stop  = 15.5;
+  const int mNumOfIndexMomentumP = 13;
+  const double mBin_MomP[mNumOfIndexMomentumP] = {3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0};
+  // const double mMomP_start = 119.5;
+  // const double mMomP_stop  = 120.5;
+  // const int mNumOfIndexMomentumP = 1;
+  // const double mBin_MomP[2] = {120.0,125.0};
   const double mDelta_MomP = 0.5;
 
   const double DEG=180./TMath::Pi();

@@ -39,8 +39,8 @@ std::pair<std::string,std::string> get_misIdentifiedParticle(int pid)
 void plotQA_NSigma(int pid = 211, int rank = 0)
 {
   string date = "Jun03_2018";
-  // string input_likelihood = Form("/work/eic/xusun/output/probability/3mm/PID_prob_%s.root",date.c_str());
-  string input_likelihood = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
+  string input_likelihood = Form("/work/eic/xusun/output/probability/3mm/PID_prob_%s.root",date.c_str());
+  // string input_likelihood = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
   cout << "read in file: " << input_likelihood.c_str() << endl;
   TFile *File_InPut_Likelihood = TFile::Open(input_likelihood.c_str());
   assert(File_InPut_Likelihood);
@@ -145,8 +145,8 @@ void plotQA_NSigma(int pid = 211, int rank = 0)
   if(rank == 1) output_proj = Form("../figures/nSigma/c_mProj_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d.pdf",identifiedParticle.second.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
   c_proj->SaveAs(output_proj.c_str());
 
-  // string input_nsigma = Form("/work/eic/xusun/output/probability/3mm/PID_nSigma_%s.root",date.c_str());
-  string input_nsigma = Form("/work/eic/xusun/output/probability/PID_nSigma_%s.root",date.c_str());
+  string input_nsigma = Form("/work/eic/xusun/output/probability/3mm/PID_nSigma_%s.root",date.c_str());
+  // string input_nsigma = Form("/work/eic/xusun/output/probability/PID_nSigma_%s.root",date.c_str());
   cout << endl;
   cout << "read in file: " << input_nsigma.c_str() << endl;
   TFile *File_InPut_NSigma = TFile::Open(input_nsigma.c_str());
