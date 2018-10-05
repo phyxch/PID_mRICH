@@ -31,9 +31,9 @@ class PID_mRICH
   int initHistoMap_Probability();
 
   int Make();
-  std::pair<double,double> get_LikelihoodDiff(int pid, double Lpion, double LKaon, double Lproton);
+  std::pair<double,double> get_LikelihoodDiff(int pid, double Lpion, double LKaon, double Lproton, double Lelectron);
   std::pair<int,int> get_misPID(int pid);
-  int get_rank(int pid, double Lpion, double LKaon, double Lproton);
+  int get_rank(int pid, double Lpion, double LKaon, double Lproton, double Lelectron);
 
   int Finish();
   int writeHistoMap_Likelihood();
@@ -65,6 +65,7 @@ class PID_mRICH
   double mLpion;
   double mLKaon;
   double mLproton;
+  double mLelectron;
 
   // key: pid | indexSpaceX | indexSpaceY | indexMomentumTheta | indexMomentumPhi
   TH1DMap h_mProbability; // p vs. probability

@@ -46,8 +46,8 @@ int calLikelihood::Init()
 {
   cout<<"calLikelihood::Init() ----- Initialization ! ------"<<endl;
 
-  // mOutPutFile = Form("/work/eic/xusun/output/likelihood/likelihood_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
-  mOutPutFile = "./out.root"; // batch mode
+  mOutPutFile = Form("/work/eic/xusun/output/likelihood/likelihood_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  // mOutPutFile = "./out.root"; // batch mode
   cout<<"calLikelihood::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   mFile_OutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
 
@@ -63,7 +63,7 @@ int calLikelihood::Init()
 int calLikelihood::initChain()
 {
   string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
-  string InPutList = Form("/work/eic/xusun/list/likelihood/mRICH_PID_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
+  string InPutList = Form("/work/eic/xusun/list/likelihood/%s/mRICH_PID_%s_%s.list",mDate.c_str(),mDate.c_str(),mNumOfList.c_str());
   
   mChainInPut_Events = new TChain("generated");
   mChainInPut_Tracks = new TChain("eic_rich");
@@ -111,7 +111,7 @@ int calLikelihood::initHistoMap()
 
   cout<<"calLikelihood::init(), read database file: "<< mInPutDataBase.c_str() <<endl;
   mFile_InPutDataBase = TFile::Open(mInPutDataBase.c_str());
-  for(int i_pid = 0; i_pid < 6; ++i_pid)
+  for(int i_pid = 0; i_pid < mRICH::mNumOfParType; ++i_pid)
   {
     for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
     {
@@ -184,6 +184,7 @@ int calLikelihood::initTree()
   mTree->Branch("Lpion",&mLpion,"Lpion/D");
   mTree->Branch("LKaon",&mLKaon,"LKaon/D");
   mTree->Branch("Lproton",&mLproton,"Lproton/D");
+  mTree->Branch("Lelectron",&mLelectron,"Lelectron/D");
   mTree->SetAutoSave(500000);
 
   return 0;
@@ -226,7 +227,18 @@ int calLikelihood::Make()
 
     if(indexSpaceX < 0 || indexSpaceY < 0 || indexMomentumP < 0 || indexMomentumTheta < 0 || indexMomentumPhi < 0) continue;
 
-    int charge = (pid_gen > 0) ? 1 : -1;
+    // int charge = (pid_gen > 0) ? 1 : -1;
+    int charge = -1; // temperary for electron implementation
+
+    // get electron database
+    string key_events_electron = utility->gen_KeyNumOfEvents(11,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
+    TH1D *h_NumofEvents_electron = (TH1D*)h_mNumOfEvents[key_events_electron]->Clone();
+    string key_photon_electron = utility->gen_KeyMassHypo(11,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
+    TH2D *h_database_electron = (TH2D*)h_mPhotonDist[key_photon_electron]->Clone();
+    int NumofEvents_electron = h_NumofEvents_electron->GetBinContent(1);
+    h_database_electron->Sumw2();
+    if(NumofEvents_electron > 0) h_database_electron->Scale(1./NumofEvents_electron);
+
 
     // get pion database
     string key_events_pion = utility->gen_KeyNumOfEvents(charge*211,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
@@ -235,7 +247,7 @@ int calLikelihood::Make()
     TH2D *h_database_pion = (TH2D*)h_mPhotonDist[key_photon_pion]->Clone();
     int NumofEvents_pion = h_NumofEvents_pion->GetBinContent(1);
     h_database_pion->Sumw2();
-    h_database_pion->Scale(1./NumofEvents_pion);
+    if(NumofEvents_pion > 0) h_database_pion->Scale(1./NumofEvents_pion);
 
     // get kaon database
     string key_events_kaon = utility->gen_KeyNumOfEvents(charge*321,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
@@ -244,7 +256,7 @@ int calLikelihood::Make()
     TH2D *h_database_kaon = (TH2D*)h_mPhotonDist[key_photon_kaon]->Clone();
     int NumofEvents_kaon = h_NumofEvents_kaon->GetBinContent(1);
     h_database_kaon->Sumw2();
-    h_database_kaon->Scale(1./NumofEvents_kaon);
+    if(NumofEvents_kaon > 0) h_database_kaon->Scale(1./NumofEvents_kaon);
 
     // get proton database
     string key_events_proton = utility->gen_KeyNumOfEvents(charge*2212,indexSpaceX,indexSpaceY,indexMomentumP,indexMomentumTheta,indexMomentumPhi);
@@ -253,7 +265,7 @@ int calLikelihood::Make()
     TH2D *h_database_proton = (TH2D*)h_mPhotonDist[key_photon_proton]->Clone();
     int NumofEvents_proton = h_NumofEvents_proton->GetBinContent(1);
     h_database_proton->Sumw2();
-    h_database_proton->Scale(1./NumofEvents_proton);
+    if(NumofEvents_proton > 0) h_database_proton->Scale(1./NumofEvents_proton);
 
     // cout << "pid_gen = " << pid_gen << ", charge = " << charge << ", database used: " << endl;
     // cout << key_photon_pion.c_str() << endl;
@@ -290,8 +302,11 @@ int calLikelihood::Make()
 	  NumOfElSbKCs++;
 	}
 
-	double QE_GaAsP = mat->extrapQE_GaAsP(wavelength); // quantum efficiency of photon sensor => need to be updated
-	if(QE_GaAsP > gRandom->Uniform(0.0,1.0))
+	// double QE_GaAsP = mat->extrapQE_GaAsP(wavelength); // quantum efficiency of photon sensor => need to be updated
+	// if(QE_GaAsP > gRandom->Uniform(0.0,1.0))
+	double QE = mat->extrapQE(wavelength); // get quantum efficiency for photon sensor => need to be updated
+	// cout << "wavelength = " << wavelength << ", QE_GaAsP = " << QE_GaAsP << ", QE = " << QE << endl;
+	if( QE > gRandom->Uniform(0.0,1.0) )
 	{
 	  NumOfElGaAsP++; 
 	  double out_x_input = ahit->get_out_x()->at(i_track);
@@ -358,6 +373,7 @@ int calLikelihood::Make()
     mLpion = probability(h_database_pion, h_photonDist_PID);
     mLKaon = probability(h_database_kaon, h_photonDist_PID);
     mLproton = probability(h_database_proton, h_photonDist_PID);
+    mLelectron = probability(h_database_electron, h_photonDist_PID);
 
     if(mTree) mTree->Fill();
 
@@ -368,6 +384,7 @@ int calLikelihood::Make()
     delete h_database_pion;
     delete h_database_kaon;
     delete h_database_proton;
+    delete h_database_electron;
   }
 
   return 0;
@@ -421,31 +438,41 @@ bool calLikelihood::isReflection(hit *ahit, int i)
 
 bool calLikelihood::isOnAerogel(hit *ahit, int i)
 {
-  if(ahit->get_out_z()->at(i)>=63.5874 && ahit->get_out_z()->at(i)<=96.5876) return true;
+  // if(ahit->get_out_z()->at(i)>=63.5874 && ahit->get_out_z()->at(i)<=96.5876) return true;
+  // else return false;
+  const int detector_id = ahit->get_id()->at(i);
+  if(detector_id == 1) return true;
   else return false;
 }
 
 bool calLikelihood::isOnPhotonSensor(hit *ahit, int i)
 {
-  double out_z = ahit->get_out_z()->at(i);
-  if(out_z > 253.6624 && out_z < 255.1626) return true;
+  // double out_z = ahit->get_out_z()->at(i);
+  // if(out_z > 253.6624+3.0 && out_z < 255.1626+3.0) return true;
+  // else return false;
+  const int detector_id = ahit->get_id()->at(i);
+  if(detector_id == 2) return true;
   else return false;
 }
 
 double calLikelihood::probability(TH2D *h_database, TH2D *h_photonDist_PID)
 {
   double prob=1.0;
-  const double noise = 2./mRICH::mNumOfPixels/mRICH::mNumOfPixels; // force every photon from inject particles used in likelihood calculation
+  const double noise = 2.0/mRICH::mNumOfPixels/mRICH::mNumOfPixels; // force every photon from inject particles used in likelihood calculation
 
   for(unsigned int i_x = 0; i_x < mRICH::mNumOfPixels; i_x++)
   {
     for(unsigned int i_y = 0; i_y < mRICH::mNumOfPixels; i_y++)
     {
       double k = h_photonDist_PID->GetBinContent(i_x+1,i_y+1); // detected photon number
+      double err_k = h_photonDist_PID->GetBinError(i_x+1,i_y+1); // error for specific bin
       double lambda = h_database->GetBinContent(i_x+1,i_y+1); // averaged photon number
       double err_lambda = h_database->GetBinError(i_x+1,i_y+1); // error for specific bin
-      if(err_lambda > 0.0) prob *= TMath::PoissonI(k,lambda);
-      else prob *= TMath::PoissonI(k,noise);
+      if(err_k > 0)
+      {
+	if(err_lambda > 0.0) prob *= TMath::PoissonI(k,lambda);
+	else prob *= TMath::PoissonI(k,noise);
+      }
     }
   }
   return log(prob);
@@ -472,7 +499,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "Jun03_2018";
+  string date = "Oct04_2018";
   string inputdatabase = Form("/work/eic/xusun/output/database/database_%s.root",date.c_str());
 
   cout << "numoflist = " << numoflist.c_str() << endl;

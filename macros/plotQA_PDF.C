@@ -25,22 +25,26 @@ std::pair<int,std::string> get_particle(int pid)
 
 void plotQA_PDF()
 {
-  string date = "May23_2018";
+  string date = "Oct04_2018";
   // string inputfile = Form("/work/eic/xusun/output/database/3mm/database_%s.root.eff.wo.smearing",date.c_str());
   string inputfile = Form("/work/eic/xusun/output/database/database_%s.root",date.c_str());
   cout << "read in file: " << inputfile.c_str() << endl;
   TFile *File_InPut = TFile::Open(inputfile.c_str());
   assert(File_InPut);
 
-  string key_pion = "h_mPhotonDist_piplus_vx_0_vy_0_mom_2_theta_2_phi_3";
+  string key_electron = "h_mPhotonDist_electron_vx_0_vy_0_mom_0_theta_0_phi_0";
+  TH2D *h_PDF_electron = (TH2D*)File_InPut->Get(key_electron.c_str());
+  assert(h_PDF_electron);
+
+  string key_pion = "h_mPhotonDist_piminus_vx_0_vy_0_mom_0_theta_0_phi_0";
   TH2D *h_PDF_pion = (TH2D*)File_InPut->Get(key_pion.c_str());
   assert(h_PDF_pion);
 
-  string key_kaon = "h_mPhotonDist_Kplus_vx_0_vy_0_mom_2_theta_2_phi_3";
+  string key_kaon = "h_mPhotonDist_Kplus_vx_0_vy_0_mom_0_theta_0_phi_0";
   TH2D *h_PDF_kaon = (TH2D*)File_InPut->Get(key_kaon.c_str());
   assert(h_PDF_kaon);
 
-  string key_proton = "h_mPhotonDist_proton_vx_0_vy_0_mom_2_theta_2_phi_3";
+  string key_proton = "h_mPhotonDist_proton_vx_0_vy_0_mom_0_theta_0_phi_0";
   TH2D *h_PDF_proton = (TH2D*)File_InPut->Get(key_proton.c_str());
   assert(h_PDF_proton);
 
@@ -114,9 +118,10 @@ void plotQA_PDF()
   c_Identified->cd()->SetGrid(0,0);
   c_Identified->cd()->SetTicks(1,1);
 
-  h_PDF_kaon->Draw("colz");
+  // h_PDF_kaon->Draw("colz");
   // h_PDF_proton->Draw("same");
-  h_PDF_pion->Draw("same ");
+  h_PDF_electron->Draw("colz");
+  h_PDF_pion->Draw("same");
 
   outputfile = "../figures/masshypo_dist/mass_hypotheses_identify.pdf";
   cout << "save plot to: " << outputfile.c_str() << endl;

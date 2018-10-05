@@ -92,6 +92,7 @@ class calLikelihood
   double mLpion;
   double mLKaon;
   double mLproton;
+  double mLelectron;
 
   TChain *mChainInPut_Events;
   TChain *mChainInPut_Tracks;

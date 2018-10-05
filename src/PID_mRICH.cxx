@@ -97,6 +97,7 @@ int PID_mRICH::initChain()
  mChainInPut->SetBranchAddress("Lpion", &mLpion);
  mChainInPut->SetBranchAddress("LKaon", &mLKaon);
  mChainInPut->SetBranchAddress("Lproton", &mLproton);
+ mChainInPut->SetBranchAddress("Lelectron", &mLelectron);
 
  long NumOfEvents = (long)mChainInPut->GetEntries();
  cout << "total number of events: " << NumOfEvents << endl;
@@ -242,11 +243,13 @@ int PID_mRICH::writeHistoMap_Probability()
   return 0;
 }
 
-std::pair<double,double> PID_mRICH::get_LikelihoodDiff(int pid, double Lpion, double LKaon, double Lproton)
+std::pair<double,double> PID_mRICH::get_LikelihoodDiff(int pid, double Lpion, double LKaon, double Lproton, double Lelectron)
 {
-  if(TMath::Abs(pid) ==  211)   return std::pair<double,double>(Lpion-LKaon,Lpion-Lproton);
+  // if(TMath::Abs(pid) ==  211)   return std::pair<double,double>(Lpion-LKaon,Lpion-Lproton);
   if(TMath::Abs(pid) ==  321)   return std::pair<double,double>(LKaon-Lpion,LKaon-Lproton);
   if(TMath::Abs(pid) ==  2212)  return std::pair<double,double>(Lproton-Lpion,Lproton-LKaon);
+  if(TMath::Abs(pid) ==  211)   return std::pair<double,double>(Lpion-Lelectron,Lpion-LKaon);
+  if(TMath::Abs(pid) ==  11)    return std::pair<double,double>(Lelectron-Lpion,Lelectron-LKaon);
   else return std::pair<double,double>(-999.9,-999.9);
 }
 
@@ -256,19 +259,21 @@ std::pair<int,int> PID_mRICH::get_misPID(int pid)
    if(pid == 211)   return std::pair<int,int>(321,2212);
    if(pid == 321)   return std::pair<int,int>(211,2212);
    if(pid == 2212)  return std::pair<int,int>(211,321);
-   if(pid == -211)  return std::pair<int,int>(-321,-2212);
+   // if(pid == -211)  return std::pair<int,int>(-321,-2212);
    if(pid == -321)  return std::pair<int,int>(-211,-2212);
    if(pid == -2212) return std::pair<int,int>(-211,-321);
+   if(pid == -211)  return std::pair<int,int>(11,-321);
+   if(pid == 11)    return std::pair<int,int>(-211,-321);
 }
 
-int PID_mRICH::get_rank(int pid, double Lpion, double LKaon, double Lproton)
+int PID_mRICH::get_rank(int pid, double Lpion, double LKaon, double Lproton, double Lelectron)
 {
   int rank = -1;
-  std::pair<double,double> likelihood_diff = this->get_LikelihoodDiff(pid,Lpion,LKaon,Lproton);
+  std::pair<double,double> likelihood_diff = this->get_LikelihoodDiff(pid,Lpion,LKaon,Lproton,Lelectron);
 
   std::pair<int,int> misPID = this->get_misPID(pid);
-  std::pair<double,double> likelihood_diff_first = this->get_LikelihoodDiff(misPID.first,Lpion,LKaon,Lproton);
-  std::pair<double,double> likelihood_diff_second = this->get_LikelihoodDiff(misPID.second,Lpion,LKaon,Lproton);
+  std::pair<double,double> likelihood_diff_first = this->get_LikelihoodDiff(misPID.first,Lpion,LKaon,Lproton,Lelectron);
+  std::pair<double,double> likelihood_diff_second = this->get_LikelihoodDiff(misPID.second,Lpion,LKaon,Lproton,Lelectron);
 
   if(likelihood_diff.first > 0.0 && likelihood_diff.second > 0.0) rank = 0;
   else if(likelihood_diff_first.first > 0.0 && likelihood_diff_first.second > 0.0) rank = 1;
@@ -297,7 +302,7 @@ int PID_mRICH::Make()
     const int indexMomentumPhi = utility->get_indexMomentumPhi(mPx,mPy);
     const double momentum = TMath::Sqrt(mPx*mPx+mPy*mPy+mPz*mPz); // in GeV
 
-    std::pair<double,double> likelihood_diff = this->get_LikelihoodDiff(mPid,mLpion,mLKaon,mLproton);
+    std::pair<double,double> likelihood_diff = this->get_LikelihoodDiff(mPid,mLpion,mLKaon,mLproton,mLelectron);
 
     //---- likelihood difference QA ----
     string key_likelihood_first = utility->gen_KeyLikelihood(mPid,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,1);
@@ -307,7 +312,7 @@ int PID_mRICH::Make()
     h_mLikelihoodDiff[key_likelihood_second]->Fill(momentum,likelihood_diff.second);
     //---- likelihood difference QA ----
 
-    int rank = this->get_rank(mPid,mLpion,mLKaon,mLproton);
+    int rank = this->get_rank(mPid,mLpion,mLKaon,mLproton,mLelectron);
     if(rank < 0) continue;
 
     string key_prob = utility->gen_KeyProb(mPid,indexSpaceX,indexSpaceY,indexMomentumTheta,indexMomentumPhi,rank);
@@ -337,7 +342,7 @@ int PID_mRICH::Finish()
 ////// This is the main function 
 int main()
 {
-  string date = "Jun03_2018";
+  string date = "Oct04_2018";
   string outputfile = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
 
   PID_mRICH *mPID_mRICH = new PID_mRICH(date,outputfile);

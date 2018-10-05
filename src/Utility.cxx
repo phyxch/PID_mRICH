@@ -23,6 +23,7 @@ void Utility::creatParticleIdMap()
   mParticleIdMap[-211]  = "piminus";
   mParticleIdMap[-321]  = "Kminus";
   mParticleIdMap[-2212] = "antiproton";
+  mParticleIdMap[11]    = "electron";
 }
 
 void Utility::creatParticleMisIdMap()
@@ -31,9 +32,11 @@ void Utility::creatParticleMisIdMap()
   mParticleMisIdMap[211]    = std::pair<std::string,std::string>("Kplus","proton");
   mParticleMisIdMap[321]    = std::pair<std::string,std::string>("piplus","proton");
   mParticleMisIdMap[2212]   = std::pair<std::string,std::string>("piplus","Kplus");
-  mParticleMisIdMap[-211]   = std::pair<std::string,std::string>("Kminus","antiproton");
+  // mParticleMisIdMap[-211]   = std::pair<std::string,std::string>("Kminus","antiproton");
   mParticleMisIdMap[-321]   = std::pair<std::string,std::string>("piminus","antiproton");
   mParticleMisIdMap[-2212]  = std::pair<std::string,std::string>("piminus","Kminus");
+  mParticleMisIdMap[-211]   = std::pair<std::string,std::string>("electron","Kminus");
+  mParticleMisIdMap[11]     = std::pair<std::string,std::string>("piminus","Kminus");
 }
 
 std::string Utility::get_IdentifiedParticle(int pid)

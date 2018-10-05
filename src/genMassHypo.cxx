@@ -62,9 +62,9 @@ int genMassHypo::Init()
 
 int genMassHypo::initChain()
 {
-  // string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
-  string inputdir = "/work/eic/xusun/output/modular_rich/BeamTest/PlusMinus/";
-  string InPutList = Form("/work/eic/xusun/list/database/mRICH_PDF_%s_%s.list",mDate.c_str(),mNumOfList.c_str());
+  string inputdir = Form("/work/eic/xusun/output/modular_rich/%s/",mDate.c_str());
+  // string inputdir = "/work/eic/xusun/output/modular_rich/BeamTest/PlusMinus/";
+  string InPutList = Form("/work/eic/xusun/list/database/%s/mRICH_PDF_%s_%s.list",mDate.c_str(),mDate.c_str(),mNumOfList.c_str());
   
   mChainInPut_Events = new TChain("generated");
   mChainInPut_Tracks = new TChain("eic_rich");
@@ -110,7 +110,7 @@ int genMassHypo::initHistoMap()
 {
   cout<<"genMassHypo::initHistoMap(), initialize database histograms ;"<<endl;
 
-  for(int i_pid = 0; i_pid < 6; ++i_pid)
+  for(int i_pid = 0; i_pid < mRICH::mNumOfParType; ++i_pid)
   {
     for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
     {
@@ -224,7 +224,7 @@ int genMassHypo::Make()
 	double wavelength = 1240./(photonE*1.e6);  /// MeV->eV,wavelength in "nm"
 	double QE_GaAsP = mat->extrapQE_GaAsP(wavelength); // get quantum efficiency for photon sensor => need to be updated
 
-	if( QE_GaAsP > gRandom->Uniform(0.0,1.0) )
+	// if( QE_GaAsP > gRandom->Uniform(0.0,1.0) )
 	{
 	  double out_x_input = ahit->get_out_x()->at(i_track);
 	  double out_y_input = ahit->get_out_y()->at(i_track);
@@ -266,7 +266,7 @@ int genMassHypo::Finish()
 
 int genMassHypo::writeHistoMap()
 {
-  for(int i_pid = 0; i_pid < 6; ++i_pid)
+  for(int i_pid = 0; i_pid < mRICH::mNumOfParType; ++i_pid)
   {
     for(int i_vx = 0; i_vx < mRICH::mNumOfIndexSpaceX; ++i_vx)
     {
@@ -357,7 +357,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "BeamTest_PlusMinus";
+  string date = "Oct04_2018";
   
   cout << "numoflist = " << numoflist.c_str() << endl;
   genMassHypo *genMassHypotheses = new genMassHypo(numoflist,date);
