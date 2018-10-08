@@ -16,8 +16,11 @@ bin/nsigma
 
 macros/AutoDict_*
 
+figures/*.pdf
 figures/*/*.pdf
 figures/*/*/*.pdf
 figures/*/*/*/*.pdf
 figures/*.eps
-figures/*.pdf
+figures/*/*.eps
+figures/*/*/*.eps
+figures/*/*/*/*.eps

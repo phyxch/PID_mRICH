@@ -11,7 +11,7 @@ chop($erunnum);
 
 if($srunnum<=$erunnum){
     for($i=$srunnum;$i<=$erunnum;$i++){
-	print `./exec_sim -r$i database Jun03_2018 genMassHypo \n`;
+	print `./exec_sim -r$i database Oct08_2018 genMassHypo \n`;
 	# print `./exec_sim -r$i likelihood Jun03_2018 calLikelihood \n`;
     }
 }

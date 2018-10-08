@@ -342,7 +342,7 @@ int PID_mRICH::Finish()
 ////// This is the main function 
 int main()
 {
-  string date = "Oct04_2018";
+  string date = "Oct08_2018";
   string outputfile = Form("/work/eic/xusun/output/probability/PID_prob_%s.root",date.c_str());
 
   PID_mRICH *mPID_mRICH = new PID_mRICH(date,outputfile);

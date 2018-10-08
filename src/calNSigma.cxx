@@ -208,7 +208,7 @@ int calNSigma::Finish()
 // This is the main function 
 int main()
 {
-  string date = "Oct04_2018";
+  string date = "Oct08_2018";
   string outputfile = Form("/work/eic/xusun/output/probability/PID_nSigma_%s.root",date.c_str());
 
   calNSigma *mcalNSigma = new calNSigma(date,outputfile);

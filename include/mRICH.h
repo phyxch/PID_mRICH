@@ -34,11 +34,11 @@ namespace mRICH
   // const double mMomP_stop  = 120.5;
   // const int mNumOfIndexMomentumP = 1;
   // const double mBin_MomP[2] = {120.0,125.0};
-  const double mMomP_start = 2.4;
-  const double mMomP_stop  = 2.6;
-  const int mNumOfIndexMomentumP = 1;
-  const double mBin_MomP[2] = {2.5,3.5};
-  const double mDelta_MomP = 0.5;
+  const double mMomP_start = 0.6;
+  const double mMomP_stop  = 3.0;
+  const int mNumOfIndexMomentumP = 12;
+  const double mBin_MomP[mNumOfIndexMomentumP] = {0.7,0.9,1.1,1.3,1.5,1.7,1.9,2.1,2.3,2.5,2.7,2.9};
+  const double mDelta_MomP = 0.1;
 
   const double DEG=180./TMath::Pi();
 

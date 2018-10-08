@@ -47,8 +47,8 @@ int genMassHypo::Init()
 {
   cout<<"genMassHypo::Init() ----- Initialization ! ------"<<endl;
 
-  mOutPutFile = Form("/work/eic/xusun/output/database/database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
-  // mOutPutFile = "./out.root"; // batch mode
+  // mOutPutFile = Form("/work/eic/xusun/output/database/database_%s_%s.root",mDate.c_str(),mNumOfList.c_str());
+  mOutPutFile = "./out.root"; // batch mode
   cout<<"genMassHypo::Init(), create output file: "<< mOutPutFile.c_str() <<endl;
   File_mOutPut = new TFile(mOutPutFile.c_str(),"RECREATE");
 
@@ -357,7 +357,7 @@ int main(int argc, char **argv)
   const char *input = argv[1];
   string numoflist(input);
   
-  string date = "Oct04_2018";
+  string date = "Oct08_2018";
   
   cout << "numoflist = " << numoflist.c_str() << endl;
   genMassHypo *genMassHypotheses = new genMassHypo(numoflist,date);
