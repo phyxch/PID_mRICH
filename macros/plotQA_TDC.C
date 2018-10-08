@@ -9,7 +9,8 @@ using namespace std;
 
 void plotQA_TDC(const int runID = 182, const string mode = "rich")
 {
-  string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
+  // string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
+  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
   assert(File_InPut);
 

@@ -4,6 +4,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TCanvas.h"
+#include <iostream>
 
 #define MAXEDGE 100000
 
@@ -39,15 +40,25 @@ int GetPMT_mRICH(int slot,int fiber,int asic);
 void GenCoord_mRICH(int ipmt, int x1, int y1);
 int GetPixel_mRICH(int fiber, int asic, int maroc_channel);
 
-void plotQA_PMT(const string mode = "rich", const int runID = 182)
+void processQA_BeamTest_TDC(const int runID = 182, const string mode = "rich")
 {
   int debug = 1;
+  int const NumOfPixel = 33;
   // string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
   string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
 
   InitDisplay_mRICH();
-  TH2F *h2 = new TH2F("h2","",33,0,33,33,0,33);
+  TH2F *h_mRingImage = new TH2F("h_mRingImage","h_mRingImage",NumOfPixel,-0.5,32.5,NumOfPixel,-0.5,32.5);
+  TH1F *h_mTDC[NumOfPixel][NumOfPixel]; // 0 for x-pixel | 1 for y-pixel
+  for(int i_pixel_x = 0; i_pixel_x < NumOfPixel; ++i_pixel_x)
+  {
+    for(int i_pixel_y = 0; i_pixel_y < NumOfPixel; ++i_pixel_y)
+    {
+      string HistName = Form("h_mTDC_pixelX_%d_pixelY_%d",i_pixel_x,i_pixel_y);
+      h_mTDC[i_pixel_x][i_pixel_y] = new TH1F(HistName.c_str(),HistName.c_str(),1000,-0.5,4999.55);
+    }
+  }
 
   unsigned int pol=MAROCPOLARITY; // 1 falling, 0 rising
 
@@ -61,14 +72,15 @@ void plotQA_PMT(const string mode = "rich", const int runID = 182)
   tree_mRICH->SetBranchAddress("pol",tPolarity);
   tree_mRICH->SetBranchAddress("time",tTime);
 
-  int NumOfEvents = tree_mRICH->GetEntries();
+  // int NumOfEvents = tree_mRICH->GetEntries();
+  int NumOfEvents = 50000;
   // int NumOfEvents = 10000;
   printf("NEntries %d\n",NumOfEvents);
 
   tree_mRICH->GetEntry(0);
   for(int i_event = 0; i_event < NumOfEvents; ++i_event)
   {
-    if(NumOfEvents>20)if(i_event%(NumOfEvents/10)==0)printf("Reading Event %6d\n",i_event);
+    if(NumOfEvents>20)if(i_event%(NumOfEvents/10)==0)printf("Processing Event %6d\n",i_event);
     ResetEventData();
     tree_mRICH->GetEntry(i_event);
 
@@ -89,30 +101,50 @@ void plotQA_PMT(const string mode = "rich", const int runID = 182)
       if(tFiber[i_photon] > 31){printf("%s EVT %d Data Error: bad fiber %d \n",__FUNCTION__,i_event,fiber);continue;}
       if(tChannel[i_photon] > 191){printf("%s EVT %d Data Error: bad channel %d \n",__FUNCTION__,i_photon,channel); continue;}
 
+      int pmt = GetPMT_mRICH(slot,fiber,asic);
+      GenCoord_mRICH(pmt, xp_mRICH[pmt-1], yp_mRICH[pmt-1]);
+      int pixel = GetPixel_mRICH(fiber, asic, pin);
+      int pixel_x = x_mRICH[pixel-1];
+      int pixel_y = y_mRICH[pixel-1];
+      h_mTDC[pixel_x][pixel_y]->Fill(tTime[i_photon]);
+
       if(tPolarity[i_photon] == pol && tTime[i_photon] > 2010 && tTime[i_photon] < 2040)
       {
-	int pmt = GetPMT_mRICH(slot,fiber,asic);
-	GenCoord_mRICH(pmt, xp_mRICH[pmt-1], yp_mRICH[pmt-1]);
-	int pixel = GetPixel_mRICH(fiber, asic, pin);
-	h2->Fill(x_mRICH[pixel-1],y_mRICH[pixel-1]);
+	h_mRingImage->Fill(x_mRICH[pixel-1],y_mRICH[pixel-1]);
       }
     }
   }
+  printf("Processed events %d\n",NumOfEvents);
 
+  /*
   TCanvas *c_TDC = new TCanvas("c_TDC","c_TDC",10,10,800,800);
   c_TDC->SetLeftMargin(0.15);
   c_TDC->SetBottomMargin(0.15);
   c_TDC->SetRightMargin(0.15);
   c_TDC->SetTicks(1,1);
   c_TDC->SetGrid(0,0);
-  h2->SetTitle("120 GeV/c proton single event");
-  h2->SetStats(0);
-  h2->GetXaxis()->SetTitle("pixel ID");
-  h2->GetXaxis()->CenterTitle();
-  h2->GetYaxis()->SetTitle("pixel ID");
-  h2->GetYaxis()->CenterTitle();
-  h2->Draw("colz");
+  h_mRingImage->SetTitle("120 GeV/c proton single event");
+  h_mRingImage->SetStats(0);
+  h_mRingImage->GetXaxis()->SetTitle("pixel ID");
+  h_mRingImage->GetXaxis()->CenterTitle();
+  h_mRingImage->GetYaxis()->SetTitle("pixel ID");
+  h_mRingImage->GetYaxis()->CenterTitle();
+  h_mRingImage->Draw("colz");
   c_TDC->SaveAs("../figures/c_TDC.pdf");
+  */
+
+  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/%sTDC_run%d.root",mode.c_str(),runID);
+  TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");
+  File_OutPut->cd();
+  h_mRingImage->Write();
+  for(int i_pixel_x = 0; i_pixel_x < NumOfPixel; ++i_pixel_x)
+  {
+    for(int i_pixel_y = 0; i_pixel_y < NumOfPixel; ++i_pixel_y)
+    {
+      h_mTDC[i_pixel_x][i_pixel_y]->Write();
+    }
+  }
+  File_OutPut->Close();
 }
 
 //----------------------------------
