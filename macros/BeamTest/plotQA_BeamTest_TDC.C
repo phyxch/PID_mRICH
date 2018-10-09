@@ -5,7 +5,7 @@
 #include "TTree.h"
 #include "TCanvas.h"
 
-void plotQA_BeamTest_TDC(const int runID = 182, const string mode = "rich")
+void plotQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
 {
   int const NumOfPixel = 33;
   string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/%sTDC_run%d.root",mode.c_str(),runID);

@@ -8,7 +8,7 @@
 #define MAXEDGE 100000
 
 // #define H13700MAP "h13700.txt"
-#define H13700MAP "../include/H13700_180degree_v2.txt"
+#define H13700MAP "../../include/H13700_180degree_v2.txt"
 
 //MAROC configuration polarity (from ssptest_TDCAll.c)
 #define MAROCPOLARITY 1
@@ -39,7 +39,7 @@ int GetPMT_mRICH(int slot,int fiber,int asic);
 void GenCoord_mRICH(int ipmt, int x1, int y1);
 int GetPixel_mRICH(int fiber, int asic, int maroc_channel);
 
-void plotQA_PMT(const string mode = "rich", const int runID = 182)
+void plotQA_PMT(const string mode = "sipm", const int runID = 672)
 {
   int debug = 1;
   // string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
@@ -89,7 +89,8 @@ void plotQA_PMT(const string mode = "rich", const int runID = 182)
       if(tFiber[i_photon] > 31){printf("%s EVT %d Data Error: bad fiber %d \n",__FUNCTION__,i_event,fiber);continue;}
       if(tChannel[i_photon] > 191){printf("%s EVT %d Data Error: bad channel %d \n",__FUNCTION__,i_photon,channel); continue;}
 
-      if(tPolarity[i_photon] == pol && tTime[i_photon] > 2010 && tTime[i_photon] < 2040)
+      // if(tPolarity[i_photon] == pol && tTime[i_photon] > 2010 && tTime[i_photon] < 2040)
+      if(tPolarity[i_photon] == pol && tTime[i_photon] > 500 && tTime[i_photon] < 570)
       {
 	int pmt = GetPMT_mRICH(slot,fiber,asic);
 	GenCoord_mRICH(pmt, xp_mRICH[pmt-1], yp_mRICH[pmt-1]);
@@ -112,7 +113,7 @@ void plotQA_PMT(const string mode = "rich", const int runID = 182)
   h2->GetYaxis()->SetTitle("pixel ID");
   h2->GetYaxis()->CenterTitle();
   h2->Draw("colz");
-  c_TDC->SaveAs("../figures/c_TDC.pdf");
+  c_TDC->SaveAs("../../figures/c_TDC.pdf");
 }
 
 //----------------------------------
@@ -123,16 +124,30 @@ void InitDisplay_mRICH()
   const char * hname = H13700MAP;
   int anode, asic, pin, channel;
 
-  //Right side (front view)
+  /*
+  //Right PMT side (front view)
   xp_mRICH[0]=32;
   yp_mRICH[0]=0;
   xp_mRICH[1]=32;
   yp_mRICH[1]=17;
 
-  //Left side (front view)
+  //Left PMT side (front view)
   xp_mRICH[2]=0;
   yp_mRICH[2]=32;
   xp_mRICH[3]=0;
+  yp_mRICH[3]=15;
+  */
+
+  //Right MPPC side (front view)
+  xp_mRICH[0]=17;
+  yp_mRICH[0]=0;
+  xp_mRICH[1]=17;
+  yp_mRICH[1]=17;
+
+  //Left MPPC side (front view)
+  xp_mRICH[2]=15;
+  yp_mRICH[2]=32;
+  xp_mRICH[3]=15;
   yp_mRICH[3]=15;
 
   FILE* fin = fopen(hname,"r");
@@ -192,7 +207,7 @@ int GetPixel_mRICH(int fiber, int asic, int maroc_channel)
  int k=0;
  if(fiber==1 || fiber==3 || fiber==5 || fiber==7)k=1;
  int i = k*192 + asic*64 + maroc_channel;
- if(maroc2h13700[i]==0)printf("getpixel fiber %d  asic %d ch %d  -->  ii  %d  %d \n",fiber,asic,maroc_channel,i, maroc2h13700[i]);
+//  if(maroc2h13700[i]==0)printf("getpixel fiber %d  asic %d ch %d  -->  ii  %d  %d \n",fiber,asic,maroc_channel,i, maroc2h13700[i]);
  return maroc2h13700[i];
 }
 
@@ -211,10 +226,12 @@ void GenCoord_mRICH(int ipmt, int x1, int y1)
     rw=(int) j/16.;
     cm=j%16;
     if(ipmt<3){
-      x_mRICH[j]=x1-cm;
+      // x_mRICH[j]=x1-cm; // PMT
+      x_mRICH[j]=x1+cm; // MPPC
       y_mRICH[j]=y1+rw;
     }else{
-      x_mRICH[j]=x1+cm;
+      // x_mRICH[j]=x1+cm; // PMT
+      x_mRICH[j]=x1-cm; // MPPC
       y_mRICH[j]=y1-rw;
     }
     // if(debug)if(j==0||j==255)printf("PMT %2d  Pixel %2d  -->  rw %3d  cm  %3d  X %3d Y %3d\n",ipmt, j+1,rw, cm,x_mRICH[j],y_mRICH[j]);
