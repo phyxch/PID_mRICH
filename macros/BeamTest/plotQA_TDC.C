@@ -7,7 +7,7 @@
 #include "TLegend.h"
 using namespace std;
 
-void plotQA_TDC(const int runID = 182, const string mode = "rich")
+void plotQA_TDC(const int runID = 356, const string mode = "sipm")
 {
   // string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
   string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
@@ -25,10 +25,6 @@ void plotQA_TDC(const int runID = 182, const string mode = "rich")
   TTree * tree_mRICH = (TTree*)File_InPut->Get("data");
   tree_mRICH->Draw("time>>h_TDC","pol==1");
 
-  // TLegend *leg = new TLegend(0.2,0.5,0.5,0.65);
-  // leg->SetFillColor(0);
-  // leg->SetBorderSize(0);
-  // leg->AddEntry(h_PMT,"PMT time","L");
-  // leg->AddEntry(h_SiPM,"SiPM time + 1490","L");
-  // leg->Draw("same");
+  string c_tdc = Form("../../figures/BeamTest_QA/c_TDC_MPPC_%d_allChanel.eps",runID);
+  c_TDC->SaveAs(c_tdc.c_str());
 }

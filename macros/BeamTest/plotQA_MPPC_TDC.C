@@ -5,10 +5,10 @@
 #include "TTree.h"
 #include "TCanvas.h"
 
-void plotQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
+void plotQA_MPPC_TDC(const int runID = 672)
 {
   int const NumOfPixel = 33;
-  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/%sTDC_run%d.root",mode.c_str(),runID);
+  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/sipmTDC_run%d.root",runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
 
   TH2F *h_mRingImage = (TH2F*)File_InPut->Get("h_mRingImage")->Clone();
@@ -35,10 +35,13 @@ void plotQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
   h_mRingImage->GetYaxis()->SetTitle("pixel ID");
   h_mRingImage->GetYaxis()->CenterTitle();
   h_mRingImage->Draw("colz");
-  string c_ringimage = Form("../figures/BeamTest_QA/c_RingImage_%s_%d.pdf",mode.c_str(),runID);
+  string c_ringimage = Form("../../figures/BeamTest_QA/c_RingImage_MPPC_%d.eps",runID);
+  c_RingImage->SaveAs(c_ringimage.c_str());
+  c_ringimage = Form("../../figures/BeamTest_QA/c_RingImage_MPPC_%d.png",runID);
   c_RingImage->SaveAs(c_ringimage.c_str());
 
-  TCanvas *c_TDC = new TCanvas("c_TDC","c_TDC",10,10,NumOfPixel*100,NumOfPixel*100);
+  // TCanvas *c_TDC = new TCanvas("c_TDC","c_TDC",10,10,NumOfPixel*100,NumOfPixel*100);
+  TCanvas *c_TDC = new TCanvas("c_TDC","c_TDC",10,10,NumOfPixel*30,NumOfPixel*30);
   c_TDC->Divide(NumOfPixel,NumOfPixel,0,0);
   for(int i_pixel_x = 0; i_pixel_x < NumOfPixel; ++i_pixel_x)
   {
@@ -58,6 +61,8 @@ void plotQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
       h_mTDC[i_pixel_x][i_pixel_y]->Draw();
     }
   }
-  string c_tdc = Form("../figures/BeamTest_QA/c_TDC_%s_%d.pdf",mode.c_str(),runID);
+  string c_tdc = Form("../../figures/BeamTest_QA/c_TDC_MPPC_%d.eps",runID);
+  c_TDC->SaveAs(c_tdc.c_str());
+  c_tdc = Form("../../figures/BeamTest_QA/c_TDC_MPPC_%d.png",runID);
   c_TDC->SaveAs(c_tdc.c_str());
 }

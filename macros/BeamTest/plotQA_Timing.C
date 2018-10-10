@@ -9,7 +9,7 @@ using namespace std;
 
 void plotQA_Timing(const int PMTid = 173, const int SiPMid = 651)
 {
-  string inputPMT = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/richTDC_run%d/sspRich.root",PMTid);
+  string inputPMT = Form("/home/xusun/Data/mRICH/BeamTest/tdc/richTDC_run%d/sspRich.root",PMTid);
   cout << "read in file: " << inputPMT.c_str() << endl;
   TFile *File_InPutPMT = TFile::Open(inputPMT.c_str());
   assert(File_InPutPMT);
@@ -25,7 +25,7 @@ void plotQA_Timing(const int PMTid = 173, const int SiPMid = 651)
   TTree * tree_mRICH_PMT = (TTree*)File_InPutPMT->Get("data");
   tree_mRICH_PMT->Draw("time>>h_PMT","pol==1");
 
-  string inputSiPM = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/sipmTDC_run%d/sspRich.root",SiPMid);
+  string inputSiPM = Form("/home/xusun/Data/mRICH/BeamTest/tdc/sipmTDC_run%d/sspRich.root",SiPMid);
   cout << "read in file: " << inputSiPM.c_str() << endl;
   TFile *File_InPutSiPM = TFile::Open(inputSiPM.c_str());
   assert(File_InPutSiPM);

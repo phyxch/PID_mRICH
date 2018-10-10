@@ -40,12 +40,12 @@ int GetPMT_mRICH(int slot,int fiber,int asic);
 void GenCoord_mRICH(int ipmt, int x1, int y1);
 int GetPixel_mRICH(int fiber, int asic, int maroc_channel);
 
-void processQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
+void processQA_PMT_TDC(const int runID = 182)
 {
   int debug = 1;
   int const NumOfPixel = 33;
   // string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
-  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
+  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/tdc/richTDC_run%d/sspRich.root",runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
 
   InitDisplay_mRICH();
@@ -56,7 +56,8 @@ void processQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
     for(int i_pixel_y = 0; i_pixel_y < NumOfPixel; ++i_pixel_y)
     {
       string HistName = Form("h_mTDC_pixelX_%d_pixelY_%d",i_pixel_x,i_pixel_y);
-      h_mTDC[i_pixel_x][i_pixel_y] = new TH1F(HistName.c_str(),HistName.c_str(),1000,-0.5,4999.55);
+      h_mTDC[i_pixel_x][i_pixel_y] = new TH1F(HistName.c_str(),HistName.c_str(),300,1499.5,2699.5);
+      // h_mTDC[i_pixel_x][i_pixel_y] = new TH1F(HistName.c_str(),HistName.c_str(),300,-0.5,1199.5); // meson
     }
   }
 
@@ -72,9 +73,8 @@ void processQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
   tree_mRICH->SetBranchAddress("pol",tPolarity);
   tree_mRICH->SetBranchAddress("time",tTime);
 
-  // int NumOfEvents = tree_mRICH->GetEntries();
-  int NumOfEvents = 50000;
-  // int NumOfEvents = 10000;
+  int NumOfEvents = tree_mRICH->GetEntries();
+  if(NumOfEvents > 50000) NumOfEvents = 50000; // for test only
   printf("NEntries %d\n",NumOfEvents);
 
   tree_mRICH->GetEntry(0);
@@ -108,8 +108,8 @@ void processQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
       int pixel_y = y_mRICH[pixel-1];
       h_mTDC[pixel_x][pixel_y]->Fill(tTime[i_photon]);
 
-      // if(tPolarity[i_photon] == pol && tTime[i_photon] > 2010 && tTime[i_photon] < 2040) // PMT
-      if(tPolarity[i_photon] == pol && tTime[i_photon] > 500 && tTime[i_photon] < 570) // MPPC
+      if(tPolarity[i_photon] == pol && tTime[i_photon] > 2010 && tTime[i_photon] < 2040)
+      // if(tPolarity[i_photon] == pol && tTime[i_photon] > 500 && tTime[i_photon] < 570) // meson
       {
 	h_mRingImage->Fill(x_mRICH[pixel-1],y_mRICH[pixel-1]);
       }
@@ -134,7 +134,7 @@ void processQA_BeamTest_TDC(const int runID = 672, const string mode = "sipm")
   c_TDC->SaveAs("../figures/c_TDC.pdf");
   */
 
-  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/%sTDC_run%d.root",mode.c_str(),runID);
+  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/richTDC_run%d.root",runID);
   TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");
   File_OutPut->cd();
   h_mRingImage->Write();
@@ -156,7 +156,6 @@ void InitDisplay_mRICH()
   const char * hname = H13700MAP;
   int anode, asic, pin, channel;
 
-  /*
   //Right PMT side (front view)
   xp_mRICH[0]=32;
   yp_mRICH[0]=0;
@@ -167,19 +166,6 @@ void InitDisplay_mRICH()
   xp_mRICH[2]=0;
   yp_mRICH[2]=32;
   xp_mRICH[3]=0;
-  yp_mRICH[3]=15;
-  */
-
-  //Right MPPC side (front view)
-  xp_mRICH[0]=17;
-  yp_mRICH[0]=0;
-  xp_mRICH[1]=17;
-  yp_mRICH[1]=17;
-
-  //Left MPPC side (front view)
-  xp_mRICH[2]=15;
-  yp_mRICH[2]=32;
-  xp_mRICH[3]=15;
   yp_mRICH[3]=15;
 
   FILE* fin = fopen(hname,"r");
@@ -258,12 +244,10 @@ void GenCoord_mRICH(int ipmt, int x1, int y1)
     rw=(int) j/16.;
     cm=j%16;
     if(ipmt<3){
-      // x_mRICH[j]=x1-cm; // PMT
-      x_mRICH[j]=x1+cm; // MPPC
+      x_mRICH[j]=x1-cm; // PMT
       y_mRICH[j]=y1+rw;
     }else{
-      // x_mRICH[j]=x1+cm; // PMT
-      x_mRICH[j]=x1-cm; // MPPC
+      x_mRICH[j]=x1+cm; // PMT
       y_mRICH[j]=y1-rw;
     }
     // if(debug)if(j==0||j==255)printf("PMT %2d  Pixel %2d  -->  rw %3d  cm  %3d  X %3d Y %3d\n",ipmt, j+1,rw, cm,x_mRICH[j],y_mRICH[j]);
