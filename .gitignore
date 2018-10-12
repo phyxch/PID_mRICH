@@ -20,7 +20,13 @@ figures/*.png
 figures/*/*.png
 figures/*/*/*.png
 figures/*/*/*/*.png
+
 figures/*.eps
 figures/*/*.eps
 figures/*/*/*.eps
 figures/*/*/*/*.eps
+
+figures/*.pdf
+figures/*/*.pdf
+figures/*/*/*.pdf
+figures/*/*/*/*.pdf

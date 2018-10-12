@@ -11,8 +11,8 @@
 #include <utility>
 #include <functional>
 #include <stdexcept>
-#include "draw.h"
-#include "../include/mRICH.h"
+#include "../draw.h"
+#include "../../include/mRICH.h"
 using namespace std;
 
 std::pair<int,std::string> get_particle(int pid)
@@ -128,7 +128,7 @@ void plotQA_NSigma_pixel(int pid = 211, int rank = 0)
   leg->Draw("same");
 
   string output_nsigma;
-  if(rank == 0) output_nsigma = Form("../figures/nSigma/c_nSigmaPixel_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d.pdf",identifiedParticle.second.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);
-  if(rank == 1) output_nsigma = Form("../figures/nSigma/c_nSigmaPixel_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d.pdf",identifiedParticle.second.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
+  if(rank == 0) output_nsigma = Form("../../figures/nSigma/c_nSigmaPixel_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d.pdf",identifiedParticle.second.c_str(),misIdentifiedParticle.first.c_str(),index_vx,index_vy,index_theta,index_phi);
+  if(rank == 1) output_nsigma = Form("../../figures/nSigma/c_nSigmaPixel_%s_%s_vx_%d_vy_%d_theta_%d_phi_%d.pdf",identifiedParticle.second.c_str(),misIdentifiedParticle.second.c_str(),index_vx,index_vy,index_theta,index_phi);
   c_nsigma->SaveAs(output_nsigma.c_str());
 }
