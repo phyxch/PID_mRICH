@@ -7,7 +7,7 @@
 #include "TLegend.h"
 using namespace std;
 
-void plotQA_Timing(const int PMTid = 173, const int SiPMid = 651)
+void plotQA_Timing(const int PMTid = 182, const int SiPMid = 649)
 {
   string inputPMT = Form("/home/xusun/Data/mRICH/BeamTest/tdc/richTDC_run%d/sspRich.root",PMTid);
   cout << "read in file: " << inputPMT.c_str() << endl;

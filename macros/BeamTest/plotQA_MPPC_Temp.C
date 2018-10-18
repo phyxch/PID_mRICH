@@ -46,6 +46,7 @@ void plotQA_MPPC_Temp()
   h_tdc_30->SetStats(0);
   h_tdc_30->GetXaxis()->SetTitle("tdc");
   h_tdc_30->GetXaxis()->CenterTitle();
+  h_tdc_30->GetXaxis()->SetRangeUser(500,650);
   h_tdc_30->GetYaxis()->SetTitle("counts");
   h_tdc_30->GetYaxis()->CenterTitle();
   h_tdc_30->SetLineColor(1);
@@ -93,7 +94,8 @@ void plotQA_MPPC_Temp()
   h_tdc_30->SetStats(0);
   h_tdc_30->GetXaxis()->SetTitle("tdc");
   h_tdc_30->GetXaxis()->CenterTitle();
-  h_tdc_30->GetYaxis()->SetRangeUser(0,800);
+  h_tdc_30->GetXaxis()->SetRangeUser(500,650);
+  h_tdc_30->GetYaxis()->SetRangeUser(0,300);
   h_tdc_30->SetLineColor(1);
   h_tdc_30->Draw();
 
@@ -113,7 +115,8 @@ void plotQA_MPPC_Temp()
   h_tdc_20->SetStats(0);
   h_tdc_20->GetXaxis()->SetTitle("tdc");
   h_tdc_20->GetXaxis()->CenterTitle();
-  h_tdc_20->GetYaxis()->SetRangeUser(0,800);
+  h_tdc_20->GetXaxis()->SetRangeUser(500,650);
+  h_tdc_20->GetYaxis()->SetRangeUser(0,300);
   h_tdc_20->SetLineColor(2);
   h_tdc_20->Draw();
 
@@ -128,7 +131,8 @@ void plotQA_MPPC_Temp()
   h_tdc_10->SetStats(0);
   h_tdc_10->GetXaxis()->SetTitle("tdc");
   h_tdc_10->GetXaxis()->CenterTitle();
-  h_tdc_10->GetYaxis()->SetRangeUser(0,800);
+  h_tdc_10->GetXaxis()->SetRangeUser(500,650);
+  h_tdc_10->GetYaxis()->SetRangeUser(0,300);
   h_tdc_10->SetLineColor(4);
   h_tdc_10->Draw();
 
@@ -143,7 +147,8 @@ void plotQA_MPPC_Temp()
   h_tdc_0->SetStats(0);
   h_tdc_0->GetXaxis()->SetTitle("tdc");
   h_tdc_0->GetXaxis()->CenterTitle();
-  h_tdc_0->GetYaxis()->SetRangeUser(0,800);
+  h_tdc_0->GetXaxis()->SetRangeUser(500,650);
+  h_tdc_0->GetYaxis()->SetRangeUser(0,300);
   h_tdc_0->SetLineColor(6);
   h_tdc_0->Draw();
 

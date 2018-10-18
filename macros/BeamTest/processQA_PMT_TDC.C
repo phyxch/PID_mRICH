@@ -56,8 +56,7 @@ void processQA_PMT_TDC(const int runID = 182)
     for(int i_pixel_y = 0; i_pixel_y < NumOfPixel; ++i_pixel_y)
     {
       string HistName = Form("h_mTDC_pixelX_%d_pixelY_%d",i_pixel_x,i_pixel_y);
-      h_mTDC[i_pixel_x][i_pixel_y] = new TH1F(HistName.c_str(),HistName.c_str(),300,1499.5,2699.5);
-      // h_mTDC[i_pixel_x][i_pixel_y] = new TH1F(HistName.c_str(),HistName.c_str(),300,-0.5,1199.5); // meson
+      h_mTDC[i_pixel_x][i_pixel_y] = new TH1F(HistName.c_str(),HistName.c_str(),5000,-0.5,4999.5);
     }
   }
 
@@ -106,12 +105,12 @@ void processQA_PMT_TDC(const int runID = 182)
       int pixel = GetPixel_mRICH(fiber, asic, pin);
       int pixel_x = x_mRICH[pixel-1];
       int pixel_y = y_mRICH[pixel-1];
-      h_mTDC[pixel_x][pixel_y]->Fill(tTime[i_photon]);
+      if(tPolarity[i_photon] == pol) h_mTDC[pixel_x][pixel_y]->Fill(tTime[i_photon]);
 
       if(tPolarity[i_photon] == pol && tTime[i_photon] > 2010 && tTime[i_photon] < 2040)
-      // if(tPolarity[i_photon] == pol && tTime[i_photon] > 500 && tTime[i_photon] < 570) // meson
       {
-	h_mRingImage->Fill(x_mRICH[pixel-1],y_mRICH[pixel-1]);
+	// h_mRingImage->Fill(x_mRICH[pixel-1],y_mRICH[pixel-1]);
+	h_mRingImage->Fill(pixel_x,pixel_y);
       }
     }
   }
