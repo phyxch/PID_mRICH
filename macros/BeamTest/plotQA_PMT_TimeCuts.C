@@ -239,4 +239,9 @@ void plotQA_PMT_TimeCuts(const int runID = 182)
   string str_sigma = Form("sigma tdc = %.1f",sigma_tdc/counter_tdc);
   plotTopLegend((char*)str_sig.c_str(),0.35,0.55,0.06,1,0.0,42,1,1);
   plotTopLegend((char*)str_sigma.c_str(),0.3,0.45,0.06,1,0.0,42,1,1);
+
+  string c_timecut = Form("../../figures/BeamTest_QA/c_TimeCuts_PMT_%d.eps",runID);
+  c_TimeCut->SaveAs(c_timecut.c_str());
+  // c_timecut = Form("../../figures/BeamTest_QA/c_TimeCuts_PMT_%d.png",runID);
+  // c_TimeCut->SaveAs(c_timecut.c_str());
 }
