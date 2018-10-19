@@ -43,6 +43,14 @@ int GetPixel_mRICH(int fiber, int asic, int maroc_channel);
 void processQA_PMT_TDC(const int runID = 182)
 {
   int debug = 1;
+  float tdc_Start = 2000.0;
+  float tdc_Stop  = 2050.0;
+  if(runID > 343 && runID < 381) // meson run 344-380
+  {
+    tdc_Start = 490.0;
+    tdc_Stop  = 590.0;
+  }
+
   int const NumOfPixel = 33;
   // string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
   string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/tdc/richTDC_run%d/sspRich.root",runID);
@@ -107,7 +115,7 @@ void processQA_PMT_TDC(const int runID = 182)
       int pixel_y = y_mRICH[pixel-1];
       if(tPolarity[i_photon] == pol) h_mTDC[pixel_x][pixel_y]->Fill(tTime[i_photon]);
 
-      if(tPolarity[i_photon] == pol && tTime[i_photon] > 2010 && tTime[i_photon] < 2040)
+      if(tPolarity[i_photon] == pol && tTime[i_photon] > tdc_Start && tTime[i_photon] < tdc_Stop)
       {
 	// h_mRingImage->Fill(x_mRICH[pixel-1],y_mRICH[pixel-1]);
 	h_mRingImage->Fill(pixel_x,pixel_y);

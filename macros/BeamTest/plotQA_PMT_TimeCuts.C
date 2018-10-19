@@ -10,8 +10,8 @@
 
 void plotQA_PMT_TimeCuts(const int runID = 182)
 {
-  int const tdc_Start = 2000;
-  int const tdc_Stop  = 2050;
+  float tdc_Start = 2000.0;
+  float tdc_Stop  = 2050.0;
 
   float ratio_cut = 2.0; // run dependent
   int x_OnRing = 10;
@@ -63,6 +63,13 @@ void plotQA_PMT_TimeCuts(const int runID = 182)
     y_OffRing = 30;
     x_beam = 17;
     y_beam = 3;
+  }
+
+  if(runID > 343 && runID < 381) // meson run 344-380
+  {
+    ratio_cut = 3.0;
+    tdc_Start = 490.0;
+    tdc_Stop  = 590.0;
   }
 
   int const NumOfPixel = 33;
@@ -242,6 +249,16 @@ void plotQA_PMT_TimeCuts(const int runID = 182)
 
   string c_timecut = Form("../../figures/BeamTest_QA/c_TimeCuts_PMT_%d.eps",runID);
   c_TimeCut->SaveAs(c_timecut.c_str());
-  // c_timecut = Form("../../figures/BeamTest_QA/c_TimeCuts_PMT_%d.png",runID);
-  // c_TimeCut->SaveAs(c_timecut.c_str());
+
+  TH2F *h_mTimeCuts = new TH2F("h_mTimeCuts","h_mTimeCuts",3,-0.5,2.5,800,-0.5,799.5);
+  h_mTimeCuts->SetBinContent(1,runID,floor(mean_tdc_Start));
+  h_mTimeCuts->SetBinContent(2,runID,ceil(mean_tdc_Stop));
+  h_mTimeCuts->SetBinContent(3,runID,runID);
+  // cout << "mean_tdc_Start = " << mean_tdc_Start << ", floor = " << floor(mean_tdc_Start) << ", mean_tdc_Stop = " << mean_tdc_Stop << ", ceil = " << ceil(mean_tdc_Stop) << endl;
+
+  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/richTimeCuts_run%d.root",runID);
+  TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");
+  File_OutPut->cd();
+  h_mTimeCuts->Write();
+  File_OutPut->Close();
 }

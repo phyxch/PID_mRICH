@@ -10,8 +10,8 @@
 
 void plotQA_MPPC_TimeCuts(const int runID = 649)
 {
-  int const tdc_Start = 490;
-  int const tdc_Stop  = 590;
+  float tdc_Start = 490.0;
+  float tdc_Stop  = 590.0;
 
   float ratio_cut = 1.8; // run dependent
   int x_OnRing = 10;
@@ -233,4 +233,16 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   c_TimeCut->SaveAs(c_timecut.c_str());
   // c_timecut = Form("../../figures/BeamTest_QA/c_TimeCuts_MPPC_%d.png",runID);
   // c_TimeCut->SaveAs(c_timecut.c_str());
+
+  TH2F *h_mTimeCuts = new TH2F("h_mTimeCuts","h_mTimeCuts",3,-0.5,2.5,800,-0.5,799.5);
+  h_mTimeCuts->SetBinContent(1,runID,floor(mean_tdc_Start));
+  h_mTimeCuts->SetBinContent(2,runID,ceil(mean_tdc_Stop));
+  h_mTimeCuts->SetBinContent(3,runID,runID);
+  // cout << "mean_tdc_Start = " << mean_tdc_Start << ", floor = " << floor(mean_tdc_Start) << ", mean_tdc_Stop = " << mean_tdc_Stop << ", ceil = " << ceil(mean_tdc_Stop) << endl;
+
+  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/sipmTimeCuts_run%d.root",runID);
+  TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");
+  File_OutPut->cd();
+  h_mTimeCuts->Write();
+  File_OutPut->Close();
 }
