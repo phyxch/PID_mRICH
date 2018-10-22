@@ -141,7 +141,7 @@ void processQA_PMT_TDC(const int runID = 182)
   c_TDC->SaveAs("../figures/c_TDC.pdf");
   */
 
-  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/richTDC_run%d.root",runID);
+  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/PMT/richTDC_run%d.root",runID);
   TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");
   File_OutPut->cd();
   h_mRingImage->Write();

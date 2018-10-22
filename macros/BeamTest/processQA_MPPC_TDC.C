@@ -116,7 +116,7 @@ void processQA_MPPC_TDC(const int runID = 672)
   }
   printf("Processed events %d\n",NumOfEvents);
 
-  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/sipmTDC_run%d.root",runID);
+  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/MPPC/sipmTDC_run%d.root",runID);
   TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");
   File_OutPut->cd();
   h_mRingImage->Write();

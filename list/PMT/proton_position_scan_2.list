@@ -1,0 +1,12 @@
+energy  120.0
+HV      1000.0
+thr     50
+table   611.1    103.5
+beam    565.5    146.9
+angle   0.0
+
+richTDC_run16
+richTDC_run18
+richTDC_run19
+richTDC_run20
+richTDC_run21

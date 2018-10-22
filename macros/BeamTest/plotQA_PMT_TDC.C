@@ -8,7 +8,7 @@
 void plotQA_PMT_TDC(const int runID = 182)
 {
   int const NumOfPixel = 33;
-  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/richTDC_run%d.root",runID);
+  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/PMT/richTDC_run%d.root",runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
 
   TH2F *h_mRingImage = (TH2F*)File_InPut->Get("h_mRingImage")->Clone();

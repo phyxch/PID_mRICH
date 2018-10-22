@@ -48,7 +48,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   if(runID == 697) ratio_cut = 0.3;
 
   int const NumOfPixel = 33;
-  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/sipmTDC_run%d.root",runID);
+  string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/MPPC/sipmTDC_run%d.root",runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
 
   TH2F *h_ratio_all = new TH2F("h_ratio_all","h_ratio_all",NumOfPixel,-0.5,32.5,NumOfPixel,-0.5,32.5);
@@ -240,7 +240,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   h_mTimeCuts->SetBinContent(3,runID,runID);
   // cout << "mean_tdc_Start = " << mean_tdc_Start << ", floor = " << floor(mean_tdc_Start) << ", mean_tdc_Stop = " << mean_tdc_Stop << ", ceil = " << ceil(mean_tdc_Stop) << endl;
 
-  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/sipmTimeCuts_run%d.root",runID);
+  string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/MPPC/sipmTimeCuts_run%d.root",runID);
   TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");
   File_OutPut->cd();
   h_mTimeCuts->Write();
