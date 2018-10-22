@@ -7,6 +7,21 @@
 
 void plotQA_PMT_TDC(const int runID = 182)
 {
+  float tdc_Start = 2000.0;
+  float tdc_Stop  = 2050.0;
+
+  float ratio_cut = 2.0; // run dependent
+  if(runID == 24) ratio_cut = 1.8; // run dependent
+  if(runID == 120) ratio_cut = 1.8; // run dependent
+  if(runID == 124) ratio_cut = 1.5; // run dependent
+  if(runID == 214) ratio_cut = 2.0; // run dependent
+  if(runID > 343 && runID < 381) // meson run 344-380
+  {
+    ratio_cut = 3.0;
+    tdc_Start = 490.0;
+    tdc_Stop  = 590.0;
+  }
+
   int const NumOfPixel = 33;
   string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/PMT/richTDC_run%d.root",runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
@@ -53,9 +68,14 @@ void plotQA_PMT_TDC(const int runID = 182)
       c_TDC->cd(i_pad);
       h_mTDC[i_pixel_x][i_pixel_y]->SetTitle("");
       h_mTDC[i_pixel_x][i_pixel_y]->SetStats(0);
-      h_mTDC[i_pixel_x][i_pixel_y]->GetYaxis()->SetRangeUser(0.1,1e3);
+      float tot = h_mTDC[i_pixel_x][i_pixel_y]->Integral();
+      float sig = h_mTDC[i_pixel_x][i_pixel_y]->Integral(tdc_Start,tdc_Stop);
+      float bkg = tot - sig;
+      float ratio = sig/bkg;
+      h_mTDC[i_pixel_x][i_pixel_y]->GetXaxis()->SetRangeUser(tdc_Start-100,tdc_Stop+100);
+      h_mTDC[i_pixel_x][i_pixel_y]->GetYaxis()->SetRangeUser(0.1,1e2);
 
-      if(max_counts > 500) h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(2);
+      if(ratio > ratio_cut) h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(2);
       else h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(4);
 
       h_mTDC[i_pixel_x][i_pixel_y]->Draw();

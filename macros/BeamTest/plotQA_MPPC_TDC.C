@@ -5,8 +5,18 @@
 #include "TTree.h"
 #include "TCanvas.h"
 
-void plotQA_MPPC_TDC(const int runID = 672)
+void plotQA_MPPC_TDC(const int runID = 649)
 {
+  float tdc_Start = 490.0;
+  float tdc_Stop  = 590.0;
+
+  float ratio_cut = 1.8; // run dependent
+  if(runID == 666) ratio_cut = 2.5; // run dependent
+  if(runID == 672) ratio_cut = 2.5; // run dependent
+  if(runID == 674) ratio_cut = 1.4;
+  if(runID == 686) ratio_cut = 0.7;
+  if(runID == 697) ratio_cut = 0.3;
+
   int const NumOfPixel = 33;
   string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/MPPC/sipmTDC_run%d.root",runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
@@ -53,9 +63,14 @@ void plotQA_MPPC_TDC(const int runID = 672)
       c_TDC->cd(i_pad);
       h_mTDC[i_pixel_x][i_pixel_y]->SetTitle("");
       h_mTDC[i_pixel_x][i_pixel_y]->SetStats(0);
-      h_mTDC[i_pixel_x][i_pixel_y]->GetYaxis()->SetRangeUser(0.1,1e3);
+      float tot = h_mTDC[i_pixel_x][i_pixel_y]->Integral();
+      float sig = h_mTDC[i_pixel_x][i_pixel_y]->Integral(tdc_Start,tdc_Stop);
+      float bkg = tot - sig;
+      float ratio = sig/bkg;
+      h_mTDC[i_pixel_x][i_pixel_y]->GetXaxis()->SetRangeUser(tdc_Start-100,tdc_Stop+100);
+      h_mTDC[i_pixel_x][i_pixel_y]->GetYaxis()->SetRangeUser(0.1,1e2);
 
-      if(max_counts > 500) h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(2);
+      if(ratio > ratio_cut) h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(2);
       else h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(4);
 
       h_mTDC[i_pixel_x][i_pixel_y]->Draw();
