@@ -65,6 +65,9 @@ void plotQA_PMT_TimeCuts(const int runID = 182)
     y_beam = 3;
   }
 
+  if(runID == 270) ratio_cut = 3.0;
+  if(runID == 314) ratio_cut = 1.5;
+
   if(runID > 343 && runID < 381) // meson run 344-380
   {
     ratio_cut = 3.0;
@@ -223,7 +226,12 @@ void plotQA_PMT_TimeCuts(const int runID = 182)
   h_ratio_cut->GetYaxis()->CenterTitle();
   h_ratio_cut->Draw("colz");
   string str_runID = Form("run%d",runID);
-  plotTopLegend((char*)str_runID.c_str(),0.4,0.5,0.06,1,0.0,42,1,1);
+  string str_beam = "120 GeV proton";
+  if(runID >= 344 && runID <= 354) str_beam = "5 GeV meson"; 
+  if(runID >= 355 && runID <= 376) str_beam = "8 GeV meson"; 
+  if(runID >= 377 && runID <= 380) str_beam = "2 GeV meson"; 
+  plotTopLegend((char*)str_beam.c_str(),0.3,0.55,0.06,1,0.0,42,1,1);
+  plotTopLegend((char*)str_runID.c_str(),0.4,0.45,0.06,1,0.0,42,1,1);
 
   c_TimeCut->cd(8);
   h_mean_cut->SetTitle("mean");

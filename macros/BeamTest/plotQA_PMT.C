@@ -106,7 +106,7 @@ void plotQA_PMT(const string mode = "sipm", const int runID = 672)
   c_TDC->SetRightMargin(0.15);
   c_TDC->SetTicks(1,1);
   c_TDC->SetGrid(0,0);
-  h2->SetTitle("120 GeV/c proton single event");
+  h2->SetTitle("120 GeV proton single event");
   h2->SetStats(0);
   h2->GetXaxis()->SetTitle("pixel ID");
   h2->GetXaxis()->CenterTitle();

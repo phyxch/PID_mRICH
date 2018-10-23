@@ -89,7 +89,7 @@ void plotQA_radius()
   }
   leg->Draw("same");
 
-  cout << "120 GeV/c proton radiaus is: " << f_radius[2]->Eval(120.0) << endl;
+  cout << "120 GeV proton radiaus is: " << f_radius[2]->Eval(120.0) << endl;
 
   c_play->SaveAs("../figures/c_radius.eps");
 }

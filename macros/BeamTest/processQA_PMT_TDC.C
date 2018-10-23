@@ -80,7 +80,7 @@ void processQA_PMT_TDC(const int runID = 182)
   tree_mRICH->SetBranchAddress("time",tTime);
 
   int NumOfEvents = tree_mRICH->GetEntries();
-  if(NumOfEvents > 50000) NumOfEvents = 50000; // for test only
+  // if(NumOfEvents > 50000) NumOfEvents = 50000; // for test only
   printf("NEntries %d\n",NumOfEvents);
 
   tree_mRICH->GetEntry(0);
@@ -122,23 +122,6 @@ void processQA_PMT_TDC(const int runID = 182)
     }
   }
   printf("Processed events %d\n",NumOfEvents);
-
-  /*
-  TCanvas *c_TDC = new TCanvas("c_TDC","c_TDC",10,10,800,800);
-  c_TDC->SetLeftMargin(0.15);
-  c_TDC->SetBottomMargin(0.15);
-  c_TDC->SetRightMargin(0.15);
-  c_TDC->SetTicks(1,1);
-  c_TDC->SetGrid(0,0);
-  h_mRingImage->SetTitle("120 GeV/c proton single event");
-  h_mRingImage->SetStats(0);
-  h_mRingImage->GetXaxis()->SetTitle("pixel ID");
-  h_mRingImage->GetXaxis()->CenterTitle();
-  h_mRingImage->GetYaxis()->SetTitle("pixel ID");
-  h_mRingImage->GetYaxis()->CenterTitle();
-  h_mRingImage->Draw("colz");
-  c_TDC->SaveAs("../figures/c_TDC.pdf");
-  */
 
   string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/PMT/richTDC_run%d.root",runID);
   TFile *File_OutPut = new TFile(outputfile.c_str(),"RECREATE");

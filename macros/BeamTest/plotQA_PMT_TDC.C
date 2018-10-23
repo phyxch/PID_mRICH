@@ -15,6 +15,8 @@ void plotQA_PMT_TDC(const int runID = 182)
   if(runID == 120) ratio_cut = 1.8; // run dependent
   if(runID == 124) ratio_cut = 1.5; // run dependent
   if(runID == 214) ratio_cut = 2.0; // run dependent
+  if(runID == 270) ratio_cut = 3.0;
+  if(runID == 314) ratio_cut = 1.5;
   if(runID > 343 && runID < 381) // meson run 344-380
   {
     ratio_cut = 3.0;
@@ -37,13 +39,13 @@ void plotQA_PMT_TDC(const int runID = 182)
     }
   }
 
-  TCanvas *c_RingImage = new TCanvas("c_RingImage","c_RingImage",10,10,800,800);
+  TCanvas *c_RingImage = new TCanvas("c_RingImage","c_RingImage",10,10,NumOfPixel*30,NumOfPixel*30);
   c_RingImage->SetLeftMargin(0.15);
   c_RingImage->SetBottomMargin(0.15);
   c_RingImage->SetRightMargin(0.15);
   c_RingImage->SetTicks(1,1);
   c_RingImage->SetGrid(0,0);
-  string title = Form("120 GeV/c proton & run%d",runID);
+  string title = Form("120 GeV proton & run%d",runID);
   if(runID > 343 && runID < 381) title = Form("meson & run%d",runID);
   h_mRingImage->SetTitle(title.c_str());
   h_mRingImage->SetStats(0);
@@ -78,7 +80,7 @@ void plotQA_PMT_TDC(const int runID = 182)
       h_mTDC[i_pixel_x][i_pixel_y]->GetYaxis()->SetRangeUser(0.1,1e2);
 
       if(ratio > ratio_cut) h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(2);
-      else h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(4);
+      else h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(1);
 
       h_mTDC[i_pixel_x][i_pixel_y]->Draw();
     }

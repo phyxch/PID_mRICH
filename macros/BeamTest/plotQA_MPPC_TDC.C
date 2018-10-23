@@ -32,13 +32,14 @@ void plotQA_MPPC_TDC(const int runID = 649)
     }
   }
 
-  TCanvas *c_RingImage = new TCanvas("c_RingImage","c_RingImage",10,10,800,800);
+  TCanvas *c_RingImage = new TCanvas("c_RingImage","c_RingImage",10,10,NumOfPixel*30,NumOfPixel*30);
   c_RingImage->SetLeftMargin(0.15);
   c_RingImage->SetBottomMargin(0.15);
   c_RingImage->SetRightMargin(0.15);
   c_RingImage->SetTicks(1,1);
   c_RingImage->SetGrid(0,0);
-  h_mRingImage->SetTitle("120 GeV/c proton");
+  string title = Form("120 GeV proton & run%d",runID);
+  h_mRingImage->SetTitle(title.c_str());
   h_mRingImage->SetStats(0);
   h_mRingImage->GetXaxis()->SetTitle("pixel ID");
   h_mRingImage->GetXaxis()->CenterTitle();

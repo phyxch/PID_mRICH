@@ -76,7 +76,7 @@ void processQA_MPPC_TDC(const int runID = 649)
   tree_mRICH->SetBranchAddress("time",tTime);
 
   int NumOfEvents = tree_mRICH->GetEntries();
-  if(NumOfEvents > 50000) NumOfEvents = 50000;
+  // if(NumOfEvents > 50000) NumOfEvents = 50000;
   // int NumOfEvents = 10000;
   printf("NEntries %d\n",NumOfEvents);
 

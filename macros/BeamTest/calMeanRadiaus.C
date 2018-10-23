@@ -29,7 +29,7 @@ void calMeanRadiaus()
   c_Identified->cd()->SetGrid(0,0);
   c_Identified->cd()->SetTicks(1,1);
 
-  h_PDF_proton->SetTitle("120 GeV/c proton");
+  h_PDF_proton->SetTitle("120 GeV proton");
   h_PDF_proton->SetStats(0);
 
   h_PDF_proton->GetXaxis()->SetTitle("out_x (mm)");

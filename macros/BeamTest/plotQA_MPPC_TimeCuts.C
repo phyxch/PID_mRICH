@@ -204,6 +204,10 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   h_ratio_cut->GetYaxis()->SetTitle("pixel ID");
   h_ratio_cut->GetYaxis()->CenterTitle();
   h_ratio_cut->Draw("colz");
+  string str_runID = Form("run%d",runID);
+  string str_beam = "120 GeV proton";
+  plotTopLegend((char*)str_beam.c_str(),0.3,0.55,0.06,1,0.0,42,1,1);
+  plotTopLegend((char*)str_runID.c_str(),0.4,0.45,0.06,1,0.0,42,1,1);
 
   c_TimeCut->cd(8);
   h_mean_cut->SetTitle("mean");
