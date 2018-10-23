@@ -52,7 +52,6 @@ void processQA_PMT_TDC(const int runID = 182)
   }
 
   int const NumOfPixel = 33;
-  // string inputfile = Form("/Users/xusun/Data/BeamTestData/suite1.0/results/tdc/%sTDC_run%d/sspRich.root",mode.c_str(),runID);
   string inputfile = Form("/home/xusun/Data/mRICH/BeamTest/tdc/richTDC_run%d/sspRich.root",runID);
   TFile *File_InPut = TFile::Open(inputfile.c_str());
 

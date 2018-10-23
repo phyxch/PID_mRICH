@@ -43,7 +43,9 @@ void plotQA_PMT_TDC(const int runID = 182)
   c_RingImage->SetRightMargin(0.15);
   c_RingImage->SetTicks(1,1);
   c_RingImage->SetGrid(0,0);
-  h_mRingImage->SetTitle("120 GeV/c proton");
+  string title = Form("120 GeV/c proton & run%d",runID);
+  if(runID > 343 && runID < 381) title = Form("meson & run%d",runID);
+  h_mRingImage->SetTitle(title.c_str());
   h_mRingImage->SetStats(0);
   h_mRingImage->GetXaxis()->SetTitle("pixel ID");
   h_mRingImage->GetXaxis()->CenterTitle();

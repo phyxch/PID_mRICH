@@ -222,6 +222,8 @@ void plotQA_PMT_TimeCuts(const int runID = 182)
   h_ratio_cut->GetYaxis()->SetTitle("pixel ID");
   h_ratio_cut->GetYaxis()->CenterTitle();
   h_ratio_cut->Draw("colz");
+  string str_runID = Form("run%d",runID);
+  plotTopLegend((char*)str_runID.c_str(),0.4,0.5,0.06,1,0.0,42,1,1);
 
   c_TimeCut->cd(8);
   h_mean_cut->SetTitle("mean");
