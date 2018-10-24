@@ -72,7 +72,7 @@ void plotQA_MPPC_TDC(const int runID = 649)
       h_mTDC[i_pixel_x][i_pixel_y]->GetYaxis()->SetRangeUser(0.1,1e2);
 
       if(ratio > ratio_cut) h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(2);
-      else h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(4);
+      else h_mTDC[i_pixel_x][i_pixel_y]->SetLineColor(1);
 
       h_mTDC[i_pixel_x][i_pixel_y]->Draw();
     }

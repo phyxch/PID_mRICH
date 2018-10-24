@@ -242,6 +242,14 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   h_mTimeCuts->SetBinContent(1,runID,floor(mean_tdc_Start));
   h_mTimeCuts->SetBinContent(2,runID,ceil(mean_tdc_Stop));
   h_mTimeCuts->SetBinContent(3,runID,runID);
+  h_mTimeCuts->GetXaxis()->SetBinLabel(1,"tdc start");
+  h_mTimeCuts->GetXaxis()->SetBinLabel(2,"tdc stop");
+  h_mTimeCuts->GetXaxis()->SetBinLabel(3,"runID");
+  h_mTimeCuts->GetXaxis()->SetBinLabel(3,"runID");
+  h_mTimeCuts->GetXaxis()->SetLabelSize(0.06);
+  h_mTimeCuts->GetYaxis()->SetTitle("runID");
+  h_mTimeCuts->GetYaxis()->CenterTitle();
+  h_mTimeCuts->GetYaxis()->SetTitleSize(0.06);
   // cout << "mean_tdc_Start = " << mean_tdc_Start << ", floor = " << floor(mean_tdc_Start) << ", mean_tdc_Stop = " << mean_tdc_Stop << ", ceil = " << ceil(mean_tdc_Stop) << endl;
 
   string outputfile = Form("/home/xusun/Data/mRICH/BeamTest/QA/MPPC/sipmTimeCuts_run%d.root",runID);
