@@ -112,9 +112,9 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
     }
   }
 
-  TCanvas *c_TimeCut = new TCanvas("c_TimeCut","c_TimeCut",10,10,900,900);
-  c_TimeCut->Divide(3,3);
-  for(int i_pad = 0; i_pad < 9; ++i_pad)
+  TCanvas *c_TimeCut = new TCanvas("c_TimeCut","c_TimeCut",10,10,900,600);
+  c_TimeCut->Divide(3,2);
+  for(int i_pad = 0; i_pad < 6; ++i_pad)
   {
     // c_TimeCut->cd(i_pad+1)->SetTopMargin(0.15);
     // c_TimeCut->cd(i_pad+1)->SetBottomMargin(0.15);
@@ -131,6 +131,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   float mean_tdc_Start = mean_tdc/counter_tdc - 3.0*sigma_tdc/counter_tdc;
   float mean_tdc_Stop  = mean_tdc/counter_tdc + 3.0*sigma_tdc/counter_tdc;
 
+  /*
   c_TimeCut->cd(1); // on ring
   h_mTDC[x_OnRing][y_OnRing]->SetTitle("On Ring");
   h_mTDC[x_OnRing][y_OnRing]->GetXaxis()->SetRangeUser(tdc_Start-100,tdc_Stop+100);
@@ -167,8 +168,9 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   h_mTDC[x_beam][y_beam]->Draw();
   PlotLine(mean_tdc_Start,mean_tdc_Start,0,0.5*yields,4,2,2);
   PlotLine(mean_tdc_Stop,mean_tdc_Stop,0,0.5*yields,4,2,2);
+  */
 
-  c_TimeCut->cd(4);
+  c_TimeCut->cd(1);
   h_ratio_all->SetTitle("sig/bkg");
   h_ratio_all->SetStats(0);
   h_ratio_all->GetXaxis()->SetTitle("pixel ID");
@@ -177,7 +179,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   h_ratio_all->GetYaxis()->CenterTitle();
   h_ratio_all->Draw("colz");
 
-  c_TimeCut->cd(5);
+  c_TimeCut->cd(2);
   h_mean_all->SetTitle("mean");
   h_mean_all->SetStats(0);
   h_mean_all->GetXaxis()->SetTitle("pixel ID");
@@ -186,7 +188,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   h_mean_all->GetYaxis()->CenterTitle();
   h_mean_all->Draw("colz");
 
-  c_TimeCut->cd(6);
+  c_TimeCut->cd(3);
   h_sigma_all->SetTitle("sigma");
   h_sigma_all->SetStats(0);
   h_sigma_all->GetXaxis()->SetTitle("pixel ID");
@@ -196,7 +198,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   h_sigma_all->Draw("colz");
 
   string str_sig = Form("sig/bkg > %1.1f",ratio_cut);
-  c_TimeCut->cd(7);
+  c_TimeCut->cd(4);
   h_ratio_cut->SetTitle(str_sig.c_str());
   h_ratio_cut->SetStats(0);
   h_ratio_cut->GetXaxis()->SetTitle("pixel ID");
@@ -209,7 +211,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   plotTopLegend((char*)str_beam.c_str(),0.3,0.55,0.06,1,0.0,42,1,1);
   plotTopLegend((char*)str_runID.c_str(),0.4,0.45,0.06,1,0.0,42,1,1);
 
-  c_TimeCut->cd(8);
+  c_TimeCut->cd(5);
   h_mean_cut->SetTitle("mean");
   h_mean_cut->SetStats(0);
   h_mean_cut->GetXaxis()->SetTitle("pixel ID");
@@ -221,7 +223,7 @@ void plotQA_MPPC_TimeCuts(const int runID = 649)
   plotTopLegend((char*)str_sig.c_str(),0.35,0.55,0.06,1,0.0,42,1,1);
   plotTopLegend((char*)str_mean.c_str(),0.3,0.45,0.06,1,0.0,42,1,1);
 
-  c_TimeCut->cd(9);
+  c_TimeCut->cd(6);
   h_sigma_cut->SetTitle("sigma");
   h_sigma_cut->SetStats(0);
   h_sigma_cut->GetXaxis()->SetTitle("pixel ID");
